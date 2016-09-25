@@ -1,0 +1,116 @@
+/*
+* estilos generales
+*/
+*{
+    margin: 0;
+    padding: 0;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    text-align: justify;
+}
+
+.navbar {
+    border-radius: 0;
+    margin-bottom: 0;
+}
+
+.clear{
+    clear: both !important;
+}
+
+.footer {
+    position:fixed;
+    left:0px;
+    bottom:0px;
+    width:100%;
+    color: #ccc;
+    background:black;
+    text-align: center;
+}
+
+/*
+* estilos barra lateral
+*/
+.social{
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 41%;
+}
+
+.social ul{
+    list-style: none;
+    margin-bottom: 0;
+}
+
+.social ul li button{
+    display: inline-block !important;
+    padding: 10px 15px !important;
+    color: white !important;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 0px 4px 4px 0px;
+}
+
+.social ul li button:hover{
+    padding: 10px 30px !important;
+    background-color: black !important;
+    -moz-transition: all 500ms ease;
+    -webkit-transition: all 500ms ease;
+    transition: all 500ms ease;
+}
+
+.social ul li .glyphicon-scale{
+    background: #ffa200 !important;;
+}
+
+.social ul li .glyphicon-heart-empty{
+    background: #ff4172 !important;;
+}
+
+.social ul li .glyphicon-user {
+    background: #2bc8ae !important;;
+}
+
+.social ul li .glyphicon-plus{
+    background: #49a5ff !important;
+}
+    /*
+    * Estilos panel del control
+    */
+.span2{
+    display: inline-block;
+    margin: 10px 15px !important;
+    width: 100px;
+    text-transform: uppercase;
+    font-family: monospace;
+}
+
+.slider.slider-horizontal{
+    width: 150px;
+}
+
+/*estilos asistente virtual*/
+#asistenteVirtual{
+    color: #00ff00;
+    margin: 0px 20px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+#asistenteVirtual:hover{
+    opacity: .8;
+}
+
+.introjs-helperNumberLayer {
+    top: 4px;
+    left: 8px;
+    height: 23px;
+    padding: 0;
+    line-height: 19px;
+}
+
+.parsley-errors-list{
+    color: red;
+}

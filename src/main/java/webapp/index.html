@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SISOBEEM SIMULATOR</title>
+
+    <!--meta-->
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+
+    <!--libs-->
+    <link href="libs/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="libs/css/animate.css" rel="stylesheet" type="text/css">
+    <link href="libs/css/bootstrap-slider.min.css" rel="stylesheet" type="text/css">
+    <link href="libs/css/introjs.min.css" rel="stylesheet" type="text/css">
+    <link href="libs/css/progression.min.css" rel="stylesheet" type="text/css">
+    <link href="libs/css/parsley.css" rel="stylesheet" type="text/css">
+
+    <!--css-->
+    <link href="stylesheet/styles.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <!-- modals-->
+
+    <!-- Modal cof simulacion-->
+    <div id="modalConfSimulacion" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Configuración general simulación</h4>
+                </div>
+                <form id="formSimulacionConfig" class="modal-body row">
+                    <!--Content modal-->
+                    <!-- input lugar del terremoto-->
+                    <div class="form-group col-lg-12">
+                        <label for="lugarTerremoto" class="control-label">Lugar</label>
+                        <input type="text" class="form-control "
+                               id="lugarTerremoto"
+                               name="lugar"
+                               placeholder="Busque un lugar"
+                               data-parsley-trigger="focusout"
+                               istype = "object"
+                               required
+                               disabled
+                               autofocus
+                               data-progression
+                               data-helper="Indica las coordenadas del lugar en mapa, entre las que se hará la simulación.">
+                    </div>
+
+                    <!-- Momento de la emregencia-->
+                    <div class="form-group col-lg-6">
+                        <label for="momentoTerremoto">Momento del día</label>
+                        <select class="form-control"
+                                id="momentoTerremoto"
+                                name="momento"
+                                required
+                                data-progression
+                                data-helper="Especifica el momento de la emergencia">
+                            <option value="dia" selected> Día</option>
+                            <option value="noche">Noche </option>
+                        </select>
+                    </div>
+
+                    <!-- input duracion de la simulacion -->
+                    <div class="form-group col-lg-6">
+                        <label for="duracionSimulacion" class="control-label">Duración simulación (Segundos)</label>
+                        <input type="number" class="form-control "
+                               id="duracionSimulacion"
+                               name="duracion"
+                               value="20"
+                               istype = "int"
+                               data-parsley-type="integer"
+                               placeholder="[20-600] segundos;"
+                               data-parsley-trigger="focusout"
+                               min="20" max="600" step="1" required
+                               data-progression
+                               data-helper="Especifica el tiempo total de duración de la simulación, en cual debe estar entre 20 y 600 Segundos " />
+                    </div>
+
+                    <!-- input intensidad del terremoto-->
+                    <div class="form-group col-lg-6">
+                        <label for="intensidad" class="control-label">Intensidad sismo</label>
+                        <input type="number" class="form-control "
+                               id="intensidad"
+                               name="intencidad"
+                               value="1"
+                               istype = "int"
+                               data-parsley-type="integer"
+                               data-parsley-trigger="focusout"
+                               placeholder="[1-12] escala mercalli"
+                               min="1" max="12" step="1" required
+                               data-progression
+                               data-helper="Especifica la intensidad de la emergencia en base a la escala mercalli" />
+                    </div>
+
+                    <!-- input duracion del terremoto -->
+                    <div class="form-group col-lg-6">
+                        <label for="duracionTerremoto" class="control-label">Duración sismo (segundos)</label>
+                        <input type="number" class="form-control "
+                               id="duracionTerremoto"
+                               name="duracionSismo"
+                               value="10"
+                               istype = "int"
+                               data-parsley-type="integer"
+                               data-parsley-trigger="focusout"
+                               placeholder="[10-20] segundos"
+                               min="10" max="20" step="1" required
+                               data-progression
+                               data-helper="Especifica la duración to tal de la emergencia, puede estar entre 10 y 20 segundos."/>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-warning"
+                            data-toggle="tooltip" data-placement="bottom" title="Seleccionar otro lugar"
+                            onclick="showModalConfig()
+                            ">Seleccionar otro sitio</button>
+                    </div>
+                    <button id="formConfSimbtn" type="button" class="btn btn-success" onclick="showModalConfig('modalConfAgents')" disabled>Siguiente</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!-- Modal cof simulacion-->
+    <div id="modalConfAgents" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Configuración general ( Personas)</h4>
+                </div>
+                <form id="formConfAgentsPers" class="modal-body">
+                    <!-- input intensidad del terremoto-->
+                    <h3 style="margin-bottom:30px">Personas</h3>
+
+                    <div class="form-group">
+                        <label for="numeroPersonas" class="control-label">Personas Transeúntes</label>
+                        <input type="number" class="form-control "
+                               id="numeroPersonas"
+                               name="transeuntes"
+                               value="1"
+                               istype = "int"
+                               placeholder="Cant. personas"
+                               min="1" step="1" value="1" required
+                               data-parsley-trigger="focusout"
+                               data-progression
+                               data-helper="Indica Cantidad de personas en el ambiente (Calles)"/>
+                    </div>
+
+
+                    <div class="form-group">
+                        <span for="porcAdultos" class="span2">niños</span>
+                        <input id="porcAdultos" type="text"
+                               name="edad"
+                               required
+                               data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="[20,60]"
+                               data-parsley-trigger="focusout"
+                               data-progression
+                               data-helper="Indica el porcentaje de adultos, sirve como indicador de cuantas personas serán adultos, niños y ancianos."/>
+                        <span for="porcAdultos" class="span2">ancianos</span>
+                    </div>
+
+                    <div class="form-group">
+                        <span for="porcConoZona" class="span2">transeúntes</span>
+                        <input id="porcConoZona" type="text"
+                               name="conocimiento"
+                               value="0"
+                               required
+                               data-parsley-trigger="focusout"
+                               data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="[20,60]"
+                               data-progression
+                               data-helper="Indica el porcentaje de personas que transitan de vez en cuando por la zona,
+                                       sirve como medidor del conocimiento del sitio de las personas [bajo, medio, alto]"/>
+                        <span for="porcConoZona" class="span2">residentes</span>
+                    </div>
+
+                    <div class="form-group">
+                        <span for="porcSalud" class="span2">discapacidad</span>
+                        <input id="porcSalud"  type="text"
+                               name="salud"
+                               value="0"
+                               required
+                               data-parsley-trigger="focusout"
+                               data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"
+                               data-progression
+                               istype = "int"
+                               data-helper="Indica el porcentaje de personas con indices de discapacidad, sirve como indicador del numero de personas con una salud baja."/>
+                        <span for="porcSalud" class="span2">sanidad</span>
+                    </div>
+
+                    <div class="form-group">
+                        <span for="porcAdultos" class="span2">individualista</span>
+                        <input id="porcLider"  type="text"
+                               name="liderazgo"
+                               data-parsley-trigger="focusout"
+                               value="0"
+                               required
+                               istype = "int"
+                               data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"
+                               data-progression
+                               data-helper="Indica porcentaje de personas con indices de liderazgo, (estas personas adquieren características que pueden ayudar a los demás durante la emergencia)"/>
+                        <span for="porcAdultos" class="span2">líder</span>
+                    </div>
+
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning"
+                        onclick="showModalConfig('modalConfSimulacion')">Atrás
+                    </button>
+
+                    <button id="confAgentsbtn" type="button" class="btn btn-success" disabled
+                        onclick="showModalConfig('modalConfAgentsEmer')">Siguiente
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!-- Modal cof simulacion-->
+    <div id="modalConfAgentsEmer" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Configuración general atención de emergencia</h4>
+                </div>
+                <form id="formConfigAtenEmer" class="modal-body row">
+                    <!-- input duracion del terremoto -->
+                    <div class="form-group">
+                        <label class="control-label">TIEMPO DE RESPUESTA</label><br>
+                        <span class="span2">oportuna</span>
+                        <input id="porcAtenEmer"  type="text"
+                               name="tiempoRespuesta"
+                               value="50"
+                               required
+                               istype = "int"
+                               data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"
+                               data-progression
+                               data-helper="Indica el promedio de eficiencia en la atención de la emergencia en el tiempo de la simulación,
+                                               Ejemplo : 100% -> la simulación termino y lo se atendió la emergencia."/>
+                        <span class="span2">retardo</span>
+                    </div>
+
+                    <!-- input duracion de la simulacion -->
+                    <div class="form-group col-lg-12">
+                        <label for="cantidadBusResc" class="control-label">Cant. Búsqueda. y Rescate</label>
+                        <input type="number" class="form-control "
+                               id="cantidadBusResc"
+                               value="0"
+                               name="personalBusquedaRescate"
+                               istype = "int"
+                               placeholder="Cant. Bomberos/defensa civil"
+                               min="0"  step="1" required
+                               data-parsley-trigger="focusout"
+                               data-progression
+                               data-helper="Indica numero de personal encargado de la búsqueda y rescate de personas"/>
+                    </div>
+
+                    <!-- input intensidad del terremoto-->
+                    <div class="form-group col-lg-6 ">
+                        <label for="cantidadSaludBas" class="control-label">Cant. personal de salud</label>
+                        <input type="number" class="form-control " id="cantidadSaludBas"
+                               name="personalSalud",
+                               value="0"
+                               istype = "int"
+                               placeholder="Cant. pramedicos"
+                               data-parsley-trigger="focusout"
+                               min="0"  step="1" required
+                               data-progression
+                               data-helper="Indica numero de personal encargado de la atención y apoyo psicológico a las personas"/>
+                    </div>
+
+                    <!-- input duracion del terremoto -->
+                    <div class="form-group col-lg-6">
+                        <label for="cantidadAisSeg" class="control-label">Cant. personal de seguridad</label>
+                        <input type="number" class="form-control " id="cantidadAisSeg"
+                               name="PersonalSeguridad"
+                               value="0"
+                               istype = "int"
+                               placeholder="Cant. Policias"
+                               data-parsley-trigger="focusout"
+                               min="0" step="1" required
+                               data-progression
+                               data-helper="Indica numero de personal encargado de la seguridad de la zona"/>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning"
+                        onclick="showModalConfig('modalConfAgents')">Atrás</button>
+
+                    <button id="confAgentsEmerbtn" type="button"
+                        onclick="showModalConfig('modalConfEdi')" class="btn btn-success" disabled>Siguiente</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!-- Modal cof simulacion-->
+    <div id="modalConfEdi" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Configuración general (edificios)</h4>
+                </div>
+                <form id="formConfigEdi" class="modal-body row">
+                    <p id="infoEdificios" class="bg-info"></p>
+                    <div class="form-group col-lg-12">
+                        <label class="control-label">SISMORESISTENCIA</label><br>
+                        <span class="span2">nula</span>
+                        <input id="sismoresistencia"  type="text"
+                               name="resistencia"
+                                value = '0'
+                               required
+                               istype = "int"
+                               data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"
+                               data-progression
+                               data-helper="Indica el promedio de sismo resistencia del edificio."/>
+                        <span class="span2">máxima</span>
+                    </div>
+
+                    <!-- input duracion de la simulacion -->
+                    <div class="form-group col-lg-12">
+                        <label for="cantidadPerEdi" class="control-label">Cant. Personas en el edificio</label>
+                        <input type="number" class="form-control "
+                               id="cantidadPerEdi"
+                               name="personas"
+                               istype = "int"
+                               placeholder="Cant. personas en el edificio"
+                               min="1"  step="1" required
+                               value="1"
+                               data-parsley-trigger="focusout"
+                               data-progression
+                               data-helper="Indica numero de personas dentro del edificio"/>
+                    </div>
+
+                    <!-- input intensidad del terremoto-->
+                    <div class="form-group col-lg-6">
+                        <label for="cantidadPisos" class="control-label">Cant. Pisos</label>
+                        <input type="number" class="form-control "
+                               id="cantidadPisos"
+                               name="pisos"
+                               value="1"
+                               istype = "int"
+                               placeholder="Cant. personas en el edificio"
+                               min="1"  step="1" required
+                               data-parsley-trigger="focusout"
+                               data-progression
+                               data-helper="Indica la cantidad de pisos del edificio"/>
+                    </div>
+
+                    <!-- input intensidad del terremoto-->
+                    <div class="form-group col-lg-6">
+                        <label for="cantSalidas" class="control-label">Cant. Salidas de evacuación</label>
+                        <input type="number" class="form-control "
+                               id="cantSalidas"
+                               name="salidas"
+                               istype = "int"
+                               placeholder="Cant. salidas del edificio"
+                               value="0"
+                               min="0"  step="1" required
+                               data-parsley-trigger="focusout"
+                               data-progression
+                               data-helper="Indica numero de salidas adicionales disponibles para evacuar el edificio"/>
+                    </div>
+                    <div id="map2"></div>
+                </form>
+                <div class="modal-footer">
+                   <button type="button" class="btn btn-warning"
+                       onclick="showModalConfig('modalConfAgentsEmer')">Atrás</button>
+
+                    <button id="addEdificiobtn" type="button" class="btn btn-success"
+                        onclick="addEdificio()" disabled>Agregar Edificio</button>
+
+                    <button id="confAgentsEdibtn" type="button" class="btn btn-primary"
+                        onclick="endConfig()" disabled>Terminar</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!-- Menu conf. Simulacion -->
+    <div class="social">
+        <ul>
+            <li data-step="3" data-intro="2. Configure condiciones de la simulacion.">
+                <div class="btn-group">
+                	<button id="btnConfSimulacion" disabled class="btn glyphicon glyphicon-scale"  aria-hidden="true"
+                        data-toggle="tooltip" data-placement="right" title="configurar simulación"
+                        onclick="showModalConfig('modalConfSimulacion')"></button>
+                </div>        
+            </li>
+            <li data-step="4" data-intro="3. Configure la cantidad de personas en la zona de la emergencia.">
+                <div class="btn-group">
+                	<button id="btnConAgents" disabled class="btn glyphicon glyphicon-user"    aria-hidden="true"
+                        data-toggle="tooltip" data-placement="right" title="Configurar personas"
+                        onclick="showModalConfig('modalConfAgents')"    ></button>
+                </div>        
+            </li>
+            <li data-step="5" data-intro="4. Especifique las condiciones de atencion de emergencias.">
+                <div class="btn-group">
+                	<button id="btnConAgentsEmer" disabled class="btn glyphicon glyphicon-heart-empty"  aria-hidden="true"
+                        data-toggle="tooltip" data-placement="right" title="Configurar atención de la emergencia"
+                        onclick="showModalConfig('modalConfAgentsEmer')"></button>
+                </div>        
+            </li>
+            <li data-step="6" data-intro="5. Agregue edificios al mapa.">
+                <div class="btn-group">
+                	<button id="btnAddEdificio" disabled class="btn glyphicon glyphicon-plus"  aria-hidden="true"
+                        data-toggle="tooltip" data-placement="right" title="Configurar edificios"
+                        onclick="showModalConfig('modalConfEdi')"></button>
+                </div>        
+            </li>
+        </ul>
+    </div>
+
+    <!-- NavBar-->
+    <nav class="navbar  navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" data-step="1"
+                   data-intro="
+                       <strong> BIENVENIDOS </strong> <br> SISOBEEM, Es el simulador de comportamiento social y atencion de emergencias.">
+                    <img alt="Brand" src="img/logo.svg" alt="SISOOBEM LOGO" style="height: 213%; margin-top: -11px;">
+                </a>
+            </div>
+
+            <div class="navbar-form navbar-right" role="search">
+                <div class="form-group">
+                    <input id="searchPlace" type="text" class="form-control" placeholder="Buscar Lugar"
+                           data-step="2"
+                           data-intro="1. Seleccione el lugar de la emergencia."
+                    >
+                    <span class="glyphicon glyphicon-search" aria-hidden="true" style="color: #aebdb4; margin: 0px 10px 0px -24px;"></span>
+                    <div class="btn-group">
+                   		<button id="runBtn" class="btn btn-warning " disabled
+                            data-step="7" data-intro="5. Ejecute la simulacion."
+                            data-toggle="tooltip" data-placement="bottom" title="Ejecutar simulación">Run</button>
+                    </div>
+                    <span id="asistenteVirtual" class="glyphicon glyphicon-off" aria-hidden="true"
+                          data-step="8" data-intro="En cualquier momento usted podrá activar y desactivar el asistente virtual
+                          para futuros ingresos desde este navegador"
+                          data-toggle="tooltip" data-placement="bottom" title="Habilitar/Deshabilitar Asistente"
+                    ></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido pagina-->
+    <section class="row">
+        <div id="map" class="col-lg-8"></div>
+        <div class="col-lg-4"></div>
+    </section>
+
+    <!-- footer-->
+    <div class="footer">
+        © 2016 SISOBEEM v. 0.1
+    </div>
+
+    <!-- libraries-->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAHzcs6XjIu_ILOGwMErPDLQ2BeLlwg5UU&language=es&region=CO&libraries=places"></script>
+    <script src="libs/js/jquery-3.1.0.min.js"></script>
+    <script src="libs/js/bootstrap.min.js"></script>
+    <script src="libs/js/bootstrap-slider.min.js"></script>
+    <script src="libs/js/intro.min.js"></script>
+    <script src="libs/js/progression.min.js"></script>
+    <script src="libs/js/parsley.min.js"></script>
+    <script src="libs/js/parsleyConfigEs.js"></script>
+
+    <!-- scripts-->
+    <script src="scripts/map.js"></script>
+    <script src="scripts/index.js"></script>
+    <script src="scripts/config.js"></script>
+    <script src="scripts/app.js"></script>
+    <script src="scripts/websockets/webSocket.js"></script>
+</body>
+</html>

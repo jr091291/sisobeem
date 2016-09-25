@@ -1,0 +1,7 @@
+\.idea
+\.jadex
+jr.settings.xml
+\.classpath
+\.project
+\.settings
+target/

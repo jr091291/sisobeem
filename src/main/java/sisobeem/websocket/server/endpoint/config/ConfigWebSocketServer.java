@@ -16,7 +16,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 
+import sisobeem.artifacts.BuildAgents;
 import sisobeem.artifacts.JsonManager;
+import sisobeem.artifacts.abstractos.BuildAgentsAbstract;
 import sisobeem.artifacts.sisobeem.config.Configuration;
 import sisobeem.artifacts.sisobeem.config.EdificesConfig;
 import sisobeem.artifacts.sisobeem.config.EmergencyConfig;
@@ -46,7 +48,10 @@ public class ConfigWebSocketServer implements  JsonManager<Configuration>{
 	 public void handleMessage(String config, Session session) throws IOException, EncodeException {
 		System.out.println("Se ha recibido un nuevo mensaje: " + config);
 		Configuration c = this.toClass(config);
-		System.out.println(c.getEmergencyConfig().getPersonalSeguridad());
+		
+		BuildAgentsAbstract build = new BuildAgents(c);
+		
+		build.build();
 	 }
 
 	 @Override

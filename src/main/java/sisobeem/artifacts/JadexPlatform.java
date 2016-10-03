@@ -59,6 +59,15 @@ public class JadexPlatform {
 		}
 		return agents;
 	}
+
+	public ArrayList<IComponentIdentifier> BuildComponents(String model, ArrayList<CreationInfo> infos  ){
+	ArrayList<IComponentIdentifier> agents =  new ArrayList<>();
+	   for (CreationInfo info : infos) {
+		   agents.add(cms.createComponent(model, info).getFirstResult());
+	  }
+		return agents;
+	}
+	
 	
 	public ArrayList<IComponentIdentifier> BuildComponents(String model, String[]names){
 		ArrayList<IComponentIdentifier> agents =  new ArrayList<>();		

@@ -5,28 +5,45 @@ import jadex.bdiv3.annotation.Belief;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import sisobeem.artifacts.Coordenada;
 import sisobeem.artifacts.EstructuraPuntoMapa;
 import sisobeem.artifacts.Random;
 import sisobeem.artifacts.Traslator;
-import sisobeem.artifacts.sisobeem.config.Bounds;
 import sisobeem.artifacts.sisobeem.config.EdificesConfig;
 import sisobeem.artifacts.sisobeem.config.SimulationConfig;
-import sisobeem.services.ISetUbicacionInicialService;
+import sisobeem.services.edificeServices.ISetBeliefEdificeService;
+import sisobeem.services.personServices.ISetBeliefPersonService;
+import sisobeem.services.personServices.ISetStartService;
+import sisobeem.services.zoneServices.IMapaService;
+
 
 @Agent
+@Description("Zone: Ambiente Superior, Mapa.")
 @Service
 @RequiredServices({
-	@RequiredService(name="ISetUbicacionInicialService", type=ISetUbicacionInicialService.class)
+	@RequiredService(name="ISetUbicacionService", type=ISetBeliefPersonService.class),
+	@RequiredService(name="ISetBeliefEdificeService", type=ISetBeliefEdificeService.class),
+	@RequiredService(name="ISetStartService", type=ISetStartService.class)
 })
-public class ZoneAgentBDI extends EnviromentAgentBDI {
+@ProvidedServices({
+	@ProvidedService(name ="IMapaService",type=IMapaService.class)
+})
+public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService {
 
-	ArrayList<IComponentIdentifier> cidsEdifices = new ArrayList<IComponentIdentifier>();
+	ArrayList<IComponentIdentifier> cidsEdifices ;
+	
+	@Belief
 	EstructuraPuntoMapa [][] mapa;
 	
 	/**
@@ -37,9 +54,13 @@ public class ZoneAgentBDI extends EnviromentAgentBDI {
 	EdificesConfig[] edConfig;
 
 
+	@SuppressWarnings("unchecked")
 	@AgentCreated
 	public void init() {
+   
 		System.out.println("Agente " + agent.getComponentIdentifier().getLocalName() + " creado");
+		
+		this.cidsEdifices= new ArrayList<IComponentIdentifier>();
 
 		// Accedemos a los argumentos del agente
     	this.arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
@@ -64,15 +85,149 @@ public class ZoneAgentBDI extends EnviromentAgentBDI {
 			System.out.println("Mapa demasiado grande");
 		}
 		
-		for (int i = 0; i < mapa.length; i++) {
-			for (int j = 0; j < mapa[i].length; j++) {
-				this.mapa[i][j] = new EstructuraPuntoMapa();
-			}
-		}
+	
+		asignarCoordenadasIniciales();
+	
+		sendCoordenadasIniciales();
+	
+		setMetoPerson();
+		
+	    setMetoEdifices();
+		
+		startAgents();
+		
 	  	
 	}
 	
-	public void AsignarCoordenadasIniciales(){	
+	@AgentBody
+	public void body() {
+    
+
+	}
+
+	
+	
+	/**
+	 * Metodo para enviar el cidZone a los agentes transeuntes
+	 */
+	private void setMetoPerson() {
+		 System.out.println("Enviado creencias a las personas");
+		 for (int i = 0; i < this.mapa.length; i++) {
+			for (int j = 0; j < this.mapa[i].length; j++) {
+				
+				for (IComponentIdentifier person : this.mapa[i][j].getAgents()) {
+					
+					IFuture<ISetBeliefPersonService> persona= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISetBeliefPersonService.class, person);
+				
+						   persona.addResultListener( new IResultListener<ISetBeliefPersonService>(){
+
+							@Override
+							public void resultAvailable(ISetBeliefPersonService result) {
+								//System.out.println("Asignando Zone a Persona");
+								result.setZone(getAgent().getComponentIdentifier());
+								
+							}
+
+							@Override
+							public void exceptionOccurred(Exception exception) {
+								
+							}
+							   
+						   });
+					   
+				}
+			}
+		 } 
+
+	}
+    
+	/**
+	 * Metodo para enviar el cidZone a los agentes Edificios
+	 */
+	private void setMetoEdifices() {
+		
+		System.out.println("Asignando creencias a los edificios");
+		 for (int i = 0; i < this.mapa.length; i++) {
+			for (int j = 0; j < this.mapa[i].length; j++) {
+				
+				for (IComponentIdentifier person : this.mapa[i][j].getAgents()) {
+					
+					IFuture<ISetBeliefEdificeService> persona= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISetBeliefEdificeService.class, person);
+					  
+						   persona.addResultListener( new IResultListener<ISetBeliefEdificeService>(){
+
+							@Override
+							public void resultAvailable(ISetBeliefEdificeService result) {
+								//System.out.println("Asignando Zone al  edificio");
+								result.setZone(getAgent().getComponentIdentifier());
+								
+							}
+
+							@Override
+							public void exceptionOccurred(Exception exception) {
+								
+							}
+							   
+						   });
+					   
+				}
+			}
+		 } 
+
+	}
+    
+	
+	/**
+	 * Metodo para enviar la señal de busqueda de objetivos
+	 */
+	private void startAgents() {
+		 System.out.println("Star Agents");
+		 for (int i = 0; i < this.mapa.length; i++) {
+			for (int j = 0; j < this.mapa[i].length; j++) {
+				
+				for (IComponentIdentifier person : this.mapa[i][j].getAgents()) {
+					
+					IFuture<ISetStartService> persona= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISetStartService.class, person);
+					  
+						//	System.out.println("Tu Ubicacion es: "+c.getX()+" - "+c.getY()+" Agente: "+person.getName());
+						   persona.addResultListener( new IResultListener<ISetStartService>(){
+
+							@Override
+							public void resultAvailable(ISetStartService result) {
+	
+									 result.setStart(true);
+							}
+
+							@Override
+							public void exceptionOccurred(Exception exception) {
+								
+							}
+							   
+						   });
+					   
+				}
+			}
+		 } 
+
+	}
+
+
+	/**
+	 * Metodo para Asignar a los transeuntes en una Coordenada al Azar
+	 */
+	public void asignarCoordenadasIniciales(){	
+		
+		System.out.println("Asignandondo Coordenadas Iniciales...");
+		/**
+		 * Instanciamos Las esctrucutras del mapa con su respectivo ArrayList
+		 */
+		for (int i = 0; i < this.mapa.length; i++) {
+			for (int j = 0; j < this.mapa[i].length; j++) {
+				this.mapa[i][j]= new EstructuraPuntoMapa();
+			}
+		}
+		
+		
 		/**
 		 * Asignacion coordenadas edificios, segun ubicacion elegida en la configuracion
 		 */
@@ -94,42 +249,105 @@ public class ZoneAgentBDI extends EnviromentAgentBDI {
 	}
 	
 	/**
-	 * Metodo para enviar las coordenadas inciales a los agentes edificios y transeuntes
+	 * Metodo para enviar las coordenadas inciales a los agentes transeuntes
 	 */
 	public void sendCoordenadasIniciales(){
-		/**
-					
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IRegisterInEnviromentService.class, this.cidEnviroment)
-			.addResultListener(new DefaultResultListener<IRegisterInEnviromentService>()
-		{
-			public void resultAvailable(IRegisterInEnviromentService enviroment)
-			{
-				System.out.println("Me estoy registrando : "+agent.getComponentIdentifier().getLocalName());
-				enviroment.registerToMe(agent.getComponentIdentifier());
+    
+		 System.out.println("Enviado Ubicacion A los agentes");
+
+	 for (int i = 0; i < this.mapa.length; i++) {
+		for (int j = 0; j < this.mapa[i].length; j++) {
+			
+			for (IComponentIdentifier person : this.mapa[i][j].getAgents()) {
+				
+				IFuture<ISetBeliefPersonService> persona= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISetBeliefPersonService.class, person);
+						
+					   persona.addResultListener( new IResultListener<ISetBeliefPersonService>(){
+
+						@Override
+						public void resultAvailable(ISetBeliefPersonService result) {
+           
+							 Coordenada c= getCoordenada(person);
+						//	 System.out.println("Tu Ubicacion es: "+c.getX()+" - "+c.getY()+" Agente: "+person.getName());
+							 if(c!=null){
+								 result.setUbicacion(c);
+							 }
+							
+						}
+
+						@Override
+						public void exceptionOccurred(Exception exception) {
+							
+						}
+						   
+					   });
+				   
 			}
-		});	
-		    
-		**/
+		}
+	 } 
+
 	}
 	
 	
+	/**
+	 * Método para Obtener la coordenada de un agente especifico
+	 * @param cid
+	 * @return Coordenada
+	 */
+	public Coordenada getCoordenada(IComponentIdentifier cid){
+
+		for (int i = 0; i < this.mapa.length; i++) {
+			for (int j = 0; j < this.mapa[i].length; j++) {			
+				if(this.mapa[i][j].getAgents().contains(cid)){
+					return new Coordenada(i,j);
+				}
+			}
+			
+		}
+		
+		return null;
+	}
 	
 
-	@AgentBody
-	public void body() {
 
-		System.out.println("Mis agentes");
-		for (IComponentIdentifier cid : cidsPerson) {
-			System.out.println(cid.getLocalName());
-		}
+
+	@Override
+	public boolean changePosition(Coordenada nueva, IComponentIdentifier cid) {
 		
+		System.out.println("Cambiando posicion de:");
+        
+		 if(validateInMap(nueva)){
+			   	Coordenada antigua = getCoordenada(cid);
+				 this.mapa[antigua.getX()][antigua.getY()].getAgents().remove(cid);
+				 this.mapa[nueva.getX()][nueva.getY()].getAgents().add(cid);
+				 
+				
+				 for (IComponentIdentifier c : this.mapa[nueva.getX()][nueva.getY()].getAgents()) {
+					 System.out.println(c.getLocalName());
+				 }
+			
+				 return true;
+		 }else{
+			 return false;
+		 }
 		
-		System.out.println("Mis edificios");
-		for (IComponentIdentifier cid : cidsEdifices) {
-			System.out.println(cid.getLocalName());
-		}
-
-
+	
+		 
+	
+		 
 	}
+	
+	/**
+	 * Método que valida si una posicion existe en el mapa o no.
+	 * @param Coordenada c
+	 * @return boolean
+	 */
+    private boolean validateInMap(Coordenada c){
+	//	System.out.println(c.getX()+" "+this.mapa.length);
+	//	System.out.println(c.getY()+" "+this.mapa[0].length);
+    	if(c.getX()>=this.mapa.length||c.getY()>= this.mapa[0].length||c.getX()<0||c.getY()<0) return false;
+    	
+    	return true;
+    }
 
 }

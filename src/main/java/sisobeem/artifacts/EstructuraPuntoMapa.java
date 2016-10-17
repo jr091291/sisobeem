@@ -10,6 +10,10 @@ public class EstructuraPuntoMapa {
 	ArrayList<IComponentIdentifier> agents;
 	int daño;
 	
+	public EstructuraPuntoMapa(){
+		agents = new ArrayList<IComponentIdentifier>();
+	}
+	
 	/**
 	 * Metodos Accesores
 	 * @return

@@ -23,9 +23,11 @@ public class BuildAgents extends BuildAgentsAbstract {
 		super(config);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<IComponentIdentifier> createTranseuntes(PersonsConfig personConfig) {
 		
+		System.out.println("Creando Transeuntes...");
 		ArrayList<CreationInfo> infos = new ArrayList<CreationInfo>();
 		
 		int[]porcentajesEdades = separador(personConfig.getEdad());
@@ -59,6 +61,7 @@ public class BuildAgents extends BuildAgentsAbstract {
 
 	}
 	
+	@SuppressWarnings("unchecked")
 	public ArrayList<IComponentIdentifier> createTranseuntes(PersonsConfig personConfig, int cantidad) {
 	    
 		ArrayList<CreationInfo> infos = new ArrayList<CreationInfo>();
@@ -92,6 +95,7 @@ public class BuildAgents extends BuildAgentsAbstract {
 	@Override
 	public ArrayList<IComponentIdentifier> createEdifices(EdificesConfig[] edificesConfigs) {
 		
+		System.out.println("Creando Edificos...");
 		ArrayList<CreationInfo> infos = new ArrayList<CreationInfo>();
 		
 		for (EdificesConfig edificesConfig : edificesConfigs) {
@@ -119,6 +123,7 @@ public class BuildAgents extends BuildAgentsAbstract {
 	 * @param numPisos Numero de pisos de la edificacion
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public ArrayList<IComponentIdentifier> createPlants(ArrayList<IComponentIdentifier> personas, int numPisos){
 		
 		ArrayList<CreationInfo> infos = new ArrayList<CreationInfo>();
@@ -164,6 +169,7 @@ public class BuildAgents extends BuildAgentsAbstract {
 		 	               EdificesConfig[] edificesConfig, ArrayList<IComponentIdentifier> edifices,
 			               ArrayList<IComponentIdentifier> emergency) {
 		
+		System.out.println("Creando Ambiente Zone...");
 		Map<String, Object> arguments = new HashMap<String, Object>();	//Mapa de Argumentos
 		//Guardado de los argmentos y adesion a la Lista
 		arguments.put("cidsPerson", transeuntes );

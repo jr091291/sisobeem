@@ -1,46 +1,55 @@
 package sisobeem.agent.person;
 
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import sisobeem.artifacts.Traslator;
-import sisobeem.artifacts.sisobeem.config.Ubicacion;
-import sisobeem.services.ISetUbicacionInicialService;
 
 @Agent
-
 @Description("Agente vicil, encargados de vivir la experiencia del terremoto.")
-@ProvidedServices(@ProvidedService(type=ISetUbicacionInicialService.class))  
-public class CivilAgentBDI extends PersonAgentBDI implements ISetUbicacionInicialService {
+@ProvidedServices({
+  })  
+public class CivilAgentBDI extends PersonAgentBDI  {
 	
-    
-	 
-        	//-------- methods --------S
 
+	/**
+	 * Configuraciones Iniciales
+	 */
 	@AgentCreated
 	public void init()
 	{   
-		// System.out.println("Agente :"+agent.getComponentIdentifier().getLocalName()+" creado");
-	    
+		
+		
 	}
+	
+	
+	/**
+	 * Cuerpo Principal del agente
+	 */
 	@AgentBody
 	public void body()
 	{
-		
-		
+	     
+	    	
+	   
 	}
-	@Override
-	public void setUbicacionInicialService(Ubicacion ubicacion) {
-		this.myPosition = Traslator.getTraslator().getCoordenada(ubicacion);
-		
+
+	/**
+	 *  Repetir movimiento aletarorio
+	 */
+	@Plan(trigger=@Trigger(factchangeds="myPosition"))
+	public void Start()
+	{   
+		//System.out.println("Entró en el trigger");
+		if(this.cidPlant==null){
+    		getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(super.move.new Aleatorio(this.getAgent(),1, this.getPosition(),super.cidZone));
+    	}
 	}
-	
-	
+
 
 	
 	

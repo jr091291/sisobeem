@@ -19,21 +19,25 @@ public class TraslatorTest {
     	
     	Bounds b = new Bounds();
     	b.setNorth(6.960997099008478);
-    	b.setSouth(-6.041245203091869);
+    	b.setSouth(6.960997099008478);
     	b.setWest(168.763111375);
-    	b.setEast(-166.59729687499998);
+    	b.setEast(168.733111375);
+    	
         Traslator.getTraslator().setDatosIniciales(b,0.00001);
         ob = Traslator.getTraslator();
 	}
 	
-	/*
+	
 	@Test
 	public void getTamañoTest() {
 		Coordenada tamaño = ob.getTamaño();
 		assertEquals(33536040, tamaño.getX());
-		//assertEquals(1300224, tamaño.getY());
+		assertEquals(1300224, tamaño.getY());
+		
+
 	}
 	
+	/**
 	@Test
 	public void getCoordenadaTest(){
 		Ubicacion u = new Ubicacion();
@@ -41,7 +45,7 @@ public class TraslatorTest {
 		u.setLng(this.ob.getEste());
 		assertEquals(33536040, ob.getCoordenada(u).getX());
 	}
-    */
+    
 	
 	@Test
 	public void getUbicacion(){
@@ -54,4 +58,6 @@ public class TraslatorTest {
 		
 		assertEquals("-166.59729687499998", Double.toString(ubi.getLng()));
 	}
+	
+	*/
 }

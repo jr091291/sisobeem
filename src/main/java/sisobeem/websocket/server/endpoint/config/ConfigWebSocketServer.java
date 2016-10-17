@@ -50,7 +50,6 @@ public class ConfigWebSocketServer implements  JsonManager<Configuration>{
 		Configuration c = this.toClass(config);
 		
 		BuildAgentsAbstract build = new BuildAgents(c);
-		
 		build.build();
 	 }
 

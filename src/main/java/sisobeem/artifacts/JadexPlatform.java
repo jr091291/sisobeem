@@ -19,7 +19,7 @@ public class JadexPlatform {
 	
 	public JadexPlatform() {
 		 this.platform = Starter.createPlatform(new String[]{
-					"-gui", "true",
+					"-gui", "false",
 					"-welcome", "false",
 					"-cli", "false",
 					"-printpass", "false"

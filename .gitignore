@@ -5,3 +5,5 @@ jr.settings.xml
 \.project
 \.settings
 target/
+jcc.settings.xml
+carbler.settings.xml

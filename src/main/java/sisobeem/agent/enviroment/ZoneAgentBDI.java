@@ -1,27 +1,63 @@
 package sisobeem.agent.enviroment;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.websocket.CloseReason;
+import javax.websocket.EncodeException;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
+
+import com.google.gson.Gson;
+
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import sisobeem.artifacts.BuildAgents;
 import sisobeem.artifacts.Coordenada;
 import sisobeem.artifacts.EstructuraPuntoMapa;
 import sisobeem.artifacts.Random;
 import sisobeem.artifacts.Traslator;
+import sisobeem.artifacts.abstractos.BuildAgentsAbstract;
+import sisobeem.artifacts.sisobeem.config.Configuration;
 import sisobeem.artifacts.sisobeem.config.EdificesConfig;
 import sisobeem.artifacts.sisobeem.config.SimulationConfig;
+import sisobeem.artifacts.sisobeem.print.MoveAction;
+import sisobeem.artifacts.sisobeem.print.MovePojo;
 import sisobeem.services.edificeServices.ISetBeliefEdificeService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 import sisobeem.services.personServices.ISetStartService;
@@ -46,6 +82,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService {
 	@Belief
 	EstructuraPuntoMapa [][] mapa;
 	
+
 	/**
 	 * Datos del sismo
 	 */
@@ -85,7 +122,6 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService {
 			System.out.println("Mapa demasiado grande");
 		}
 		
-	
 		asignarCoordenadasIniciales();
 	
 		sendCoordenadasIniciales();
@@ -96,7 +132,8 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService {
 		
 		startAgents();
 		
-	  	
+		
+		
 	}
 	
 	@AgentBody
@@ -328,6 +365,8 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService {
 			
 				 return true;
 		 }else{
+			 
+			 System.out.println("Error en la direccion");
 			 return false;
 		 }
 		
@@ -349,5 +388,42 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService {
     	
     	return true;
     }
+    
+    
 
+	
+	/**
+	 *  Called when the agent is terminated.
+	 */
+	@AgentKilled
+	public void killed()
+	{
+	
+	}
+	
+   
+	@OnOpen
+	 public void open(Session session) {
+		System.out.println("Se ha abierto una conexion con el socket" + this.getClass().getName());
+	 }
+	
+	 @OnClose
+	 public void close(Session session, CloseReason reason) {
+		 System.out.println("Se ha cerrado una conexion con el socket: " + this.getClass().getName() + " " + reason.getReasonPhrase());	
+	 }
+	
+	 @OnError
+	 public void onError(Session session, Throwable error) {
+		 System.out.println("Se ha presentado un error con el socket" + this.getClass().getName() +": "+ error.getMessage());	
+	 }
+	
+	 @OnMessage
+	 public void handleMessage(String json, Session session) throws IOException, EncodeException {
+		 session.getBasicRemote().sendText(json);
+		
+	 }
+	 
+	 
+	 
+	 
 }

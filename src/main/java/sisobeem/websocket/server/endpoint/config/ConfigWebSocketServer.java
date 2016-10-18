@@ -11,11 +11,9 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
-
 import sisobeem.artifacts.BuildAgents;
 import sisobeem.artifacts.JsonManager;
 import sisobeem.artifacts.abstractos.BuildAgentsAbstract;
@@ -28,7 +26,7 @@ import sisobeem.artifacts.sisobeem.config.SimulationConfig;
 @ApplicationScoped
 @ServerEndpoint(value="/simulacion/config")
 public class ConfigWebSocketServer implements  JsonManager<Configuration>{
-	
+
 	 @OnOpen
 	 public void open() {
 		System.out.println("Se ha abierto una conexion con el socket" + this.getClass().getName());

@@ -9,7 +9,6 @@ import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Mapping;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -19,10 +18,10 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredServices;
 import sisobeem.artifacts.Coordenada;
-import sisobeem.artifacts.Random;
 import sisobeem.capabilitys.MoveCapability;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 import sisobeem.services.personServices.ISetStartService;
+import sisobeem.utilities.Random;
 
 
 /**
@@ -78,6 +77,16 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	Coordenada myPosition;
 	
 
+	@Belief
+	protected Boolean contextCaminar;
+	
+	@Belief
+	int velocidad;
+	
+	@Belief
+	protected double intensidadSismo;
+	
+    
 	public String estado;
 	
 	/**
@@ -104,7 +113,7 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	 */
 	public void iniciarCreencias(){
 		
-		
+		this.velocidad=1;
 		// Accedemos a los argumentos del agente
     	this.arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
 		//Creencias Enviadas en la configuracion
@@ -144,10 +153,13 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	@Plan(trigger=@Trigger(factchangeds="start"))
 	public void start()
 	{   
-		//System.out.println("Entró en el trigger");
+		//System.out.println("quiero moverme");
 		if(this.cidPlant==null){
-    		getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(move.new Aleatorio(this.getAgent(),1, this.getPosition(),cidZone));
-    	}
+			contextCaminar=true;
+     	}
+		
+		
+		
 	}
 	
 	
@@ -184,7 +196,15 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	public void setZone(IComponentIdentifier zone) {
 		cidZone = zone;
 	}
+
+	@Override
+	public void setSismo(double intensidad) {
+		this.intensidadSismo=intensidad;
+		System.out.println(agent.getComponentIdentifier().getLocalName()+" : "+intensidad);
+	}
 	
+	
+
 	
 
 	

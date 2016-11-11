@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import sisobeem.artifacts.sisobeem.config.Bounds;
+import sisobeem.artifacts.Bounds;
 
 public class BoundsTest {
 	@Test

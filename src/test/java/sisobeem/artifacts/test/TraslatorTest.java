@@ -1,14 +1,12 @@
 package sisobeem.artifacts.test;
 
-import static org.junit.Assert.*;
-
-import org.apache.xalan.xsltc.compiler.sym;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
+import sisobeem.artifacts.Bounds;
 import sisobeem.artifacts.Coordenada;
-import sisobeem.artifacts.Traslator;
-import sisobeem.artifacts.sisobeem.config.Bounds;
-import sisobeem.artifacts.sisobeem.config.Ubicacion;
+import sisobeem.artifacts.Ubicacion;
+import sisobeem.utilities.Traslator;
 
 
 public class TraslatorTest {
@@ -19,7 +17,7 @@ public class TraslatorTest {
     	
     	Bounds b = new Bounds();
     	b.setNorth(6.960997099008478);
-    	b.setSouth(6.960997099008478);
+    	b.setSouth(6.998);
     	b.setWest(168.763111375);
     	b.setEast(168.733111375);
     	
@@ -31,8 +29,13 @@ public class TraslatorTest {
 	@Test
 	public void getTamañoTest() {
 		Coordenada tamaño = ob.getTamaño();
-		assertEquals(33536040, tamaño.getX());
-		assertEquals(1300224, tamaño.getY());
+		
+		//System.out.println(tamaño.getX());
+
+		//System.out.println(tamaño.getY());
+		
+		assertEquals(3000, tamaño.getX());
+	    assertEquals(3700, tamaño.getY());
 		
 
 	}
@@ -45,7 +48,7 @@ public class TraslatorTest {
 		u.setLng(this.ob.getEste());
 		assertEquals(33536040, ob.getCoordenada(u).getX());
 	}
-    
+    */
 	
 	@Test
 	public void getUbicacion(){
@@ -54,10 +57,22 @@ public class TraslatorTest {
 		Ubicacion ubi = ob.getUbicacion(c);
 		
 		System.out.println(Double.toString(ubi.getLng()));
+		System.out.println(Double.toString(ubi.getLat()));
 		System.out.println("-166.59729687499998");
 		
-		assertEquals("-166.59729687499998", Double.toString(ubi.getLng()));
+		
+		Coordenada nueva = ob.getCoordenada(new Ubicacion(6.998, 168.764111376));
+		System.out.println(nueva.getX());
+		
+		Ubicacion nuevaa= ob.getUbicacion(new Coordenada(99,0));
+		
+		System.out.println(nuevaa.getLng());
+		
+		
+		
+		
+		assertEquals(nueva.getX(), 100);
 	}
 	
-	*/
+	  
 }

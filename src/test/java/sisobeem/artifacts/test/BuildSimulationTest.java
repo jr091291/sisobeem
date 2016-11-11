@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import jadex.bridge.IComponentIdentifier;
 import sisobeem.agent.person.CivilAgentBDI;
-import sisobeem.artifacts.JadexPlatform;
+import sisobeem.core.JadexPlatform;
 
 public class BuildSimulationTest {
 	static JadexPlatform simulation;

@@ -1,18 +1,19 @@
 package sisobeem.artifacts.test;
 
 import org.junit.Test;
-import sisobeem.artifacts.BuildAgents;
-import sisobeem.artifacts.sisobeem.config.Bounds;
-import sisobeem.artifacts.sisobeem.config.Configuration;
-import sisobeem.artifacts.sisobeem.config.EdificesConfig;
-import sisobeem.artifacts.sisobeem.config.PersonsConfig;
-import sisobeem.artifacts.sisobeem.config.SimulationConfig;
-import sisobeem.artifacts.sisobeem.config.Ubicacion;
+
+import sisobeem.artifacts.Bounds;
+import sisobeem.artifacts.Ubicacion;
+import sisobeem.core.BuildAgents;
+import sisobeem.core.simulation.Configuration;
+import sisobeem.core.simulation.EdificesConfig;
+import sisobeem.core.simulation.PersonsConfig;
+import sisobeem.core.simulation.SimulationConfig;
 
 public class BuildAgentsTest {
 	
 	PersonsConfig personsConfig;
-	EdificesConfig edficesConfig[] = new EdificesConfig[4];
+	EdificesConfig edficesConfig[] = new EdificesConfig[0];
 	BuildAgents ob;
 	Configuration config;
 	SimulationConfig simulationConfig;
@@ -25,15 +26,15 @@ public class BuildAgentsTest {
 		personsConfig.setEdad("30,70");
 		personsConfig.setLiderazgo(50);
 		personsConfig.setSalud(50);
-		personsConfig.setTranseuntes(3);
+		personsConfig.setTranseuntes(0);
 		
 		Ubicacion u = new Ubicacion();
 		u.setLat(6.952999096008478);
 		u.setLng(168.736111375);
 		
 		//Cantidad de edificios
-		for (int i = 0; i < 4; i++) {
-			edficesConfig[i] = new EdificesConfig(0, 10+i, u, 10, i, 4);
+		for (int i = 0; i < 2; i++) {
+		//	edficesConfig[i] = new EdificesConfig(0, 2, u, 10, 2, 4);
 		}
 		
 	   	Bounds b = new Bounds();
@@ -45,7 +46,7 @@ public class BuildAgentsTest {
     	simulationConfig = new SimulationConfig();
     	simulationConfig.setDuracion(60);
     	simulationConfig.setDuracionSismo(20);
-    	simulationConfig.setIntencidad(5);
+    	simulationConfig.setIntencidad(9);
     	simulationConfig.setLugar(b);
     	simulationConfig.setMomento("dia");
 		

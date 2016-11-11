@@ -1,27 +1,27 @@
 package sisobeem.artifacts;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import jadex.bridge.IComponentIdentifier;
 
 public class EstructuraPuntoMapa {
 	
 	
-	ArrayList<IComponentIdentifier> agents;
+	CopyOnWriteArrayList<IComponentIdentifier> agents;
 	int daño;
 	
 	public EstructuraPuntoMapa(){
-		agents = new ArrayList<IComponentIdentifier>();
+		agents = new CopyOnWriteArrayList<IComponentIdentifier>();
 	}
 	
 	/**
 	 * Metodos Accesores
 	 * @return
 	 */
-	public ArrayList<IComponentIdentifier> getAgents() {
+	public CopyOnWriteArrayList<IComponentIdentifier> getAgents() {
 		return agents;
 	}
-	public void setAgents(ArrayList<IComponentIdentifier> agents) {
+	public void setAgents(CopyOnWriteArrayList<IComponentIdentifier> agents) {
 		this.agents = agents;
 	}
 	public int getDaño() {

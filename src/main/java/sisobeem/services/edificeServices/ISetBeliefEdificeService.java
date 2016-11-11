@@ -14,4 +14,11 @@ public interface ISetBeliefEdificeService {
 	 * @param zone
 	 */
 	public void setZone(IComponentIdentifier zone);
+	
+	
+	/**
+	 * Servicio para modificar la creencia intensidadSismo en el agente edificio
+	 * @param intensidad
+	 */
+	public void setSismo(double intensidad);
 }

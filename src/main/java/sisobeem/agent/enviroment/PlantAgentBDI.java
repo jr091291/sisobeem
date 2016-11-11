@@ -3,6 +3,8 @@ package sisobeem.agent.enviroment;
 import java.util.ArrayList;
 
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.Trigger;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -115,7 +117,39 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 		this.cidZone = cidZone;
 	}
 
+	@Override
+	public void setSismo(double intensidad) {
+		
+	  this.intensidadSismo = intensidad;
+		
+	}
 
+	
+	@Plan(trigger = @Trigger(factchangeds = "intensidadSismo"))
+	public void sendIntensidadSismoPerson(){
+	    
+		
+		for (IComponentIdentifier person : this.cidsPerson) {
+			
+			IFuture<ISetBeliefPersonService> personService= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ISetBeliefPersonService.class, person);
+			  
+				//	System.out.println("Tu Ubicacion es: "+c.getX()+" - "+c.getY()+" Agente: "+person.getName());
+				   personService.addResultListener( new IResultListener<ISetBeliefPersonService>(){
+					
+					@Override
+					public void resultAvailable(ISetBeliefPersonService result) { 
+							 result.setSismo(intensidadSismo);	
+					}
+					
+					@Override
+					public void exceptionOccurred(Exception exception) {
+
+					}
+					   
+				   });
+			   
+		}
+	}
 }
 
 

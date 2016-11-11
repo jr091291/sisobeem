@@ -6,17 +6,17 @@ import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import sisobeem.artifacts.Coordenada;
-import sisobeem.artifacts.Random;
 import sisobeem.services.zoneServices.IMapaService;
+import sisobeem.utilities.Random;
 
 @Capability
 @RequiredServices({
@@ -25,6 +25,9 @@ import sisobeem.services.zoneServices.IMapaService;
 
 public class MoveCapability {
    
+	
+
+
 	public MoveCapability()
 	{
 	
@@ -33,10 +36,11 @@ public class MoveCapability {
 	/**
 	 * Meta movimiento Aleatorio
 	 */
-	@Goal
+	@Goal(excludemode=ExcludeMode.Never)
 	public class Aleatorio
-	{
+	{   
 
+		
 		@GoalParameter
 		IInternalAccess agent;
 		
@@ -44,8 +48,13 @@ public class MoveCapability {
 		protected int velocidad;
 		
 		@GoalParameter
-		protected Coordenada position;
+		IComponentIdentifier zone;
 		
+		@GoalParameter
+		protected Coordenada position;
+
+		
+
 		public Aleatorio(IInternalAccess agent,int velocidad, Coordenada position,IComponentIdentifier zone)
 		{  
 	//	  System.out.println(agent.getComponentIdentifier().getLocalName());
@@ -55,7 +64,10 @@ public class MoveCapability {
 		 	this.agent = agent;
             this.velocidad = velocidad;
 			this.position = position;
-		 	aleatorio(agent,velocidad, position,zone);
+			this.zone= zone;
+			aleatorio(agent,velocidad, position,zone);
+		
+		 	
 		}
 		
 	
@@ -72,22 +84,33 @@ public class MoveCapability {
 	protected void aleatorio(IInternalAccess agent,int velocidad, Coordenada position, IComponentIdentifier zone)
 	{  
 		//System.out.println("Entró en el trigger");
-	//	System.out.println("Plan movimiento aleatorio: "+velocidad+" "+position.getX()+","+position.getY());
-	  //  System.out.println(agent.getComponentIdentifier().getLocalName());
+	    //System.out.println("Plan movimiento aleatorio: "+velocidad+" "+position.getX()+","+position.getY());
+	   //System.out.println(agent.getComponentIdentifier().getLocalName());
 		
-	    agent.getComponentFeature(IExecutionFeature.class).waitForDelay(velocidad+000).get();
+		try {
+			Thread.sleep(velocidad*1000);
+		} catch (InterruptedException e) {
+			
+			System.out.println("error");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+		
+		//System.out.println("voy a moverme");
 		
 		IFuture<IMapaService> zoneService= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IMapaService.class,zone);
 		  
-			//	System.out.println("Tu Ubicacion es: "+c.getX()+" - "+c.getY()+" Agente: "+person.getName());
+		//   System.out.println(zoneService);
+		//	 System.out.println("3");
 			   zoneService.addResultListener( new IResultListener<IMapaService>(){
 
 				@Override
 				public void resultAvailable(IMapaService result) {
                          
+					  //  System.out.println("resultado");
 					     Coordenada nueva = getCoordenadaAleatoria(position);
-					     System.out.println(getMyPosition().getX()+" - "+getMyPosition().getY()+" to "+nueva.getX()+" - "+nueva.getY());
+					   //  System.out.println(getMyPosition().getX()+" - "+getMyPosition().getY()+" to "+nueva.getX()+" - "+nueva.getY());
 						 if(result.changePosition(nueva, agent.getComponentIdentifier())) setMyPosition(nueva);
 						 
 						 

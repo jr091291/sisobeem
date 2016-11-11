@@ -20,4 +20,10 @@ public interface ISetBelifePlantService {
 	 * @param cidZone
 	 */
 	public void setZone(IComponentIdentifier cidZone);
+	
+	/**
+	 * Servicio para modificar la creencia intensidadSismo en el agente edificio
+	 * @param intensidad
+	 */
+	public void setSismo(double intensidad);
 }

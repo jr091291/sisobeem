@@ -7,7 +7,7 @@ var socketSimulacion = new WebSocket(BASE_URL+ '/simulacion/config');
 
 socketSimulacion.onmessage = function(event) {
     var mensaje = JSON.parse(event.data);
-    console.log(mensaje);
+    //console.log(mensaje);
 };
 
 function sendConfig(config) {

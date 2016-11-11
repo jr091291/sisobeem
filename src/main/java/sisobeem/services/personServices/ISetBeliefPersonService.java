@@ -34,4 +34,10 @@ public interface ISetBeliefPersonService {
 	 */
     public void setUbicacion(Coordenada coordenada);
     
+	/**
+	 * Servicio para modificar la creencia intensidadSismo en el agente edificio
+	 * @param intensidad
+	 */
+	public void setSismo(double intensidad);
+    
 }

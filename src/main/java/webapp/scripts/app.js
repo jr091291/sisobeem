@@ -8,7 +8,7 @@ var edificiosList = new EdificiosList();
  * Inicializamos el mapa
  * */
 map = new Map(google, "map", {
-    center: {lat: -34.397, lng: 150.644},
+    center: {lat: 10.474245, lng:  -73.243633},
     zoom: 17,
     disableDefaultUI: true,
     clickableIcons: false,

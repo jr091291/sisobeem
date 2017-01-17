@@ -3,12 +3,14 @@
  */
 package sisobeem.agent.person;
 
+import java.util.ArrayList;
 import java.util.Map;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Mapping;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -18,11 +20,17 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredServices;
 import sisobeem.artifacts.Coordenada;
+import sisobeem.capabilitys.EvacuarCapability;
+import sisobeem.capabilitys.FindPersonHelpCapability;
 import sisobeem.capabilitys.MoveCapability;
+import sisobeem.capabilitys.MoveCapability.Aleatorio;
+import sisobeem.capabilitys.ResguardarseCapability;
+import sisobeem.services.personServices.IGetInformationService;
+import sisobeem.services.personServices.IReceptorMensajesService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 import sisobeem.services.personServices.ISetStartService;
 import sisobeem.utilities.Random;
-
+import static sisobeem.artifacts.Log.getLog;
 
 /**
  * Abstrae el comportamiento de una persona
@@ -31,15 +39,18 @@ import sisobeem.utilities.Random;
  */
 
 
+@SuppressWarnings("unused")
 @Agent
 @Description("Abstrae el comportamiento de una persona")
 @RequiredServices({
-
+	
 })
 @ProvidedServices({
     @ProvidedService(type=ISetStartService.class),
-    @ProvidedService(type=ISetBeliefPersonService.class)})  
-public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStartService {
+    @ProvidedService(type=IGetInformationService.class),
+    @ProvidedService(type=ISetBeliefPersonService.class),
+    @ProvidedService(type=IReceptorMensajesService.class)})  
+public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStartService,IReceptorMensajesService,IGetInformationService {
     
 	@Belief
 	Boolean start;
@@ -89,13 +100,23 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
     
 	public String estado;
 	
+	@Belief
+	protected ArrayList<IComponentIdentifier> cidsPeopleHelp;
+	
 	/**
 	 * Capacidades
 	 */
 	@Capability(beliefmapping=@Mapping(target="myPosition", value = "myPosition"))
 	protected MoveCapability move = new MoveCapability();
 	
+	@Capability(beliefmapping=@Mapping(target="contextCaminar", value = "contextCaminar"))
+	protected ResguardarseCapability resguardarse = new ResguardarseCapability();
 	
+	@Capability(beliefmapping=@Mapping(target="cidsPeopleHelp", value = "cidsPeopleHelp"))
+	protected FindPersonHelpCapability FindPersonHelpCapability = new FindPersonHelpCapability();
+	
+	@Capability
+	protected EvacuarCapability EvacuarEdificio = new EvacuarCapability();
 
 	/**
 	 *  Get the agent.
@@ -153,12 +174,27 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	@Plan(trigger=@Trigger(factchangeds="start"))
 	public void start()
 	{   
-		//System.out.println("quiero moverme");
+		
 		if(this.cidPlant==null){
-			contextCaminar=true;
+			//getLog().setDebug("Estoy en la calle");
+			
+			contextCaminar = true;
+     	}else{
+     		//getLog().setDebug("Estoy en un edificio");
+      		//getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(FindPersonHelpCapability.new FindPerson(this.getAgent(),this.cidPlant));
+          
+     		
+
      	}
 		
 		
+		
+	}
+	
+	@Plan(trigger=@Trigger(factchangeds="cidsPeopleHelp"))
+	public void op()
+	{   
+		getLog().setDebug("Nuevo listado de personas que necesitan ayuda recibido");
 		
 	}
 	
@@ -200,8 +236,10 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	@Override
 	public void setSismo(double intensidad) {
 		this.intensidadSismo=intensidad;
-		System.out.println(agent.getComponentIdentifier().getLocalName()+" : "+intensidad);
+		//getLog().setDebug(""+intensidad);
 	}
+	
+	
 	
 	
 

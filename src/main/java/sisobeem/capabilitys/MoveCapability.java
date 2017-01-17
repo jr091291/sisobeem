@@ -19,206 +19,179 @@ import sisobeem.services.zoneServices.IMapaService;
 import sisobeem.utilities.Random;
 
 @Capability
-@RequiredServices({
-	@RequiredService(name ="IMapaService",type=IMapaService.class)
-})
+@RequiredServices({ @RequiredService(name = "IMapaService", type = IMapaService.class) })
 
 public class MoveCapability {
-   
-	
 
+	public MoveCapability() {
 
-	public MoveCapability()
-	{
-	
 	}
-	
+
 	/**
 	 * Meta movimiento Aleatorio
 	 */
-	@Goal(excludemode=ExcludeMode.Never)
-	public class Aleatorio
-	{   
+	@Goal(excludemode = ExcludeMode.Never)
+	public class Aleatorio {
 
-		
 		@GoalParameter
 		IInternalAccess agent;
-		
+
 		@GoalParameter
 		protected int velocidad;
-		
+
 		@GoalParameter
 		IComponentIdentifier zone;
-		
+
 		@GoalParameter
 		protected Coordenada position;
 
-		
+		public Aleatorio(IInternalAccess agent, int velocidad, Coordenada position, IComponentIdentifier zone) {
+			// System.out.println(agent.getComponentIdentifier().getLocalName());
 
-		public Aleatorio(IInternalAccess agent,int velocidad, Coordenada position,IComponentIdentifier zone)
-		{  
-	//	  System.out.println(agent.getComponentIdentifier().getLocalName());
-		 
-      //    System.out.println("Entro a la capacidad Aleatoria"+velocidad);
-       //   System.out.println(zone.toString());
-		 	this.agent = agent;
-            this.velocidad = velocidad;
+			// System.out.println("Entro a la capacidad Aleatoria"+velocidad);
+			System.out.println(position.getX());
+			this.agent = agent;
+			this.velocidad = velocidad;
 			this.position = position;
-			this.zone= zone;
-			aleatorio(agent,velocidad, position,zone);
-		
-		 	
+			this.zone = zone;
+			aleatorio(agent, velocidad, position, zone);
+
 		}
-		
-	
-	
-	
+
 	}
-	
 
 	/**
-	 *  Movimiento Aleatorio 1.0.
+	 * Movimiento Aleatorio 1.0.
 	 */
 
 	@Plan
-	protected void aleatorio(IInternalAccess agent,int velocidad, Coordenada position, IComponentIdentifier zone)
-	{  
-		//System.out.println("Entró en el trigger");
-	    //System.out.println("Plan movimiento aleatorio: "+velocidad+" "+position.getX()+","+position.getY());
-	   //System.out.println(agent.getComponentIdentifier().getLocalName());
-		
+	protected void aleatorio(IInternalAccess agent, int velocidad, Coordenada position, IComponentIdentifier zone) {
+		// System.out.println("Entró en el trigger");
+		// System.out.println("Plan movimiento aleatorio: "+velocidad+"
+		// "+position.getX()+","+position.getY());
+		// System.out.println(agent.getComponentIdentifier().getLocalName());
+
 		try {
-			Thread.sleep(velocidad*1000);
+			Thread.sleep(velocidad * 1000);
 		} catch (InterruptedException e) {
-			
+
 			System.out.println("error");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
 		//System.out.println("voy a moverme");
-		
-		IFuture<IMapaService> zoneService= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IMapaService.class,zone);
-		  
-		//   System.out.println(zoneService);
-		//	 System.out.println("3");
-			   zoneService.addResultListener( new IResultListener<IMapaService>(){
 
-				@Override
-				public void resultAvailable(IMapaService result) {
-                         
-					  //  System.out.println("resultado");
-					     Coordenada nueva = getCoordenadaAleatoria(position);
-					   //  System.out.println(getMyPosition().getX()+" - "+getMyPosition().getY()+" to "+nueva.getX()+" - "+nueva.getY());
-						 if(result.changePosition(nueva, agent.getComponentIdentifier())) setMyPosition(nueva);
-						 
-						 
-				}
+		IFuture<IMapaService> zoneService = agent.getComponentFeature(IRequiredServicesFeature.class)
+				.searchService(IMapaService.class, zone);
 
-				@Override
-				public void exceptionOccurred(Exception exception) {
-					
-				}
-				   
-			   });
-		
+		// System.out.println(zoneService);
+		//System.out.println("3");
+		zoneService.addResultListener(new IResultListener<IMapaService>() {
+
+			@Override
+			public void resultAvailable(IMapaService result) {
+
+				// System.out.println("resultado");
+				
+				System.out.println(position.getX()+" -- "+position.getY());
+				Coordenada nueva = getCoordenadaAleatoria(position);
+				// System.out.println(getMyPosition().getX()+" - "+getMyPosition().getY()+" to "+nueva.getX()+" - "+nueva.getY());
+				if (result.changePosition(nueva, agent.getComponentIdentifier()))
+					setMyPosition(nueva);
+
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception) {
+
+			}
+
+		});
+
 	}
-	
-	
 
-	
-
-	
-	
 	/**
 	 * Método para elegir al nueva posicion
+	 * 
 	 * @param posicionActual
 	 * @return
 	 */
-	
-	public Coordenada getCoordenadaAleatoria(Coordenada posicionActual){
-		   
-		    Coordenada nuevaPosicion = new Coordenada();
-	        int aleatorio = Random.getIntRandom(1, 8);
 
-	        switch(aleatorio){
-	               case 1:
-	            	     //Arriba
-	                     nuevaPosicion.setX(posicionActual.getX());
-	                     nuevaPosicion.setY(posicionActual.getY()+1);
-	                     break;
-	               case 2: 
-	                     nuevaPosicion.setX(posicionActual.getX());
-	                     nuevaPosicion.setY(posicionActual.getY()-1);
-	                     break;
-	               case 3: 
-	            	     //Izquierda
-	                     nuevaPosicion.setX(posicionActual.getX()-1);
-	                     nuevaPosicion.setY(posicionActual.getY());
-	                     break;
-	               case 4:
-	            	     //Derecha
-	                     nuevaPosicion.setX(posicionActual.getX()+1);
-	                     nuevaPosicion.setY(posicionActual.getY());
-	                     break;
-	               case 5:
-	                     //Arriba derecha
-	                     nuevaPosicion.setX(posicionActual.getX()+1);
-	                     nuevaPosicion.setY(posicionActual.getY()+1);
-	                     break;
-	               case 6:
-	                     //Arriba izquierda
-	                     nuevaPosicion.setX(posicionActual.getX()-1);
-	                     nuevaPosicion.setY(posicionActual.getY()+1);
-	                     break;
- 	               case 7:
-	                     //Abajo derecha
-	                     nuevaPosicion.setX(posicionActual.getX()+1);
-	                     nuevaPosicion.setY(posicionActual.getY()-1);
-	                     break;
-	               case 8:
-	                     //Abajo Izquierda
-	                     nuevaPosicion.setX(posicionActual.getX()-1);
-	                     nuevaPosicion.setY(posicionActual.getY()-1);
-	                     break;
-	               default:
-	                     break;
-	           }
-	        
-	        return nuevaPosicion;
-		
+	public Coordenada getCoordenadaAleatoria(Coordenada posicionActual) {
+
+		Coordenada nuevaPosicion = new Coordenada();
+		int aleatorio = Random.getIntRandom(1, 8);
+
+		switch (aleatorio) {
+		case 1:
+			// Arriba
+			nuevaPosicion.setX(posicionActual.getX());
+			nuevaPosicion.setY(posicionActual.getY() + 1);
+			break;
+		case 2:
+			nuevaPosicion.setX(posicionActual.getX());
+			nuevaPosicion.setY(posicionActual.getY() - 1);
+			break;
+		case 3:
+			// Izquierda
+			nuevaPosicion.setX(posicionActual.getX() - 1);
+			nuevaPosicion.setY(posicionActual.getY());
+			break;
+		case 4:
+			// Derecha
+			nuevaPosicion.setX(posicionActual.getX() + 1);
+			nuevaPosicion.setY(posicionActual.getY());
+			break;
+		case 5:
+			// Arriba derecha
+			nuevaPosicion.setX(posicionActual.getX() + 1);
+			nuevaPosicion.setY(posicionActual.getY() + 1);
+			break;
+		case 6:
+			// Arriba izquierda
+			nuevaPosicion.setX(posicionActual.getX() - 1);
+			nuevaPosicion.setY(posicionActual.getY() + 1);
+			break;
+		case 7:
+			// Abajo derecha
+			nuevaPosicion.setX(posicionActual.getX() + 1);
+			nuevaPosicion.setY(posicionActual.getY() - 1);
+			break;
+		case 8:
+			// Abajo Izquierda
+			nuevaPosicion.setX(posicionActual.getX() - 1);
+			nuevaPosicion.setY(posicionActual.getY() - 1);
+			break;
+		default:
+			break;
+		}
+
+		return nuevaPosicion;
+
 	}
-	
-	
+
 	/**
 	 * Meta movimiento a sitio especifico
 	 */
-	
-	
+
 	@Goal
-	public class Ruta
-	{
+	public class Ruta {
 		@GoalParameter
 		protected ArrayList<Coordenada> ruta;
-	
-		public Ruta(ArrayList<Coordenada> r)
-		{
+
+		public Ruta(ArrayList<Coordenada> r) {
 			this.ruta = r;
 		}
 	}
-	
+
 	/**
-	 *  Get the wordtable.
-	*/
+	 * Get the wordtable.
+	 */
 	@Belief
 	public native Coordenada getMyPosition();
-	
-	
+
 	@Belief
 	public native void setMyPosition(Coordenada c);
-	
-	
-	
 
 }

@@ -16,4 +16,11 @@ public interface IMapaService {
     *   @param cid
     */
    public boolean changePosition(Coordenada nueva, IComponentIdentifier cid);
+   
+   
+   /**
+    * Servicio para generar el daño por la caida de un edificio
+    * @param cidEdifice
+    */
+   public void derrumbarEdifice(IComponentIdentifier cidEdifice);
 }

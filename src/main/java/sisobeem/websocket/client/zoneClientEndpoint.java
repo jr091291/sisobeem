@@ -10,6 +10,7 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
+import static sisobeem.artifacts.Log.getLog;
  
 @ClientEndpoint
 public class zoneClientEndpoint {
@@ -29,7 +30,6 @@ public class zoneClientEndpoint {
 	@OnOpen
 	public void onOpen(final Session userSession) {
 		this.userSession = userSession;
-		System.out.println(userSession.isOpen());
 	}
  
 	@OnClose

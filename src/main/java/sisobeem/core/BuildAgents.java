@@ -14,7 +14,7 @@ import sisobeem.core.simulation.EmergencyConfig;
 import sisobeem.core.simulation.PersonsConfig;
 import sisobeem.core.simulation.SimulationConfig;
 import sisobeem.utilities.Random;
-
+import static sisobeem.artifacts.Log.getLog;
 public class BuildAgents extends BuildAgentsAbstract {
 
     /**
@@ -31,7 +31,7 @@ public class BuildAgents extends BuildAgentsAbstract {
 		
 		
         if(personConfig.getTranseuntes()>0){
-    		System.out.println("Creando Transeuntes...");
+    		getLog().setInfo("Creando Transeuntes...");
     		
     		ArrayList<CreationInfo> infos = new ArrayList<CreationInfo>();
     		int[]porcentajesEdades = separador(personConfig.getEdad());
@@ -107,7 +107,7 @@ public class BuildAgents extends BuildAgentsAbstract {
 	public ArrayList<IComponentIdentifier> createEdifices(EdificesConfig[] edificesConfigs) {
 		
 	   if(edificesConfigs.length>0){
-			System.out.println("Creando Edificos...");
+			getLog().setInfo("Creando Edificos...");
 			ArrayList<CreationInfo> infos = new ArrayList<CreationInfo>();
 			
 			for (EdificesConfig edificesConfig : edificesConfigs) {
@@ -188,7 +188,7 @@ public class BuildAgents extends BuildAgentsAbstract {
 		 	               EdificesConfig[] edificesConfig, ArrayList<IComponentIdentifier> edifices,
 			               ArrayList<IComponentIdentifier> emergency) {
 		
-		System.out.println("Creando Ambiente Zone...");
+		getLog().setInfo("Creando Ambiente Zone...");
 		Map<String, Object> arguments = new HashMap<String, Object>();	//Mapa de Argumentos
 		//Guardado de los argmentos y adesion a la Lista
 		arguments.put("cidsPerson", transeuntes );

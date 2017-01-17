@@ -1,0 +1,76 @@
+package sisobeem.capabilitys;
+
+import static sisobeem.artifacts.Log.getLog;
+
+import jadex.bdiv3.annotation.Capability;
+import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalParameter;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import sisobeem.services.edificeServices.IEvacuarService;
+
+/**
+ * Capacidad de cambiar de un ambiente a otro
+ * 
+ * @author Erley
+ *
+ */
+@Capability
+public class EvacuarCapability {
+
+	/**
+	 * Meta buscar persona que necesiten ayuda
+	 */
+	@Goal(excludemode = ExcludeMode.Never)
+	public class Evacuar {
+
+		@GoalParameter
+		IInternalAccess agent;
+
+		@GoalParameter
+		double conocimientoZona;
+
+		@GoalParameter
+		IComponentIdentifier cidPiso;
+
+		@GoalParameter
+		IComponentIdentifier cidEdifice;
+
+		public Evacuar(IInternalAccess agent, double conocimientoZona, IComponentIdentifier cidPiso,
+				IComponentIdentifier cidEdifice) {
+			// System.out.println(agent.getComponentIdentifier().getLocalName());
+			getLog().setDebug(" Entró a la capacidad de resguardarse");
+			CambiarDePiso();
+		}
+
+		/**
+		 * Plan que consulta los cids de las personas que necesitan ayuda
+		 */
+
+		@Plan
+		protected void CambiarDePiso() {
+			IFuture<IEvacuarService> pisoService = agent.getComponentFeature(IRequiredServicesFeature.class)
+					.searchService(IEvacuarService.class, cidEdifice);
+
+			pisoService.addResultListener(new IResultListener<IEvacuarService>() {
+
+				@Override
+				public void resultAvailable(IEvacuarService result) {
+					result.cambiarDePiso(conocimientoZona, cidPiso, agent.getComponentIdentifier());
+				}
+
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					getLog().setError(exception.getMessage());
+				}
+
+			});
+		}
+	}
+
+}

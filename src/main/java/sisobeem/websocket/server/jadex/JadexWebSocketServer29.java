@@ -14,6 +14,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import sisobeem.artifacts.Log;
 import sisobeem.websocket.Session.DeviceSessionHandler29;
 
 @ApplicationScoped
@@ -25,23 +26,24 @@ public class JadexWebSocketServer29{
 	 
 	 @OnOpen
 	 public void open(Session session) {
-			System.out.println("Se ha abierto una conexion con el socket" + this.getClass().getName());
+		   Log.getLog().setInfo("Se ha abierto una conexion con el socket" + this.getClass().getName());
 			sessionHandler.addSession(session);
 		 }
 	
 	 @OnClose
 	 public void close(Session session, CloseReason reason) {
-		 System.out.println("Se ha cerrado una conexion con el socket: " + this.getClass().getName() + " " + reason.getReasonPhrase());	
+		 Log.getLog().setError("Se ha cerrado una conexion con el socket: " + this.getClass().getName() + " " + reason.getReasonPhrase());
 	 }
 	
 	 @OnError
 	 public void onError(Session session, Throwable error) {
-		 System.out.println("Se ha presentado un error con el socket" + this.getClass().getName() +": "+ error.getMessage());	
+		 Log.getLog().setError("Se ha presentado un error con el socket" + this.getClass().getName() +": "+ error.getMessage());	
 	 }
 	
 	 @OnMessage
 	 public void handleMessage(String json, Session session) throws IOException, EncodeException {
 		 sessionHandler.sendToVista(json);
+
 	 }
 
 

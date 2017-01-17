@@ -8,7 +8,7 @@ public class EstructuraPuntoMapa {
 	
 	
 	CopyOnWriteArrayList<IComponentIdentifier> agents;
-	int daño;
+	double daño;
 	
 	public EstructuraPuntoMapa(){
 		agents = new CopyOnWriteArrayList<IComponentIdentifier>();
@@ -24,11 +24,11 @@ public class EstructuraPuntoMapa {
 	public void setAgents(CopyOnWriteArrayList<IComponentIdentifier> agents) {
 		this.agents = agents;
 	}
-	public int getDaño() {
+	public double getDaño() {
 		return daño;
 	}
-	public void setDaño(int daño) {
-		this.daño = daño;
+	public void setDaño(double d) {
+		this.daño = d;
 	}
 	
 	

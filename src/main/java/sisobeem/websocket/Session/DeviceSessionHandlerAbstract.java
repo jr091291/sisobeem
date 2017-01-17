@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javax.json.JsonObject;
 import javax.websocket.Session;
+import static sisobeem.artifacts.Log.getLog;
 
 public abstract class DeviceSessionHandlerAbstract {
 	  private ArrayList<Session> sessions = new ArrayList<Session>();
@@ -35,7 +36,7 @@ public abstract class DeviceSessionHandlerAbstract {
   				 s.getBasicRemote().sendText(message);
   		              
          } catch (IOException ex) {
-        	 System.out.println("Error al enviar el mensaje en el manejador de mensajes");
+        	 getLog().setError("Error al enviar el mensaje en el manejador de mensajes");
          }
     }
 }

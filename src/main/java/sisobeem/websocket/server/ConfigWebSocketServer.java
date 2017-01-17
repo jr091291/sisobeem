@@ -25,28 +25,29 @@ import sisobeem.core.simulation.PersonsConfig;
 import sisobeem.core.simulation.SimulationConfig;
 import sisobeem.interfaces.JsonManager;
 
+import static sisobeem.artifacts.Log.getLog;
 @ApplicationScoped
 @ServerEndpoint(value="/simulacion/config")
 public class ConfigWebSocketServer implements  JsonManager<Configuration>{
 
 	 @OnOpen
 	 public void open() {
-		System.out.println("Se ha abierto una conexion con el socket" + this.getClass().getName());
+		getLog().setInfo("Se ha abierto una conexion con el socket" + this.getClass().getName());
 	 }
 	
 	 @OnClose
 	 public void close(Session session, CloseReason reason) {
-		 System.out.println("Se ha cerrado una conexion con el socket: " + this.getClass().getName() + " " + reason.getReasonPhrase());	
+		getLog().setInfo("Se ha cerrado una conexion con el socket: " + this.getClass().getName() + " " + reason.getReasonPhrase());
 	 }
 	
 	 @OnError
 	 public void onError(Session session, Throwable error) {
-		 System.out.println("Se ha presentado un error con el socket" + this.getClass().getName() +": "+ error.getMessage());	
+		 getLog().setError("Se ha presentado un error con el socket" + this.getClass().getName() +": "+ error.getMessage());	
 	 }
 	
 	 @OnMessage
 	 public void handleMessage(String config, Session session) throws IOException, EncodeException {
-		System.out.println("Se ha recibido un nuevo mensaje: " + config);
+		getLog().setInfo("Se ha recibido un nuevo mensaje: " + config);
 		Configuration c = this.toClass(config);
 		BuildAgentsAbstract build = new BuildAgents(c);
 	   build.build();

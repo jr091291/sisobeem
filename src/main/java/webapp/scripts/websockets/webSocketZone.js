@@ -240,7 +240,9 @@ function factoryAction(data){
 		contador++;
 		console.log(contador);
 		break;
-
+	case "route":
+		var data = data.data;
+		getRoute(data.origen, data.destino);
 	default:
 		console.log("Accion " + data.name + " Desconocido" );
 		break;
@@ -248,15 +250,22 @@ function factoryAction(data){
 }
 
 var AgentsMarkets = {};
+var Route = function Route(origen,destino, coordenadas){
+	this.origen = origen;
+	this.destino = destino;
+	this.coordenadas = coordenadas;
+}
 
 /* Funciones de acciones*/
 function move(idAgent, latLng, mapa, image){
 	var market = AgentsMarkets[idAgent];
 	
 	if(market){
-		market.setMap(null);
-		market.position =  new google.maps.LatLng(latLng.lat,latLng.lng);
-		market.setMap(mapa);
+		if(market.position.lat()!= latLng.lat && market.position.lng() != latLng.lng){
+			market.setMap(null);
+			market.position =  new google.maps.LatLng(latLng.lat,latLng.lng);
+			market.setMap(mapa);
+		}
 	}
 	else{
 			var marketNew = new google.maps.Marker({
@@ -271,6 +280,22 @@ function move(idAgent, latLng, mapa, image){
 	
 }
 
+function getRoute(origen, destino){
+	 var directionsService = new google.maps.DirectionsService;
+	 directionsService.route({
+		    origin: origen,
+		    destination: destino,
+		    travelMode: google.maps.TravelMode.WALKING
+		  }, function(response, status) {
+		    // Route the directions and pass the response to a function to create
+		    // markers for each step.
+		    if (status === google.maps.DirectionsStatus.OK) {
+				return new Route(origen, destino, response.routes[0].overview_path);
+		    } else {
+		        return new Route(origen, destino, []);
+		    }
+	});
+}
 
 
 

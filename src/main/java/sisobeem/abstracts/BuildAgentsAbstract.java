@@ -1,7 +1,6 @@
 package sisobeem.abstracts;
 
 import java.util.ArrayList;
-
 import jadex.bridge.IComponentIdentifier;
 import sisobeem.core.JadexPlatform;
 import sisobeem.core.simulation.Configuration;

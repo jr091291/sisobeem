@@ -224,3 +224,12 @@ function helpActive (){
     }
 }
 
+$(document).ready(function(){
+
+	/*MANEJADORES DE EVENTOS*/
+	document.getElementById("runBtn").onclick = function (){
+		sendConfig(getConfiguration());
+		$('#runBtn').attr('disabled', true);
+	}
+	
+});

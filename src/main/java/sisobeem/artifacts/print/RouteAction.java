@@ -22,7 +22,7 @@ public class RouteAction extends Action<RoutePojo> {
 	@Override
 	public String toJson() {
 		Gson gson = new Gson();
-		return gson.toJson(this.getData());  
+		return gson.toJson(this);  
 	}
 
 }

@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.websocket.MessageHandler;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -33,7 +35,9 @@ import sisobeem.artifacts.Cronometro;
 import sisobeem.artifacts.EstructuraPuntoMapa;
 import sisobeem.artifacts.Mensajero;
 import sisobeem.artifacts.print.MoveAction;
+import sisobeem.artifacts.print.RouteAction;
 import sisobeem.artifacts.print.pojo.MovePojo;
+import sisobeem.artifacts.print.pojo.RoutePojo;
 import sisobeem.core.simulation.EdificesConfig;
 import sisobeem.core.simulation.SimulationConfig;
 import sisobeem.interfaces.ISismo;
@@ -42,6 +46,7 @@ import sisobeem.services.personServices.IReceptorMensajesService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 import sisobeem.services.personServices.ISetStartService;
 import sisobeem.services.zoneServices.IAdicionarPersonasService;
+import sisobeem.services.zoneServices.IGetDestinyService;
 import sisobeem.services.zoneServices.IMapaService;
 import sisobeem.utilities.Random;
 import sisobeem.utilities.Sismo;
@@ -55,8 +60,9 @@ import sisobeem.websocket.client.zoneClientEndpoint;
 		@RequiredService(name = "ISetBeliefEdificeService", type = ISetBeliefEdificeService.class),
 		@RequiredService(name = "ISetStartService", type = ISetStartService.class) })
 @ProvidedServices({ @ProvidedService(name = "IMapaService", type = IMapaService.class),
-	                @ProvidedService(name = "IAdicionarPersonasService", type = IAdicionarPersonasService.class) })
-public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, ISismo,IAdicionarPersonasService {
+	                @ProvidedService(name = "IAdicionarPersonasService", type = IAdicionarPersonasService.class),
+	                @ProvidedService(name = "IGetDestinyService", type = IGetDestinyService.class)})
+public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, ISismo,IAdicionarPersonasService,IGetDestinyService {
 
 	/**
 	 * Contextos
@@ -260,7 +266,14 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 			clientEndPoint38 = new zoneClientEndpoint(new URI("ws://localhost:8080/sisobeem/simulacion/jadex38"));
 			clientEndPoint39 = new zoneClientEndpoint(new URI("ws://localhost:8080/sisobeem/simulacion/jadex39"));
 			clientEndPoint40 = new zoneClientEndpoint(new URI("ws://localhost:8080/sisobeem/simulacion/jadex40"));
-
+			
+			 // add listener
+            clientEndPoint.addMessageHandler(new zoneClientEndpoint.MessageHandler() {
+                public void handleMessage(String message) {
+                    System.out.println("Zone reibió un mensaje");
+                }
+            });
+			
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -932,6 +945,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 	}
 
+	
 	@Override
 	public void derrumbarEdifice(IComponentIdentifier cidEdifice) {
 		Coordenada  edificio = this.getCoordenada(cidEdifice);
@@ -943,6 +957,24 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	@Override
 	public void AdicionarPersonService(IComponentIdentifier person) {
 		this.cidsPerson.add(person);		
+	}
+
+	@Override
+	public void getRuta(IComponentIdentifier agent, Coordenada destino) {
+		Coordenada inicio  = this.getCoordenada(agent);
+		
+		RouteAction info = new RouteAction("route",
+				new RoutePojo(Traslator.getTraslator().getUbicacion(inicio), Traslator.getTraslator().getUbicacion(destino),agent));
+		
+		this.bandejaMsg.put(agent.getLocalName(), info.toJson());
+		
+		getLog().setDebug("Enviando mensaje con la peticion de la ruta");
+	}
+
+	@Override
+	public Coordenada getDestiny() {
+		
+		return new Coordenada(1,1);
 	}
 
 }

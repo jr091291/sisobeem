@@ -39,4 +39,28 @@ public abstract class DeviceSessionHandlerAbstract {
         	 getLog().setError("Error al enviar el mensaje en el manejador de mensajes");
          }
     }
+     
+     
+     public void sendToZone(String message){
+    
+     try {
+		         Session s= sessions.get(sessions.size()-1);
+				 s.getBasicRemote().sendText(message);
+		              
+       } catch (IOException ex) {
+      	 getLog().setError("Error al enviar el mensaje a Zone");
+       }
+     }
+     
+     
+    public Boolean vista(Session session){
+		
+    	Session vista = this.sessions.get(0);
+    	
+    	if(vista.equals(session)){
+    		return true;
+    	}
+    	return false;
+    	
+    }
 }

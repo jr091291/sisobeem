@@ -22,7 +22,7 @@ public class ResguardarseCapability {
 		
 		public Resguardarse() {
 			// System.out.println(agent.getComponentIdentifier().getLocalName());
-            getLog().setDebug(" Entró a la capacidad de resguardarse");
+          //  getLog().setDebug(" Entró a la capacidad de resguardarse");
             MovimientoOff();
 		}
 		

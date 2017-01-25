@@ -42,7 +42,15 @@ public class JadexWebSocketServer{
 	
 	 @OnMessage
 	 public void handleMessage(String json, Session session) throws IOException, EncodeException {
-		 sessionHandler.sendToVista(json);
+		 if(sessionHandler.vista(session)){
+			 sessionHandler.sendToZone(json);
+			// Log.getLog().setDebug("Enviando mensaje a Zone");
+		 }else{
+			 sessionHandler.sendToVista(json);
+			// Log.getLog().setDebug("Enviando mensaje a la vista");
+		 }
+		 
+		
 	 }
 
 

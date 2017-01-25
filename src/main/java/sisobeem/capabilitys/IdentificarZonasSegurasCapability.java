@@ -2,8 +2,6 @@ package sisobeem.capabilitys;
 
 import static sisobeem.artifacts.Log.getLog;
 
-import java.util.ArrayList;
-
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Goal;
@@ -15,16 +13,19 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import sisobeem.services.enviromentService.IGetPersonHelpService;
+import sisobeem.artifacts.Coordenada;
+import sisobeem.services.zoneServices.IGetDestinyService;
+
 
 @Capability
-public class FindPersonHelpCapability {
+public class IdentificarZonasSegurasCapability {
+
 	
 	/**
 	 * Meta  buscar persona que necesiten ayuda
 	 */
 	@Goal(excludemode = ExcludeMode.Never)
-	public class FindPerson {
+	public class FindZonaSegura {
 
 		@GoalParameter
 		IInternalAccess agent;
@@ -33,33 +34,33 @@ public class FindPersonHelpCapability {
 		IComponentIdentifier enviroment;
 		
 
-		public FindPerson(IInternalAccess agent,IComponentIdentifier enviroment) {
+		public FindZonaSegura(IInternalAccess agent,IComponentIdentifier enviroment) {
 			// System.out.println(agent.getComponentIdentifier().getLocalName());
            // getLog().setDebug(" Entró a la capacidad");
 		     
 			this.agent = agent;
 			this.enviroment = enviroment;
 		
-			findPerson(agent, enviroment);
+			BuscarDestino(agent, enviroment);
 
 		}
 		
 		
 		/**
-		 * Plan que consulta los cids de las personas que necesitan ayuda
+		 * Plan que consultar un destino seguro
 		 */
 
 		@Plan
-		protected void findPerson(IInternalAccess agent,IComponentIdentifier enviroment) {
+		protected void BuscarDestino(IInternalAccess agent,IComponentIdentifier enviroment) {
 			
-			IFuture<IGetPersonHelpService> zoneService = agent.getComponentFeature(IRequiredServicesFeature.class)
-					.searchService(IGetPersonHelpService.class, enviroment);
+			IFuture<IGetDestinyService> zoneService = agent.getComponentFeature(IRequiredServicesFeature.class)
+					.searchService(IGetDestinyService.class, enviroment);
 
-			zoneService.addResultListener(new IResultListener<IGetPersonHelpService>() {
+			zoneService.addResultListener(new IResultListener<IGetDestinyService>() {
 
 				@Override
-				public void resultAvailable(IGetPersonHelpService result) {
-					setCidsPeopleHelp(result.getPeopleHelp());
+				public void resultAvailable(IGetDestinyService result) {
+					setMyDestiny(result.getDestiny());
 				}
 
 				@Override
@@ -75,16 +76,15 @@ public class FindPersonHelpCapability {
 	
 	
 	/**
-	 * Get the cidPeopleHelp
+	 * Get the myDestiny
 	 */
 	@Belief
-	public native ArrayList<IComponentIdentifier> getCidsPeopleHelp();
+	public native Coordenada getMyDestiny();
 
 	/**
-	 * Set cidPeopleHelp
-	 * @param peopleNeedHelp
+	 * Set myDestiny
+	 * @param myDestiny
 	 */
 	@Belief
-	public native void setCidsPeopleHelp(ArrayList<IComponentIdentifier> peopleNeedHelp);
-
+	public native void setMyDestiny(Coordenada myDestiny);
 }

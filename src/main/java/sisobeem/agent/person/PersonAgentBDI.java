@@ -14,6 +14,9 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedService;
@@ -22,6 +25,7 @@ import jadex.micro.annotation.RequiredServices;
 import sisobeem.artifacts.Coordenada;
 import sisobeem.capabilitys.EvacuarCapability;
 import sisobeem.capabilitys.FindPersonHelpCapability;
+import sisobeem.capabilitys.IdentificarZonasSegurasCapability;
 import sisobeem.capabilitys.MoveCapability;
 import sisobeem.capabilitys.MoveCapability.Aleatorio;
 import sisobeem.capabilitys.ResguardarseCapability;
@@ -29,6 +33,8 @@ import sisobeem.services.personServices.IGetInformationService;
 import sisobeem.services.personServices.IReceptorMensajesService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 import sisobeem.services.personServices.ISetStartService;
+import sisobeem.services.plantServices.ISetBelifePlantService;
+import sisobeem.services.zoneServices.IMapaService;
 import sisobeem.utilities.Random;
 import static sisobeem.artifacts.Log.getLog;
 
@@ -87,6 +93,8 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	@Belief 
 	Coordenada myPosition;
 	
+	@Belief
+	Coordenada myDestiny;
 
 	@Belief
 	protected Boolean contextCaminar;
@@ -108,6 +116,9 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	 */
 	@Capability(beliefmapping=@Mapping(target="myPosition", value = "myPosition"))
 	protected MoveCapability move = new MoveCapability();
+	
+	@Capability(beliefmapping=@Mapping(target="myDestiny", value = "myDestiny"))
+	protected IdentificarZonasSegurasCapability IdentificarZonas = new IdentificarZonasSegurasCapability();
 	
 	@Capability(beliefmapping=@Mapping(target="contextCaminar", value = "contextCaminar"))
 	protected ResguardarseCapability resguardarse = new ResguardarseCapability();
@@ -179,6 +190,8 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 			//getLog().setDebug("Estoy en la calle");
 			
 			contextCaminar = true;
+			
+			getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(IdentificarZonas.new FindZonaSegura(this.getAgent(),this.cidZone));
      	}else{
      		//getLog().setDebug("Estoy en un edificio");
       		//getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(FindPersonHelpCapability.new FindPerson(this.getAgent(),this.cidPlant));
@@ -191,10 +204,11 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 		
 	}
 	
-	@Plan(trigger=@Trigger(factchangeds="cidsPeopleHelp"))
-	public void op()
+	@Plan(trigger=@Trigger(factchangeds="myDestiny"))
+	public void nuevoDestino()
 	{   
-		getLog().setDebug("Nuevo listado de personas que necesitan ayuda recibido");
+		//getLog().setDebug("Nuevo destino Recibido");
+		solicitarRuta();
 		
 	}
 	
@@ -238,6 +252,33 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 		this.intensidadSismo=intensidad;
 		//getLog().setDebug(""+intensidad);
 	}
+	
+	
+	/**
+	 * Método que solicita una ruta si existe la creencia myDestiny
+	 */
+	public void solicitarRuta(){
+	
+	  if(this.myDestiny!=null&&this.cidZone!=null){
+			IFuture<IMapaService> zone = agent.getComponentFeature(IRequiredServicesFeature.class)
+					.searchService(IMapaService.class, this.cidZone);
+			zone.addResultListener(new IResultListener<IMapaService>() {
+
+				@Override
+				public void resultAvailable(IMapaService result) {
+					result.getRuta(getAgent().getComponentIdentifier(), myDestiny);
+				}
+
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					getLog().setError(exception.getMessage());
+				}
+
+			});
+	  }
+
+	}
+	
 	
 	
 	

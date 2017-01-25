@@ -44,7 +44,7 @@ public class EvacuarCapability {
 		public Evacuar(IInternalAccess agent, double conocimientoZona, IComponentIdentifier cidPiso,
 				IComponentIdentifier cidEdifice) {
 			// System.out.println(agent.getComponentIdentifier().getLocalName());
-			getLog().setDebug(" Entró a la capacidad de resguardarse");
+			//getLog().setDebug(" Entró a la capacidad de resguardarse");
 			CambiarDePiso();
 		}
 

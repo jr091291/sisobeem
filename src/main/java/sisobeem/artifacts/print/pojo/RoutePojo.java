@@ -1,16 +1,20 @@
 package sisobeem.artifacts.print.pojo;
 
+import jadex.bridge.IComponentIdentifier;
 import sisobeem.artifacts.Ubicacion;
 
 public class RoutePojo {
+	
+	private IComponentIdentifier agent;
 	private Ubicacion origen;
 	private Ubicacion destino;
 	private Ubicacion[] coordenadas;
 
-	public RoutePojo(Ubicacion origen, Ubicacion destino) {
+	public RoutePojo(Ubicacion origen, Ubicacion destino, IComponentIdentifier agent) {
 		super();
 		this.origen = origen;
 		this.destino = destino;
+		this.agent = agent;
 	}
 
 	

@@ -23,4 +23,12 @@ public interface IMapaService {
     * @param cidEdifice
     */
    public void derrumbarEdifice(IComponentIdentifier cidEdifice);
+   
+   
+   /**
+    * Servicio para solicitar una ruta 
+    * @param agent
+    * @param destino
+    */
+   public void getRuta(IComponentIdentifier agent, Coordenada destino);
 }

@@ -241,8 +241,10 @@ function factoryAction(data){
 		console.log(contador);
 		break;
 	case "route":
-		var data = data.data;
-		getRoute(data.origen, data.destino);
+		console.log("recibiendo mensaje de ruta");
+		//var data = data.data;
+		//getRoute(data.origen, data.destino);
+		sendMensaje("RUTAAASS");
 	default:
 		console.log("Accion " + data.name + " Desconocido" );
 		break;

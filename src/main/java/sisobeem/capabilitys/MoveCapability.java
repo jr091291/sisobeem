@@ -49,7 +49,7 @@ public class MoveCapability {
 			// System.out.println(agent.getComponentIdentifier().getLocalName());
 
 			// System.out.println("Entro a la capacidad Aleatoria"+velocidad);
-			System.out.println(position.getX());
+			//System.out.println(position.getX());
 			this.agent = agent;
 			this.velocidad = velocidad;
 			this.position = position;
@@ -94,7 +94,7 @@ public class MoveCapability {
 
 				// System.out.println("resultado");
 				
-				System.out.println(position.getX()+" -- "+position.getY());
+				//System.out.println(position.getX()+" -- "+position.getY());
 				Coordenada nueva = getCoordenadaAleatoria(position);
 				// System.out.println(getMyPosition().getX()+" - "+getMyPosition().getY()+" to "+nueva.getX()+" - "+nueva.getY());
 				if (result.changePosition(nueva, agent.getComponentIdentifier()))

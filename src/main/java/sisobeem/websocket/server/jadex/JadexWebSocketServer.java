@@ -50,7 +50,6 @@ public class JadexWebSocketServer{
 			// Log.getLog().setDebug("Enviando mensaje a la vista");
 		 }
 		 
-		
 	 }
 
 

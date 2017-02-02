@@ -242,9 +242,9 @@ function factoryAction(data){
 		break;
 	case "route":
 		console.log("recibiendo mensaje de ruta");
-		//var data = data.data;
-		//getRoute(data.origen, data.destino);
-		sendMensaje("RUTAAASS");
+		var data = data.data;
+		var route = getRoute(data.origen, data.destino);
+		sendMensaje(route);
 	default:
 		console.log("Accion " + data.name + " Desconocido" );
 		break;
@@ -284,10 +284,13 @@ function move(idAgent, latLng, mapa, image){
 
 function getRoute(origen, destino){
 	 var directionsService = new google.maps.DirectionsService;
-	 directionsService.route({
+	 
+	 directionsService.route(
+		  {
 		    origin: origen,
 		    destination: destino,
-		    travelMode: google.maps.TravelMode.WALKING
+		    travelMode: google.maps.TravelMode.WALKING,
+		    provideRouteAlternatives: true
 		  }, function(response, status) {
 		    // Route the directions and pass the response to a function to create
 		    // markers for each step.

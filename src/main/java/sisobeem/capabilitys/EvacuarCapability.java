@@ -44,7 +44,11 @@ public class EvacuarCapability {
 		public Evacuar(IInternalAccess agent, double conocimientoZona, IComponentIdentifier cidPiso,
 				IComponentIdentifier cidEdifice) {
 			// System.out.println(agent.getComponentIdentifier().getLocalName());
-			//getLog().setDebug(" Entró a la capacidad de resguardarse");
+			//getLog().setDebug(" Entró a la capacidad de Evacuar");
+			this.agent = agent;
+			this.conocimientoZona = conocimientoZona;
+			this.cidPiso = cidPiso;
+			this.cidEdifice = cidEdifice;
 			CambiarDePiso();
 		}
 
@@ -54,6 +58,8 @@ public class EvacuarCapability {
 
 		@Plan
 		protected void CambiarDePiso() {
+			
+			System.out.println(conocimientoZona+" "+cidPiso.getLocalName()+" "+cidEdifice.getLocalName());
 			IFuture<IEvacuarService> pisoService = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IEvacuarService.class, cidEdifice);
 
@@ -61,7 +67,9 @@ public class EvacuarCapability {
 
 				@Override
 				public void resultAvailable(IEvacuarService result) {
+					getLog().setDebug("Solicitando cambiar de piso al edificio");
 					result.cambiarDePiso(conocimientoZona, cidPiso, agent.getComponentIdentifier());
+					
 				}
 
 				@Override

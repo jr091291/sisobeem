@@ -72,6 +72,8 @@ public class Mensajero extends Thread{
 		for (int i = inicioPerson; i < finPerson;) {
 			// System.out.println(cidsPerson.get(i).getLocalName()); 
 			 String data = bandejaMsg.get(cidsPerson.get(i).getLocalName());
+			 
+			 bandejaMsg.remove(cidsPerson.get(i).getLocalName()); // Eliminamos el mensaje  despues de tenerlo guardado
 			 // System.out.println(data); 
 			  if(data!=null){
 				

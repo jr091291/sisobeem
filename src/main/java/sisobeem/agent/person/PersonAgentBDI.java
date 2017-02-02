@@ -21,6 +21,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import sisobeem.artifacts.Coordenada;
 import sisobeem.capabilitys.EvacuarCapability;
@@ -29,10 +30,12 @@ import sisobeem.capabilitys.IdentificarZonasSegurasCapability;
 import sisobeem.capabilitys.MoveCapability;
 import sisobeem.capabilitys.MoveCapability.Aleatorio;
 import sisobeem.capabilitys.ResguardarseCapability;
+import sisobeem.services.edificeServices.IEvacuarService;
 import sisobeem.services.personServices.IGetInformationService;
 import sisobeem.services.personServices.IReceptorMensajesService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 import sisobeem.services.personServices.ISetStartService;
+import sisobeem.services.plantServices.IEvacuarPisoService;
 import sisobeem.services.plantServices.ISetBelifePlantService;
 import sisobeem.services.zoneServices.IMapaService;
 import sisobeem.utilities.Random;
@@ -49,7 +52,7 @@ import static sisobeem.artifacts.Log.getLog;
 @Agent
 @Description("Abstrae el comportamiento de una persona")
 @RequiredServices({
-	
+	@RequiredService(name = "IEvacuarService", type = IEvacuarService.class)
 })
 @ProvidedServices({
     @ProvidedService(type=ISetStartService.class),
@@ -151,6 +154,8 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 		//Creencias Enviadas en la configuracion
 		this.edad = (int) this.arguments.get("edad");
 		this.conocimientoZona = (double) this.arguments.get("conocimientoZona");
+		
+		
 		this.salud = (int) this.arguments.get("salud");
 		this.liderazgo = (double) this.arguments.get("liderazgo");
 		
@@ -186,6 +191,8 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	public void start()
 	{   
 		
+		//getLog().setDebug(this.getAgent().getComponentIdentifier().getLocalName()+" : "+this.conocimientoZona);
+		
 		if(this.cidPlant==null){
 			//getLog().setDebug("Estoy en la calle");
 			
@@ -193,8 +200,8 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 			
 			getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(IdentificarZonas.new FindZonaSegura(this.getAgent(),this.cidZone));
      	}else{
-     		//getLog().setDebug("Estoy en un edificio");
-      		//getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(FindPersonHelpCapability.new FindPerson(this.getAgent(),this.cidPlant));
+     	    //	getLog().setDebug("Estoy en un edificio");
+      		//getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(EvacuarEdificio.new Evacuar(this.getAgent(),this.conocimientoZona,this.cidPlant,this.cidEdifice));
           
      		
 
@@ -207,7 +214,7 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	@Plan(trigger=@Trigger(factchangeds="myDestiny"))
 	public void nuevoDestino()
 	{   
-		//getLog().setDebug("Nuevo destino Recibido");
+		//getLog().setDebug("Entro");
 		solicitarRuta();
 		
 	}

@@ -275,15 +275,17 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 	@Override
 	public void cambiarDePiso(double ConocimientoDeLaZona, IComponentIdentifier pisoActual,
 			IComponentIdentifier agent) {
+		
+		getLog().setDebug("edificio: Recibiendo solicitud");
 
 		int numPiso = getNumeroPiso(pisoActual);
 		IComponentIdentifier pisoProximo;
-		if (ConocimientoDeLaZona > 50) {
+		if (ConocimientoDeLaZona <2) {
 
 			pisoProximo = this.cidsPlants.get(numPiso - 2);
 
 			if (numPiso > 1) {
-
+				getLog().setDebug("Piso actual: "+numPiso+ " Piso a donde ir : "+pisoProximo);
 				RemoveAgentPiso(pisoActual, agent);
 				AdicionarAgentPiso(pisoProximo, agent);
 
@@ -407,7 +409,7 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 
 		int contador = 0;
 
-		for (IComponentIdentifier cidPiso : cidsPerson) {
+		for (IComponentIdentifier cidPiso : cidsPlants) {
 			contador++;
 
 			if (cidPiso.equals(piso)) {

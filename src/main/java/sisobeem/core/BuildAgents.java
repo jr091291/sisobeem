@@ -41,11 +41,13 @@ public class BuildAgents extends BuildAgentsAbstract {
     				                            100-porcentajesEdades[1]);
     		
     		int[] porcentajesConocimiento = separador(personConfig.getConocimiento());
+    		
     		double[]conocimiento = Random.getConocimientoRandom(personConfig.getTranseuntes(),
     				                                            porcentajesConocimiento[0],
     				                                            porcentajesConocimiento[1]-porcentajesConocimiento[0],
     				                                            100-porcentajesConocimiento[1]);
     		
+ 
     		int[]salud = Random.getSaludRamdon(personConfig.getTranseuntes(), personConfig.getSalud());
     		double[]liderazgos = Random.getLiderazgoRamdon(personConfig.getTranseuntes(), personConfig.getLiderazgo());
     	    
@@ -82,7 +84,7 @@ public class BuildAgents extends BuildAgentsAbstract {
 			double[]conocimiento = Random.getConocimientoRandom(cantidad, porcentajesConocimiento[0],
 					                                            porcentajesConocimiento[1]-porcentajesConocimiento[0],
 					                                            100-porcentajesConocimiento[1]);
-			
+		
 			int[]salud = Random.getSaludRamdon(cantidad, personConfig.getSalud());
 			double[]liderazgos = Random.getLiderazgoRamdon(cantidad, personConfig.getLiderazgo());
 		    

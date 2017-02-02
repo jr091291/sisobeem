@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.websocket.MessageHandler;
-
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -532,7 +530,6 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	/**
 	 * Método para la creacion e inicializacion del sismo
 	 */
-	@SuppressWarnings("unused")
 	private void iniciarSismo() {
 
 		int duracion = simulacionConfig.getDuracionSismo();

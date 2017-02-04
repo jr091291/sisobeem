@@ -3,6 +3,11 @@ package sisobeem.artifacts;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.kernelbase.ExternalAccess;
+import sisobeem.services.zoneServices.IMapaService;
 
 public class EstructuraPuntoMapa {
 	

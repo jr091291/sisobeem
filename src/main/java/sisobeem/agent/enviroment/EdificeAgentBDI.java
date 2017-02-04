@@ -28,6 +28,7 @@ import sisobeem.services.plantServices.IDerrumbePlantService;
 import sisobeem.services.plantServices.IEvacuarPisoService;
 import sisobeem.services.plantServices.ISetBelifePlantService;
 import sisobeem.services.zoneServices.IAdicionarPersonasService;
+import sisobeem.services.zoneServices.IMapaService;
 import sisobeem.utilities.Traslator;
 
 import static sisobeem.artifacts.Log.getLog;
@@ -155,6 +156,23 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 	
 	
 	private void Derrumbar(){
+		
+		IFuture<IMapaService> zoneService = agent.getComponentFeature(IRequiredServicesFeature.class)
+				.searchService(IMapaService.class, cidZone);
+		zoneService.addResultListener(new IResultListener<IMapaService>() {
+
+			@Override
+			public void resultAvailable(IMapaService result) {
+                   result.derrumbarEdifice(getAgent().getComponentIdentifier());
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception) {
+
+			}
+
+		});
+
 		
 		getLog().setDebug("El edificio: "+getAgent().getComponentIdentifier().getLocalName()+" se esta derrumbando");
 		// System.out.println("Edifice: Enviando Creecias A los agentes");

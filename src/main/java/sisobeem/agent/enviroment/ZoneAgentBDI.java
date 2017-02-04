@@ -40,11 +40,13 @@ import sisobeem.core.simulation.EdificesConfig;
 import sisobeem.core.simulation.SimulationConfig;
 import sisobeem.interfaces.ISismo;
 import sisobeem.services.edificeServices.ISetBeliefEdificeService;
+import sisobeem.services.personServices.IGetInformationService;
 import sisobeem.services.personServices.IReceptorMensajesService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 import sisobeem.services.personServices.ISetStartService;
 import sisobeem.services.zoneServices.IAdicionarPersonasService;
 import sisobeem.services.zoneServices.IGetDestinyService;
+import sisobeem.services.zoneServices.IGetInformationZoneService;
 import sisobeem.services.zoneServices.IMapaService;
 import sisobeem.utilities.Random;
 import sisobeem.utilities.Sismo;
@@ -59,8 +61,10 @@ import sisobeem.websocket.client.zoneClientEndpoint;
 		@RequiredService(name = "ISetStartService", type = ISetStartService.class) })
 @ProvidedServices({ @ProvidedService(name = "IMapaService", type = IMapaService.class),
 	                @ProvidedService(name = "IAdicionarPersonasService", type = IAdicionarPersonasService.class),
+	                @ProvidedService(name = "IGetInformationZoneService", type = IGetInformationZoneService.class),
+	                
 	                @ProvidedService(name = "IGetDestinyService", type = IGetDestinyService.class)})
-public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, ISismo,IAdicionarPersonasService,IGetDestinyService {
+public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, ISismo,IAdicionarPersonasService,IGetDestinyService,IGetInformationZoneService {
 
 	/**
 	 * Contextos
@@ -610,7 +614,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 		for (int i = 0; i < this.mapa.length; i++) {
 			for (int j = 0; j < this.mapa[i].length; j++) {
-				this.mapa[i][j].setDaño(intesidad * (0.3));
+				this.mapa[i][j].setDaño(Random.getDoubleRandom(1, intesidad));
 			}
 		}
 	}
@@ -948,7 +952,13 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	public void derrumbarEdifice(IComponentIdentifier cidEdifice) {
 		Coordenada  edificio = this.getCoordenada(cidEdifice);
 		
-		//Codigo para aumentar el daño de la matriz aledaña al edificio
+		for (int i = 0; i < this.mapa.length; i++) {
+			for (int j = 0; j < this.mapa[i].length; j++) {				
+				if((i<=edificio.getX()-8)&&(i>=edificio.getX()+8)&&(j<=edificio.getY()-8)&&(j>=edificio.getY()+8)){
+					this.mapa[i][j].setDaño(9);
+				}
+			}
+		}
 		
 	}
 
@@ -976,6 +986,76 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	public Coordenada getDestiny() {
 		
 		return new Coordenada(1,1);
+	}
+
+	@Override
+	public ArrayList<Coordenada> getPuntosSeguros() {
+    
+		ArrayList<Coordenada> lista = new ArrayList<Coordenada>();
+		
+		for (int i = 0; i < this.mapa.length; i++) {
+			for (int j = 0; j < this.mapa[i].length; j++) {				
+			        if(this.mapa[i][j].getDaño()<3){
+			        	lista.add(new Coordenada(i,j));
+			        }
+			}
+		}
+		
+        ArrayList<Coordenada> depurada = (ArrayList<Coordenada>) reducirPuntos(lista).clone();
+		
+		return depurada;
+	}
+
+	@Override
+	public ArrayList<Coordenada> getPuntosInseguros() {
+
+		ArrayList<Coordenada> lista = new ArrayList<Coordenada>();
+		
+		for (int i = 0; i < this.mapa.length; i++) {
+			for (int j = 0; j < this.mapa[i].length; j++) {				
+			        if(this.mapa[i][j].getDaño()>6){
+			        	lista.add(new Coordenada(i,j));
+			        }
+			}
+		}
+		
+		ArrayList<Coordenada> depurada = (ArrayList<Coordenada>) reducirPuntos(lista).clone();
+		
+		return depurada;
+	}
+	
+	
+	
+	/**
+	 * Meotodo para reducir puntos cercanos
+	 * @param lista
+	 * @return
+	 */
+	private ArrayList<Coordenada> reducirPuntos(ArrayList<Coordenada> lista){
+	
+		
+		ArrayList<Coordenada> lista2 = (ArrayList<Coordenada>) lista.clone();
+		ArrayList<Coordenada> listaf = new ArrayList<Coordenada>();
+		
+		for (int i = 0; i < lista.size(); i++) {
+			int contador = 0;
+			for (Coordenada coordenada : lista2) {
+				if(Math.abs((lista.get(i).getX()-coordenada.getX()))<8){
+					if(Math.abs((lista.get(i).getY()-coordenada.getY()))<8){
+						contador++;
+						lista2.remove(coordenada);
+					}
+				}
+			}
+			
+			
+			if(contador>1){
+				listaf.add(lista.get(i));
+			}
+		}
+		
+		return (ArrayList<Coordenada>) listaf.clone();
+		
 	}
 
 }

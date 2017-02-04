@@ -170,8 +170,9 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(4000).get();
 		contextSendMsg = true;
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(4000).get();
-		// System.out.println("Iniciando Sismo");
-		// this.iniciarSismo();
+		
+		//Iniciamos el sismo
+		 this.iniciarSismo();
 
 	}
 
@@ -953,7 +954,10 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 	@Override
 	public void AdicionarPersonService(IComponentIdentifier person) {
-		this.cidsPerson.add(person);		
+		if(!this.cidsPerson.contains(person)){
+			getLog().setDebug("Nuevo agente recibido por el zone: "+person.getLocalName());
+			this.cidsPerson.add(person);
+		}
 	}
 
 	@Override

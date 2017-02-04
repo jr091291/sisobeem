@@ -118,6 +118,8 @@ public class BuildAgents extends BuildAgentsAbstract {
 				//Guardado de los argmentos y adesion a la Lista
 				arguments.put("salidas", edificesConfig.getSalidas());
 				arguments.put("resistencia", edificesConfig.getResistencia());
+				
+				//getLog().setDebug("" +edificesConfig.getResistencia());
 				arguments.put("ubicacion", edificesConfig.getUbicacion());
 			
 				ArrayList<IComponentIdentifier> personas = createTranseuntes(super.getConfig().getPersonsConfig(),  edificesConfig.getPersonas());

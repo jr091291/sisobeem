@@ -9,6 +9,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedServices;
+import sisobeem.capabilitys.EvacuarCapability.Evacuar;
 import sisobeem.capabilitys.MoveCapability.Aleatorio;
 import sisobeem.utilities.Random;
 
@@ -64,6 +65,19 @@ public class CivilAgentBDI extends PersonAgentBDI  {
         	 caminar();
          }
 	}
+	
+	/**
+	 *  Cuando termino de dar caminar
+	 */
+	@Plan(trigger=@Trigger(goalfinisheds=sisobeem.capabilitys.EvacuarCapability.Evacuar.class))
+	public void  Evacuar()
+	{   
+		if(cidEdifice!=null&&cidPlant!=null){
+			getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(EvacuarEdificio.new Evacuar(this.getAgent(),this.conocimientoZona,this.cidPlant,this.cidEdifice));
+		}
+	}
+
+	
 
 	
 	/**
@@ -78,39 +92,52 @@ public class CivilAgentBDI extends PersonAgentBDI  {
 
 	@Override
 	public void CalmaMsj() {
-		this.miedo = this.miedo - 1;
-		this.enojo = this.enojo -1;
+		
+		if(this.vivo){
+			this.miedo = this.miedo - 1;
+			this.enojo = this.enojo -1;
+		}
+		
 		
 	}
 
 
 	@Override
 	public void ConfianzaMsj() {
-		this.confianza = this.confianza +1;
-		this.gregarismo = this.gregarismo +1;
+		if(this.vivo){
+			this.confianza = this.confianza +1;
+			this.gregarismo = this.gregarismo +1;
+		}
 		
 	}
 
 
 	@Override
 	public void FrustracionMsj() {
-		this.confianza = this.confianza -1;
-		this.enojo = this.enojo +1;
-		this.tristeza = this.tristeza +1;
+		
+		if(this.vivo){
+			this.confianza = this.confianza -1;
+			this.enojo = this.enojo +1;
+			this.tristeza = this.tristeza +1;
+		}
 		
 	}
 
 
 	@Override
 	public void HostilMsj() {
-		this.enojo = this.enojo+2;
+		if(this.vivo){
+			this.enojo = this.enojo+2;
+		}
 	}
 
 
 	@Override
 	public void PanicoMsj() {
-		this.miedo = this.miedo+1;
-		this.confianza = this.confianza-1;
+		if(this.vivo){
+			this.miedo = this.miedo+1;
+			this.confianza = this.confianza-1;
+		}
 		
 	}
 
@@ -124,15 +151,20 @@ public class CivilAgentBDI extends PersonAgentBDI  {
 
 	@Override
 	public void ResguardoMsj() {
-		this.contextCaminar = false;
+		
+		if(this.vivo){
+			this.contextCaminar = false;
+		}
 	}
 
 
 	@Override
 	public void MotivacionMsj() {
-		this.miedo = this.miedo -1;
-		this.tristeza = this.tristeza -1;
-		this.confianza = this.confianza +1;	
+		if(this.vivo){
+			this.miedo = this.miedo -1;
+			this.tristeza = this.tristeza -1;
+			this.confianza = this.confianza +1;	
+		}
 	}
 
 
@@ -141,6 +173,8 @@ public class CivilAgentBDI extends PersonAgentBDI  {
 		return this.estado;
 	}
 
+
+	
 
 
 

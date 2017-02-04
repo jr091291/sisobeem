@@ -24,17 +24,19 @@ import sisobeem.services.edificeServices.IGetSalidasService;
 import sisobeem.services.edificeServices.ISetBeliefEdificeService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 import sisobeem.services.personServices.ISetStartService;
+import sisobeem.services.plantServices.IDerrumbePlantService;
 import sisobeem.services.plantServices.IEvacuarPisoService;
 import sisobeem.services.plantServices.ISetBelifePlantService;
 import sisobeem.services.zoneServices.IAdicionarPersonasService;
 import sisobeem.utilities.Traslator;
 
 import static sisobeem.artifacts.Log.getLog;
-
+import sisobeem.utilities.Random;
 @Agent
 @Description("Agente Edificio: encargado de simular el ambiente edificio")
 @RequiredServices({ @RequiredService(name = "ISetBelifePlantService", type = ISetBelifePlantService.class),
 		@RequiredService(name = "IEvacuarPisoService", type = IEvacuarPisoService.class),
+		@RequiredService(name = "IDerrumbePlantService", type = IDerrumbePlantService.class),
 		@RequiredService(name = "IAdicionarPersonasService", type = IAdicionarPersonasService.class)
 
 })
@@ -46,6 +48,8 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 		implements ISetBeliefEdificeService, ISetStartService, IGetSalidasService, IEvacuarService {
 
 	ArrayList<IComponentIdentifier> cidsPlants;
+	
+	
 
 	@Belief
 	IComponentIdentifier cidZone;
@@ -140,31 +144,56 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 
 		}
 
-		if (intensidadSismo > resistencia) {
-			Derrumbar();
+		if (intensidadSismo > (resistencia/10)) {
+			if(this.start){
+				Derrumbar();
+			}
 		}
 
 	}
 
-	private void Derrumbar() {
+	
+	
+	private void Derrumbar(){
+		
+		getLog().setDebug("El edificio: "+getAgent().getComponentIdentifier().getLocalName()+" se esta derrumbando");
+		// System.out.println("Edifice: Enviando Creecias A los agentes");
+		for (IComponentIdentifier piso : this.cidsPlants) {
 
-		IFuture<ISetStartService> pisoService = agent.getComponentFeature(IRequiredServicesFeature.class)
-				.searchService(ISetStartService.class, cidZone);
+			IFuture<IDerrumbePlantService> pisoService = agent.getComponentFeature(IRequiredServicesFeature.class)
+					.searchService(IDerrumbePlantService.class, piso);
 
-		pisoService.addResultListener(new IResultListener<ISetStartService>() {
+			// System.out.println("Tu Ubicacion es: "+c.getX()+" - "+c.getY()+"
+			// Agente: "+person.getName());
+			pisoService.addResultListener(new IResultListener<IDerrumbePlantService>() {
 
-			@Override
-			public void resultAvailable(ISetStartService result) {
-				result.setStart(true);
-			}
+				@Override
+				public void resultAvailable(IDerrumbePlantService result) {
+					result.Derrumbar(calcularDañoDerrumbe());
+				}
 
-			@Override
-			public void exceptionOccurred(Exception exception) {
-				getLog().setError(exception.getMessage());
-			}
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					getLog().setError(exception.getMessage());
+				}
 
-		});
+			});
 
+		}
+		
+		
+		this.start = false;
+	}
+	
+	
+	private int calcularDañoDerrumbe(){
+		if(this.cidsPlants.size()>3){
+			return 80;
+		}
+		
+		else{
+			return 50;
+		}
 	}
 
 	@Override
@@ -177,8 +206,15 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 	@Override
 	public void setSismo(double intensidad) {
 		this.intensidadSismo = intensidad;
-
-		// System.out.println("temblando con intensidad de "+intensidad);
+      
+		if(intensidad>5){
+			  int x = Random.getIntRandom(1, (int)intensidad);
+			  if(x>5){
+				  this.salidas= this.salidas - 1;
+				  
+			//	  getLog().setDebug("Se ha cerrado una salida en :"+getAgent().getComponentIdentifier().getLocalName());
+			  }
+		}
 	}
 
 	/**
@@ -240,6 +276,8 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 
 	@Override
 	public void setStart(Boolean s) {
+		
+		this.start = true;
 		// getLog().setDebug("Edifice: Enviando start a los pisos");
 		for (IComponentIdentifier piso : this.cidsPlants) {
 
@@ -275,25 +313,32 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 	@Override
 	public void cambiarDePiso(double ConocimientoDeLaZona, IComponentIdentifier pisoActual,
 			IComponentIdentifier agent) {
-		
-		getLog().setDebug("edificio: Recibiendo solicitud");
 
-		int numPiso = getNumeroPiso(pisoActual);
-		IComponentIdentifier pisoProximo;
-		if (ConocimientoDeLaZona <2) {
+		// getLog().setDebug("edificio: Recibiendo solicitud");
 
-			pisoProximo = this.cidsPlants.get(numPiso - 2);
+		if (salidas > 0) {
+			int numPiso = getNumeroPiso(pisoActual);
+			IComponentIdentifier pisoProximo;
+			if (ConocimientoDeLaZona > 0) {
 
-			if (numPiso > 1) {
-				getLog().setDebug("Piso actual: "+numPiso+ " Piso a donde ir : "+pisoProximo);
-				RemoveAgentPiso(pisoActual, agent);
-				AdicionarAgentPiso(pisoProximo, agent);
+				if (numPiso != 1) {
+					pisoProximo = this.cidsPlants.get(numPiso - 2);
+					// getLog().setDebug("Piso actual: "+numPiso+ " Piso a donde
+					// ir : "+getNumeroPiso(pisoProximo));
+					RemoveAgentPiso(pisoActual, agent);
+					AdicionarAgentPiso(pisoProximo, agent);
 
-			} else {
+				} else {
+					pisoProximo = this.cidsPlants.get(numPiso - 1);
+					// getLog().setDebug("Enviando al zone");
+					EnviarAgenteAlAmbienteZone(pisoProximo, agent);
 
-				EnviarAgenteAlAmbienteZone(pisoProximo, agent);
-
+				}
 			}
+
+		} else {
+		//	getLog().setDebug(
+	    //				"Hay personsas atrapadas en el edificion: " + getAgent().getComponentIdentifier().getLocalName());
 		}
 
 	}
@@ -358,10 +403,10 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 	public void EnviarAgenteAlAmbienteZone(IComponentIdentifier piso, IComponentIdentifier person) {
 
 		// Primero Adcionamos la persona al listado de Zone
-		IFuture<IAdicionarPersonasService> pisoService = agent.getComponentFeature(IRequiredServicesFeature.class)
-				.searchService(IAdicionarPersonasService.class, piso);
+		IFuture<IAdicionarPersonasService> ZoneService = agent.getComponentFeature(IRequiredServicesFeature.class)
+				.searchService(IAdicionarPersonasService.class, cidZone);
 
-		pisoService.addResultListener(new IResultListener<IAdicionarPersonasService>() {
+		ZoneService.addResultListener(new IResultListener<IAdicionarPersonasService>() {
 
 			@Override
 			public void resultAvailable(IAdicionarPersonasService result) {
@@ -379,10 +424,10 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 		RemoveAgentPiso(piso, person);
 
 		// Cambiamos las creencias del agente: cidPiso = null, cidEdifice = null
-		IFuture<ISetBeliefPersonService> pisoS = agent.getComponentFeature(IRequiredServicesFeature.class)
+		IFuture<ISetBeliefPersonService> ag = agent.getComponentFeature(IRequiredServicesFeature.class)
 				.searchService(ISetBeliefPersonService.class, person);
 
-		pisoS.addResultListener(new IResultListener<ISetBeliefPersonService>() {
+		ag.addResultListener(new IResultListener<ISetBeliefPersonService>() {
 
 			@Override
 			public void resultAvailable(ISetBeliefPersonService result) {

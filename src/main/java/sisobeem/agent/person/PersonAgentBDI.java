@@ -30,11 +30,13 @@ import sisobeem.capabilitys.IdentificarZonasSegurasCapability;
 import sisobeem.capabilitys.MoveCapability;
 import sisobeem.capabilitys.MoveCapability.Aleatorio;
 import sisobeem.capabilitys.ResguardarseCapability;
+import sisobeem.capabilitys.SuicidioCapability;
 import sisobeem.services.edificeServices.IEvacuarService;
 import sisobeem.services.personServices.IGetInformationService;
 import sisobeem.services.personServices.IReceptorMensajesService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 import sisobeem.services.personServices.ISetStartService;
+import sisobeem.services.personServices.IsetDerrumbeService;
 import sisobeem.services.plantServices.IEvacuarPisoService;
 import sisobeem.services.plantServices.ISetBelifePlantService;
 import sisobeem.services.zoneServices.IMapaService;
@@ -58,8 +60,10 @@ import static sisobeem.artifacts.Log.getLog;
     @ProvidedService(type=ISetStartService.class),
     @ProvidedService(type=IGetInformationService.class),
     @ProvidedService(type=ISetBeliefPersonService.class),
-    @ProvidedService(type=IReceptorMensajesService.class)})  
-public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStartService,IReceptorMensajesService,IGetInformationService {
+    @ProvidedService(type=IReceptorMensajesService.class),
+    @ProvidedService(type=IsetDerrumbeService.class)
+    })  
+public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStartService,IReceptorMensajesService,IGetInformationService,IsetDerrumbeService {
     
 	@Belief
 	Boolean start;
@@ -108,7 +112,8 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	@Belief
 	protected double intensidadSismo;
 	
-    
+    @Belief
+    protected Boolean vivo = true;
 	public String estado;
 	
 	@Belief
@@ -132,6 +137,8 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	@Capability
 	protected EvacuarCapability EvacuarEdificio = new EvacuarCapability();
 
+	@Capability(beliefmapping=@Mapping(target="salud", value = "salud"))
+	protected SuicidioCapability Suicidio = new SuicidioCapability();
 	/**
 	 *  Get the agent.
 	 *  @return The agent.
@@ -148,6 +155,8 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	 */
 	public void iniciarCreencias(){
 		
+		
+		//this.vivo = true;
 		this.velocidad=1;
 		// Accedemos a los argumentos del agente
     	this.arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
@@ -198,12 +207,12 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 			
 			contextCaminar = true;
 			
-			getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(IdentificarZonas.new FindZonaSegura(this.getAgent(),this.cidZone));
+			//getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(IdentificarZonas.new FindZonaSegura(this.getAgent(),this.cidZone));
      	}else{
      	    //	getLog().setDebug("Estoy en un edificio");
       		//getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(EvacuarEdificio.new Evacuar(this.getAgent(),this.conocimientoZona,this.cidPlant,this.cidEdifice));
           
-     		
+     		getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(Suicidio.new SaltarDelEdificio(this.getAgent(),this.cidPlant));
 
      	}
 		
@@ -266,7 +275,7 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	 */
 	public void solicitarRuta(){
 	
-	  if(this.myDestiny!=null&&this.cidZone!=null){
+	  if(this.myDestiny!=null&&this.cidZone!=null&&this.vivo==true){
 			IFuture<IMapaService> zone = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IMapaService.class, this.cidZone);
 			zone.addResultListener(new IResultListener<IMapaService>() {
@@ -285,6 +294,22 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	  }
 
 	}
+	
+	
+	@Override
+	public void recibirDerumbe(int daño) {
+	     this.salud = this.salud - daño;
+	}
+	
+	@Plan(trigger=@Trigger(factchangeds="salud"))
+	private void ValidarVida(){
+		if(this.salud<1){
+			this.vivo=false;
+			getLog().setInfo("EL agente: "+getAgent().getComponentIdentifier().getLocalName()+" está muerto");
+		}
+	}
+	
+
 	
 	
 	

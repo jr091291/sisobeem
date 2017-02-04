@@ -119,6 +119,9 @@ public class Sismo {
 					
 					   
                 }	
+			   
+			   
+			   System.out.println("Sismo terminado");
 			
 		   }
 		   

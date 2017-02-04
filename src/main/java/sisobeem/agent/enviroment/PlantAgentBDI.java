@@ -23,16 +23,21 @@ import jadex.micro.annotation.RequiredServices;
 import sisobeem.services.personServices.IReceptorMensajesService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 import sisobeem.services.personServices.ISetStartService;
+import sisobeem.services.personServices.IsetDerrumbeService;
+import sisobeem.services.plantServices.IDerrumbePlantService;
 import sisobeem.services.plantServices.IEvacuarPisoService;
 import sisobeem.services.plantServices.ISetBelifePlantService;
 
 @Agent
 @Description("Abstrae el comportamiento de una Piso")
-@RequiredServices({ @RequiredService(name = "ISetEnviromentService", type = ISetBeliefPersonService.class) })
+@RequiredServices({ @RequiredService(name = "ISetEnviromentService", type = ISetBeliefPersonService.class),
+	                @RequiredService(name = "IsetDerrumbeService", type = IsetDerrumbeService.class)
+	})
 @ProvidedServices({ @ProvidedService(name = "IEvacuarPisoService",type = IEvacuarPisoService.class),
 	                @ProvidedService(name = "ISetStartService",type = ISetStartService.class),
+	                @ProvidedService(name = "IDerrumbePlantService",type = IDerrumbePlantService.class),
 	                @ProvidedService(name = "ISetBelifePlantService", type = ISetBelifePlantService.class) })
-public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlantService,ISetStartService,IEvacuarPisoService {
+public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlantService,ISetStartService,IEvacuarPisoService,IDerrumbePlantService {
 
 	@Belief
 	IComponentIdentifier cidEdifice;
@@ -424,33 +429,66 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 
 	@Override
 	public void Evacuar(IComponentIdentifier agent) {
-		this.cidsPerson.remove(agent);
+		
+		if(this.cidsPerson.contains(agent)){
+		//	getLog().setDebug("Elimando agente"+agent.getLocalName()+" de mi piso");
+			this.cidsPerson.remove(agent);
+		}
 				
 	}
 
 	@Override
 	public void Adicionar(IComponentIdentifier agent) {
-		this.cidsPerson.add(agent);
+		if(!this.cidsPerson.contains(agent)){
+			
+			this.cidsPerson.add(agent);
+			
+			/**
+			 * Cambiamos la creencia del nuevo piso en el agente
+			 */
+			IFuture<ISetBeliefPersonService> pisoService = getAgent().getComponentFeature(IRequiredServicesFeature.class)
+					.searchService(ISetBeliefPersonService.class,agent);
+
+			pisoService.addResultListener(new IResultListener<ISetBeliefPersonService>() {
+
+				@Override
+				public void resultAvailable(ISetBeliefPersonService result) {
+					result.setPlant(getAgent().getComponentIdentifier());
+				}
+
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					  getLog().setError(exception.getMessage());
+				}
+
+			});
+		}
 		
-		/**
-		 * Cambiamos la creencia del nuevo piso en el agente
-		 */
-		IFuture<ISetBeliefPersonService> pisoService = getAgent().getComponentFeature(IRequiredServicesFeature.class)
-				.searchService(ISetBeliefPersonService.class,agent);
+	}
 
-		pisoService.addResultListener(new IResultListener<ISetBeliefPersonService>() {
+	@Override
+	public void Derrumbar(int daño) {
+		
+		for (IComponentIdentifier receptor : cidsPerson) {
+			IFuture<IsetDerrumbeService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
+					.searchService(IsetDerrumbeService.class, receptor);
 
-			@Override
-			public void resultAvailable(ISetBeliefPersonService result) {
-				result.setPlant(getAgent().getComponentIdentifier());
-			}
+			persona.addResultListener(new IResultListener<IsetDerrumbeService>() {
 
-			@Override
-			public void exceptionOccurred(Exception exception) {
-				  getLog().setError(exception.getMessage());
-			}
+				@Override
+				public void resultAvailable(IsetDerrumbeService result) {
 
-		});
+					result.recibirDerumbe(daño);
+
+				}
+
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					getLog().setFatal(exception.getMessage());
+				}
+
+			});
+		}
 		
 	}
 

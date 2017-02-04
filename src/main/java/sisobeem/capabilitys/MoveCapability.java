@@ -1,6 +1,9 @@
 package sisobeem.capabilitys;
 
+import static sisobeem.artifacts.Log.getLog;
+
 import java.util.ArrayList;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Goal;
@@ -49,7 +52,7 @@ public class MoveCapability {
 			// System.out.println(agent.getComponentIdentifier().getLocalName());
 
 			// System.out.println("Entro a la capacidad Aleatoria"+velocidad);
-			//System.out.println(position.getX());
+			// System.out.println(position.getX());
 			this.agent = agent;
 			this.velocidad = velocidad;
 			this.position = position;
@@ -80,23 +83,27 @@ public class MoveCapability {
 			e.printStackTrace();
 		}
 
-		//System.out.println("voy a moverme");
+		// System.out.println("voy a moverme");
 
 		IFuture<IMapaService> zoneService = agent.getComponentFeature(IRequiredServicesFeature.class)
 				.searchService(IMapaService.class, zone);
 
 		// System.out.println(zoneService);
-		//System.out.println("3");
+		// System.out.println("3");
 		zoneService.addResultListener(new IResultListener<IMapaService>() {
 
 			@Override
 			public void resultAvailable(IMapaService result) {
 
 				// System.out.println("resultado");
-				
-				//System.out.println(position.getX()+" -- "+position.getY());
+
+				// System.out.println(position.getX()+" -- "+position.getY());
+
 				Coordenada nueva = getCoordenadaAleatoria(position);
-				// System.out.println(getMyPosition().getX()+" - "+getMyPosition().getY()+" to "+nueva.getX()+" - "+nueva.getY());
+
+				// System.out.println(getMyPosition().getX()+" -
+				// "+getMyPosition().getY()+" to "+nueva.getX()+" -
+				// "+nueva.getY());
 				if (result.changePosition(nueva, agent.getComponentIdentifier()))
 					setMyPosition(nueva);
 
@@ -120,54 +127,61 @@ public class MoveCapability {
 
 	public Coordenada getCoordenadaAleatoria(Coordenada posicionActual) {
 
-		Coordenada nuevaPosicion = new Coordenada();
-		int aleatorio = Random.getIntRandom(1, 8);
+		try {
+			Coordenada nuevaPosicion = new Coordenada();
+			int aleatorio = Random.getIntRandom(1, 8);
 
-		switch (aleatorio) {
-		case 1:
-			// Arriba
-			nuevaPosicion.setX(posicionActual.getX());
-			nuevaPosicion.setY(posicionActual.getY() + 1);
-			break;
-		case 2:
-			nuevaPosicion.setX(posicionActual.getX());
-			nuevaPosicion.setY(posicionActual.getY() - 1);
-			break;
-		case 3:
-			// Izquierda
-			nuevaPosicion.setX(posicionActual.getX() - 1);
-			nuevaPosicion.setY(posicionActual.getY());
-			break;
-		case 4:
-			// Derecha
-			nuevaPosicion.setX(posicionActual.getX() + 1);
-			nuevaPosicion.setY(posicionActual.getY());
-			break;
-		case 5:
-			// Arriba derecha
-			nuevaPosicion.setX(posicionActual.getX() + 1);
-			nuevaPosicion.setY(posicionActual.getY() + 1);
-			break;
-		case 6:
-			// Arriba izquierda
-			nuevaPosicion.setX(posicionActual.getX() - 1);
-			nuevaPosicion.setY(posicionActual.getY() + 1);
-			break;
-		case 7:
-			// Abajo derecha
-			nuevaPosicion.setX(posicionActual.getX() + 1);
-			nuevaPosicion.setY(posicionActual.getY() - 1);
-			break;
-		case 8:
-			// Abajo Izquierda
-			nuevaPosicion.setX(posicionActual.getX() - 1);
-			nuevaPosicion.setY(posicionActual.getY() - 1);
-			break;
-		default:
-			break;
+			switch (aleatorio) {
+			case 1:
+				// Arriba
+				nuevaPosicion.setX(posicionActual.getX());
+				nuevaPosicion.setY(posicionActual.getY() + 1);
+				break;
+			case 2:
+				nuevaPosicion.setX(posicionActual.getX());
+				nuevaPosicion.setY(posicionActual.getY() - 1);
+				break;
+			case 3:
+				// Izquierda
+				nuevaPosicion.setX(posicionActual.getX() - 1);
+				nuevaPosicion.setY(posicionActual.getY());
+				break;
+			case 4:
+				// Derecha
+				nuevaPosicion.setX(posicionActual.getX() + 1);
+				nuevaPosicion.setY(posicionActual.getY());
+				break;
+			case 5:
+				// Arriba derecha
+				nuevaPosicion.setX(posicionActual.getX() + 1);
+				nuevaPosicion.setY(posicionActual.getY() + 1);
+				break;
+			case 6:
+				// Arriba izquierda
+				nuevaPosicion.setX(posicionActual.getX() - 1);
+				nuevaPosicion.setY(posicionActual.getY() + 1);
+				break;
+			case 7:
+				// Abajo derecha
+				nuevaPosicion.setX(posicionActual.getX() + 1);
+				nuevaPosicion.setY(posicionActual.getY() - 1);
+				break;
+			case 8:
+				// Abajo Izquierda
+				nuevaPosicion.setX(posicionActual.getX() - 1);
+				nuevaPosicion.setY(posicionActual.getY() - 1);
+				break;
+			default:
+				break;
+			}
+
+			return nuevaPosicion;
+		} catch (Exception e) {
+
+			getLog().setError("Error  capturado, en la eleccion aleatoria del mvimiento");
+
 		}
-
-		return nuevaPosicion;
+		return posicionActual;
 
 	}
 

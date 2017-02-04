@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -34,6 +35,8 @@ public class EvacuarCapability {
 
 		@GoalParameter
 		double conocimientoZona;
+		
+		int tiempo = 4000; // Un segundo para evacuar el edificio
 
 		@GoalParameter
 		IComponentIdentifier cidPiso;
@@ -59,7 +62,9 @@ public class EvacuarCapability {
 		@Plan
 		protected void CambiarDePiso() {
 			
-			System.out.println(conocimientoZona+" "+cidPiso.getLocalName()+" "+cidEdifice.getLocalName());
+			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(tiempo).get();
+			
+			//System.out.println(conocimientoZona+" "+cidPiso.getLocalName()+" "+cidEdifice.getLocalName());
 			IFuture<IEvacuarService> pisoService = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IEvacuarService.class, cidEdifice);
 
@@ -67,7 +72,7 @@ public class EvacuarCapability {
 
 				@Override
 				public void resultAvailable(IEvacuarService result) {
-					getLog().setDebug("Solicitando cambiar de piso al edificio");
+					//getLog().setDebug("Solicitando cambiar de piso al edificio");
 					result.cambiarDePiso(conocimientoZona, cidPiso, agent.getComponentIdentifier());
 					
 				}

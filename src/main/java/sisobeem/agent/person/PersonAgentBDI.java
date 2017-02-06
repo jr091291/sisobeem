@@ -205,14 +205,14 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 		if(this.cidPlant==null){
 			//getLog().setDebug("Estoy en la calle");
 			
-			contextCaminar = true;
+			//contextCaminar = true;
 			
 			//getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(IdentificarZonas.new FindZonaSegura(this.getAgent(),this.cidZone));
      	}else{
      	    //	getLog().setDebug("Estoy en un edificio");
       		//getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(EvacuarEdificio.new Evacuar(this.getAgent(),this.conocimientoZona,this.cidPlant,this.cidEdifice));
           
-     		getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(Suicidio.new SaltarDelEdificio(this.getAgent(),this.cidPlant));
+     	//	getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(Suicidio.new SaltarDelEdificio(this.getAgent(),this.cidPlant));
 
      	}
 		

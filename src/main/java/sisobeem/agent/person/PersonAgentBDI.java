@@ -86,6 +86,9 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
     @Belief
     IComponentIdentifier cidPlant ;
     
+    @Belief
+    IComponentIdentifier coordinador ;
+    
 	// Emociones
 	@Belief
 	double confianza,miedo,tristeza,enojo;
@@ -307,6 +310,12 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 			this.vivo=false;
 			getLog().setInfo("EL agente: "+getAgent().getComponentIdentifier().getLocalName()+" está muerto");
 		}
+	}
+	
+
+	@Override
+	public void setToCoordinador(IComponentIdentifier coordinador) {
+		this.coordinador = coordinador;
 	}
 	
 

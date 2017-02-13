@@ -190,6 +190,7 @@ public class BuildAgents extends BuildAgentsAbstract {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<IComponentIdentifier> createAtencionEmergency(EmergencyConfig emergencyConfig) {
 		
@@ -212,6 +213,7 @@ public class BuildAgents extends BuildAgentsAbstract {
 
 	
 
+	@SuppressWarnings("unchecked")
 	private ArrayList<IComponentIdentifier> createBusqueda(int cantidad) {
 
 		if (cantidad > 0) {
@@ -232,6 +234,7 @@ public class BuildAgents extends BuildAgentsAbstract {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private ArrayList<IComponentIdentifier> CreateSalud(int cantidad) {
 
 		if (cantidad > 0) {
@@ -252,6 +255,7 @@ public class BuildAgents extends BuildAgentsAbstract {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private ArrayList<IComponentIdentifier> createSeguridad(int cantidad) {
 
 		if (cantidad > 0) {
@@ -283,7 +287,7 @@ public class BuildAgents extends BuildAgentsAbstract {
 																		// Argumentos
 		// Guardado de los argmentos y adesion a la Lista
 		arguments.put("cidsPerson", transeuntes);
-		arguments.put("cidEmergenia", emergency.get(0));
+		arguments.put("cidEmergencia", emergency.get(0));
 		arguments.put("cidsEdifices", edifices);
 		arguments.put("simulacionConfig", simulacionConfig);
 		arguments.put("edificesConfig", edificesConfig);

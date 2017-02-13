@@ -39,5 +39,8 @@ public interface ISetBeliefPersonService {
 	 * @param intensidad
 	 */
 	public void setSismo(double intensidad);
+	
+	
+	public void setToCoordinador(IComponentIdentifier coordinador);
     
 }

@@ -14,7 +14,7 @@ public class RoutePojo {
 		super();
 		this.origen = origen;
 		this.destino = destino;
-		this.agent = agent;
+		this.setAgent(agent);
 	}
 
 	
@@ -44,5 +44,15 @@ public class RoutePojo {
 
 	public void setCoordenadas(Ubicacion[] coordenadas) {
 		this.coordenadas = coordenadas;
+	}
+
+
+	public IComponentIdentifier getAgent() {
+		return agent;
+	}
+
+
+	public void setAgent(IComponentIdentifier agent) {
+		this.agent = agent;
 	}
 }

@@ -32,15 +32,21 @@ import sisobeem.artifacts.Coordenada;
 import sisobeem.artifacts.Cronometro;
 import sisobeem.artifacts.EstructuraPuntoMapa;
 import sisobeem.artifacts.Mensajero;
+import sisobeem.artifacts.print.EdificeAction;
 import sisobeem.artifacts.print.MoveAction;
+import sisobeem.artifacts.print.PersonAction;
+import sisobeem.artifacts.print.PuntoAction;
 import sisobeem.artifacts.print.RouteAction;
+import sisobeem.artifacts.print.pojo.EdificePojo;
 import sisobeem.artifacts.print.pojo.MovePojo;
+import sisobeem.artifacts.print.pojo.PersonPojo;
+import sisobeem.artifacts.print.pojo.PuntoPojo;
 import sisobeem.artifacts.print.pojo.RoutePojo;
 import sisobeem.core.simulation.EdificesConfig;
 import sisobeem.core.simulation.SimulationConfig;
 import sisobeem.interfaces.ISismo;
+import sisobeem.services.coordinadorService.ISetZone;
 import sisobeem.services.edificeServices.ISetBeliefEdificeService;
-import sisobeem.services.personServices.IGetInformationService;
 import sisobeem.services.personServices.IReceptorMensajesService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 import sisobeem.services.personServices.ISetStartService;
@@ -48,6 +54,7 @@ import sisobeem.services.zoneServices.IAdicionarPersonasService;
 import sisobeem.services.zoneServices.IGetDestinyService;
 import sisobeem.services.zoneServices.IGetInformationZoneService;
 import sisobeem.services.zoneServices.IMapaService;
+import sisobeem.services.zoneServices.ISetInformationService;
 import sisobeem.utilities.Random;
 import sisobeem.utilities.Sismo;
 import sisobeem.utilities.Traslator;
@@ -58,19 +65,23 @@ import sisobeem.websocket.client.zoneClientEndpoint;
 @Service
 @RequiredServices({ @RequiredService(name = "ISetUbicacionService", type = ISetBeliefPersonService.class),
 		@RequiredService(name = "ISetBeliefEdificeService", type = ISetBeliefEdificeService.class),
+		@RequiredService(name = "ISetZone", type = ISetZone.class),
 		@RequiredService(name = "ISetStartService", type = ISetStartService.class) })
 @ProvidedServices({ @ProvidedService(name = "IMapaService", type = IMapaService.class),
-	                @ProvidedService(name = "IAdicionarPersonasService", type = IAdicionarPersonasService.class),
-	                @ProvidedService(name = "IGetInformationZoneService", type = IGetInformationZoneService.class),
-	                
-	                @ProvidedService(name = "IGetDestinyService", type = IGetDestinyService.class)})
-public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, ISismo,IAdicionarPersonasService,IGetDestinyService,IGetInformationZoneService {
+		@ProvidedService(name = "IAdicionarPersonasService", type = IAdicionarPersonasService.class),
+		@ProvidedService(name = "IGetInformationZoneService", type = IGetInformationZoneService.class),
+		@ProvidedService(name = "ISetInformationService", type = ISetInformationService.class),
+		@ProvidedService(name = "IGetDestinyService", type = IGetDestinyService.class) })
+public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, ISismo, IAdicionarPersonasService,
+		IGetDestinyService, IGetInformationZoneService, ISetInformationService {
 
 	/**
 	 * Contextos
 	 */
 	@Belief
 	public Boolean contextSendMsg;
+
+	int contador = 0;
 
 	/**
 	 * Bandeja de mensajes
@@ -97,6 +108,9 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 	@Belief
 	EstructuraPuntoMapa[][] mapa;
+
+	@Belief
+	IComponentIdentifier coordinador;
 
 	@Belief
 	private Sismo sismo;
@@ -136,6 +150,8 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		// Datos de la simulacion
 		this.simulacionConfig = (SimulationConfig) this.arguments.get("simulacionConfig");
 
+		this.coordinador = (IComponentIdentifier) this.arguments.get("cidEmergencia");
+
 		this.edConfig = (EdificesConfig[]) this.arguments.get("edificesConfig");
 
 		/**
@@ -160,6 +176,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		sendCoordenadasIniciales();
 		setMetoPerson();
 		setMetoEdifices();
+		sendMeToCoordinator();
 
 		/**
 		 * Iniciando agentes
@@ -174,9 +191,16 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(4000).get();
 		contextSendMsg = true;
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(4000).get();
-		
-		//Iniciamos el sismo
-		 this.iniciarSismo();
+
+		// Cronometro crono = new Cronometro();
+		// crono.iniciarCronometro();
+
+		// Iniciamos el sismo
+		this.iniciarSismo();
+		// Iniciamos mecanismos de atencion de emergencias
+		agent.getComponentFeature(IExecutionFeature.class)
+				.waitForDelay((this.simulacionConfig.getDuracionSismo() * 1000)).get();
+		this.startCoordinadorEmergencia();
 
 	}
 
@@ -269,14 +293,14 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 			clientEndPoint38 = new zoneClientEndpoint(new URI("ws://localhost:8080/sisobeem/simulacion/jadex38"));
 			clientEndPoint39 = new zoneClientEndpoint(new URI("ws://localhost:8080/sisobeem/simulacion/jadex39"));
 			clientEndPoint40 = new zoneClientEndpoint(new URI("ws://localhost:8080/sisobeem/simulacion/jadex40"));
-			
-			 // add listener
-            clientEndPoint.addMessageHandler(new zoneClientEndpoint.MessageHandler() {
-                public void handleMessage(String message) {
-                    System.out.println("Zone reibió un mensaje");
-                }
-            });
-			
+
+			// add listener
+			clientEndPoint.addMessageHandler(new zoneClientEndpoint.MessageHandler() {
+				public void handleMessage(String message) {
+					System.out.println("Zone reibió un mensaje");
+				}
+			});
+
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -354,6 +378,30 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	}
 
 	/**
+	 * Metodo para enviar el cidZone al coordinador de la emrgencia
+	 */
+	private void sendMeToCoordinator() {
+
+		IFuture<ISetZone> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
+				.searchService(ISetZone.class, this.coordinador);
+
+		persona.addResultListener(new IResultListener<ISetZone>() {
+
+			@Override
+			public void resultAvailable(ISetZone result) {
+
+				result.setZone(agent.getComponentIdentifier());
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception) {
+				getLog().setWarn(exception.getMessage());
+			}
+
+		});
+	}
+
+	/**
 	 * Metodo para enviar la señal de busqueda de objetivos
 	 */
 	private void startAgents() {
@@ -387,6 +435,28 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 			}
 		}
 
+	}
+
+	private void startCoordinadorEmergencia() {
+
+		// System.out.println("Entro");
+		IFuture<ISetStartService> coordinador = agent.getComponentFeature(IRequiredServicesFeature.class)
+				.searchService(ISetStartService.class, this.coordinador);
+
+		coordinador.addResultListener(new IResultListener<ISetStartService>() {
+
+			@Override
+			public void resultAvailable(ISetStartService result) {
+
+				result.setStart(true);
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception) {
+				getLog().setWarn(exception.getMessage());
+			}
+
+		});
 	}
 
 	/**
@@ -947,115 +1017,157 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 	}
 
-	
 	@Override
 	public void derrumbarEdifice(IComponentIdentifier cidEdifice) {
-		Coordenada  edificio = this.getCoordenada(cidEdifice);
-		
+		Coordenada edificio = this.getCoordenada(cidEdifice);
+
 		for (int i = 0; i < this.mapa.length; i++) {
-			for (int j = 0; j < this.mapa[i].length; j++) {				
-				if((i<=edificio.getX()-8)&&(i>=edificio.getX()+8)&&(j<=edificio.getY()-8)&&(j>=edificio.getY()+8)){
+			for (int j = 0; j < this.mapa[i].length; j++) {
+				if ((i <= edificio.getX() - 8) && (i >= edificio.getX() + 8) && (j <= edificio.getY() - 8)
+						&& (j >= edificio.getY() + 8)) {
 					this.mapa[i][j].setDaño(9);
 				}
 			}
 		}
-		
+
+		EdificeAction info = new EdificeAction("derrumbe", new EdificePojo(cidEdifice.getLocalName(),
+				Traslator.getTraslator().getUbicacion(edificio), "derrumbe"));
+		this.bandejaMsg.put(cidEdifice.getLocalName(), info.toJson());
 	}
 
 	@Override
 	public void AdicionarPersonService(IComponentIdentifier person) {
-		if(!this.cidsPerson.contains(person)){
-			getLog().setDebug("Nuevo agente recibido por el zone: "+person.getLocalName());
+		if (!this.cidsPerson.contains(person)) {
+			getLog().setDebug("Nuevo agente recibido por el zone: " + person.getLocalName());
 			this.cidsPerson.add(person);
 		}
 	}
 
 	@Override
 	public void getRuta(IComponentIdentifier agent, Coordenada destino) {
-		Coordenada inicio  = this.getCoordenada(agent);
-		
-		RouteAction info = new RouteAction("route",
-				new RoutePojo(Traslator.getTraslator().getUbicacion(inicio), Traslator.getTraslator().getUbicacion(destino),agent));
-		
+		Coordenada inicio = this.getCoordenada(agent);
+
+		RouteAction info = new RouteAction("route", new RoutePojo(Traslator.getTraslator().getUbicacion(inicio),
+				Traslator.getTraslator().getUbicacion(destino), agent));
+
 		this.bandejaMsg.put(agent.getLocalName(), info.toJson());
-		
+
 		getLog().setDebug("Enviando mensaje con la peticion de la ruta");
 	}
 
 	@Override
 	public Coordenada getDestiny() {
-		
-		return new Coordenada(1,1);
+
+		return new Coordenada(1, 1);
 	}
 
 	@Override
 	public ArrayList<Coordenada> getPuntosSeguros() {
-    
+
 		ArrayList<Coordenada> lista = new ArrayList<Coordenada>();
-		
+
 		for (int i = 0; i < this.mapa.length; i++) {
-			for (int j = 0; j < this.mapa[i].length; j++) {				
-			        if(this.mapa[i][j].getDaño()<3){
-			        	lista.add(new Coordenada(i,j));
-			        }
+			for (int j = 0; j < this.mapa[i].length; j++) {
+				if (this.mapa[i][j].getDaño() < 3) {
+					lista.add(new Coordenada(i, j));
+				}
 			}
 		}
-		
-        ArrayList<Coordenada> depurada = (ArrayList<Coordenada>) reducirPuntos(lista).clone();
-		
+
+		@SuppressWarnings("unchecked")
+		ArrayList<Coordenada> depurada = (ArrayList<Coordenada>) reducirPuntos(lista).clone();
+
+		sendPuntosSeguros(depurada);
+
 		return depurada;
+	}
+
+	private void sendPuntosSeguros(ArrayList<Coordenada> puntosSeguros) {
+
+		for (Coordenada coordenada : puntosSeguros) {
+			contador++;
+			PuntoAction info = new PuntoAction("punto",
+					new PuntoPojo(Traslator.getTraslator().getUbicacion(coordenada), "seguro"));
+			this.bandejaMsg.put(agent.getComponentIdentifier().getLocalName() + contador, info.toJson());
+		}
+
 	}
 
 	@Override
 	public ArrayList<Coordenada> getPuntosInseguros() {
 
 		ArrayList<Coordenada> lista = new ArrayList<Coordenada>();
-		
+
 		for (int i = 0; i < this.mapa.length; i++) {
-			for (int j = 0; j < this.mapa[i].length; j++) {				
-			        if(this.mapa[i][j].getDaño()>6){
-			        	lista.add(new Coordenada(i,j));
-			        }
+			for (int j = 0; j < this.mapa[i].length; j++) {
+				if (this.mapa[i][j].getDaño() > 6) {
+					lista.add(new Coordenada(i, j));
+				}
 			}
 		}
-		
+
+		@SuppressWarnings("unchecked")
 		ArrayList<Coordenada> depurada = (ArrayList<Coordenada>) reducirPuntos(lista).clone();
-		
+		sendPuntosInseguros(depurada);
 		return depurada;
 	}
-	
-	
-	
+
+	private void sendPuntosInseguros(ArrayList<Coordenada> pInseguro) {
+
+		for (Coordenada coordenada : pInseguro) {
+			contador++;
+			PuntoAction info = new PuntoAction("punto",
+					new PuntoPojo(Traslator.getTraslator().getUbicacion(coordenada), "inseguro"));
+			this.bandejaMsg.put(agent.getComponentIdentifier().getLocalName() + contador, info.toJson());
+		}
+
+	}
+
 	/**
 	 * Meotodo para reducir puntos cercanos
+	 * 
 	 * @param lista
 	 * @return
 	 */
-	private ArrayList<Coordenada> reducirPuntos(ArrayList<Coordenada> lista){
-	
-		
-		ArrayList<Coordenada> lista2 = (ArrayList<Coordenada>) lista.clone();
+	@SuppressWarnings("unchecked")
+	private ArrayList<Coordenada> reducirPuntos(ArrayList<Coordenada> lista) {
+
 		ArrayList<Coordenada> listaf = new ArrayList<Coordenada>();
-		
-		for (int i = 0; i < lista.size(); i++) {
-			int contador = 0;
-			for (Coordenada coordenada : lista2) {
-				if(Math.abs((lista.get(i).getX()-coordenada.getX()))<8){
-					if(Math.abs((lista.get(i).getY()-coordenada.getY()))<8){
-						contador++;
-						lista2.remove(coordenada);
-					}
+
+		int tamaño = this.mapa.length;
+
+		int cantidadPuntos = Random.getIntRandom(5, 10);
+
+		int salto = tamaño / cantidadPuntos;
+
+		int humbral = 0;
+
+		int dindel = humbral + salto;
+
+		for (int i = 0; i < cantidadPuntos; i++) {
+
+			for (int j = 0; j < lista.size(); j++) {
+				if (lista.get(j).getX() >= humbral && lista.get(j).getX() <= dindel && lista.get(j).getY() >= humbral
+						&& lista.get(j).getY() <= dindel) {
+					humbral = humbral + salto;
+					dindel = humbral + salto;
+					listaf.add(lista.get(j));
+					j = lista.size();
 				}
 			}
-			
-			
-			if(contador>1){
-				listaf.add(lista.get(i));
-			}
+
 		}
-		
+
 		return (ArrayList<Coordenada>) listaf.clone();
-		
+
+	}
+
+	@Override
+	public void setDead(IComponentIdentifier agent) {
+
+		PersonAction info = new PersonAction("muerte", new PersonPojo(agent.getLocalName(),
+				Traslator.getTraslator().getUbicacion(this.getCoordenada(agent)), "muerte"));
+		this.bandejaMsg.put(agent.getLocalName(), info.toJson());
 	}
 
 }

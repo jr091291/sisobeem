@@ -1,14 +1,10 @@
 package sisobeem.capabilitys;
 
-import static sisobeem.artifacts.Log.getLog;
-
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Goal;
-import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
-import jadex.bridge.IInternalAccess;
 
 @Capability
 public class ResguardarseCapability {

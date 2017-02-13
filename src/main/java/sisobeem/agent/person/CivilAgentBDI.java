@@ -9,7 +9,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedServices;
-import sisobeem.capabilitys.EvacuarCapability.Evacuar;
 import sisobeem.capabilitys.MoveCapability.Aleatorio;
 import sisobeem.utilities.Random;
 
@@ -77,9 +76,15 @@ public class CivilAgentBDI extends PersonAgentBDI  {
 		}
 	}
 
+	/*
+	@Plan(trigger=@Trigger(goalfinisheds={sisobeem.capabilitys.EvacuarCapability.Evacuar.class,}))
+	public void  Evacuar2()
+	{   
+		System.out.println("Terminó");
+	}
 	
 
-	
+	*/
 	/**
 	 * Acciones al recibir distintos tipos de mensajes
 	 */
@@ -172,6 +177,8 @@ public class CivilAgentBDI extends PersonAgentBDI  {
 	public String getEstado() {
 		return this.estado;
 	}
+
+
 
 
 	

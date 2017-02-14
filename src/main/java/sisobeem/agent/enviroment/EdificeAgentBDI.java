@@ -484,4 +484,11 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 
 	}
 
+	@Override
+	public void Team(IComponentIdentifier emisor) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }

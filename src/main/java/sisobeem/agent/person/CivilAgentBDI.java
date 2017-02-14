@@ -1,5 +1,7 @@
 package sisobeem.agent.person;
 
+import java.util.ArrayList;
+
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
@@ -9,6 +11,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedServices;
+import sisobeem.artifacts.Coordenada;
 import sisobeem.capabilitys.MoveCapability.Aleatorio;
 import sisobeem.utilities.Random;
 
@@ -174,9 +177,16 @@ public class CivilAgentBDI extends PersonAgentBDI  {
 
 
 	@Override
-	public String getEstado() {
-		return this.estado;
+	public void Team(IComponentIdentifier parner) {
+		// TODO Auto-generated method stub
+		
 	}
+
+
+
+
+
+
 
 
 

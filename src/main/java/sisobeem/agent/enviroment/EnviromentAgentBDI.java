@@ -27,6 +27,7 @@ import sisobeem.services.personServices.IReceptorMensajesService;
 @Agent
 @ProvidedServices({
 	                @ProvidedService(name = "IGetPersonHelpService",type = IGetPersonHelpService.class),
+	             //   @ProvidedService(name = "ITeamService",type = ITeamService.class),
 	                @ProvidedService(name = "IComunicarMensajesService",type = IComunicarMensajesService.class)})
 @RequiredServices({ @RequiredService(name = "IReceptorMensajesService", type = IReceptorMensajesService.class)})
 @Description("Abstrae el comportamiento de un ambiente")
@@ -308,6 +309,37 @@ public abstract class EnviromentAgentBDI implements IComunicarMensajesService,IG
 		}
 
 	}
+	
+	@Override
+	public void Team(IComponentIdentifier emisor, IComponentIdentifier receptor) {
+		if (this.cidsPerson.contains(emisor) || this.cidsPerson.contains(receptor)) {
+			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
+					.searchService(IReceptorMensajesService.class, receptor);
+
+			persona.addResultListener(new IResultListener<IReceptorMensajesService>() {
+
+				@Override
+				public void resultAvailable(IReceptorMensajesService result) {
+					getLog().setInfo("Enviando mensaje Team de: " + emisor.getLocalName() + " para:"
+							+ receptor.getLocalName());
+					result.Team(emisor);
+
+				}
+
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					getLog().setFatal(exception.getMessage());
+				}
+
+			});
+		} else {
+
+			getLog().setInfo("Mensaje no enviado, ya que no se encuentra al agente Emisor: " + emisor.getLocalName()
+					+ " ó al agente: " + receptor.getLocalName());
+		}
+
+	}
+
 	
 	
 

@@ -1,5 +1,7 @@
 package sisobeem.services.personServices;
 
+import java.util.ArrayList;
+
 import jadex.bridge.IComponentIdentifier;
 import sisobeem.artifacts.Coordenada;
 
@@ -42,5 +44,7 @@ public interface ISetBeliefPersonService {
 	
 	
 	public void setToCoordinador(IComponentIdentifier coordinador);
+	
+	public void setRute(ArrayList<Coordenada> rute);
     
 }

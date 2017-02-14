@@ -20,6 +20,7 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import sisobeem.services.personServices.IGetInformationService;
 import sisobeem.services.personServices.IReceptorMensajesService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 import sisobeem.services.personServices.ISetStartService;
@@ -27,6 +28,7 @@ import sisobeem.services.personServices.IsetDerrumbeService;
 import sisobeem.services.plantServices.IDerrumbePlantService;
 import sisobeem.services.plantServices.IEvacuarPisoService;
 import sisobeem.services.plantServices.ISetBelifePlantService;
+import sisobeem.services.zoneServices.IGetInformationZoneService;
 
 @Agent
 @Description("Abstrae el comportamiento de una Piso")
@@ -400,6 +402,32 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 		}
 
 	}
+	
+	@Override
+	public void Team(IComponentIdentifier emisor) {
+		getLog().setInfo(emisor.getLocalName() + ": Armando team");
+		for (IComponentIdentifier receptor : cidsPerson) {
+			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
+					.searchService(IReceptorMensajesService.class, receptor);
+
+			persona.addResultListener(new IResultListener<IReceptorMensajesService>() {
+
+				@Override
+				public void resultAvailable(IReceptorMensajesService result) {
+
+					result.Team(emisor);
+
+				}
+
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					getLog().setFatal(exception.getMessage());
+				}
+
+			});
+		}
+	}
+
 
 	@Override
 	public void setStart(Boolean s) {
@@ -492,4 +520,6 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 		
 	}
 
+
+	
 }

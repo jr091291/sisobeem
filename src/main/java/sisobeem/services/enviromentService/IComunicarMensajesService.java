@@ -153,4 +153,12 @@ public interface IComunicarMensajesService {
 	 * @param receptor
 	 */
 	public void Motivacion(IComponentIdentifier emisor, IComponentIdentifier receptor);
+	
+	/**
+	 * Servicio que envia un mensaje de adesion al grupo
+	 * @param emisor
+	 */
+	public void Team(IComponentIdentifier emisor);
+	
+	public void Team(IComponentIdentifier emisor, IComponentIdentifier receptor);
 }

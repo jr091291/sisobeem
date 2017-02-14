@@ -111,6 +111,13 @@ public class BusquedaYRescateAgentBDI extends PersonAgentBDI{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
+	@Override
+	public void Team(IComponentIdentifier parner) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 
 }

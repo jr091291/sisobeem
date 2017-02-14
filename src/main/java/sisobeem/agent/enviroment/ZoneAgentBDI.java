@@ -1016,6 +1016,39 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		}
 
 	}
+	
+	@Override
+	public void Team(IComponentIdentifier emisor) {
+		ArrayList<IComponentIdentifier> listado = this.getAgentsInMyRange(emisor);
+
+		getLog().setInfo(emisor.getLocalName() + ": armado team ");
+
+		for (IComponentIdentifier receptor : listado) {
+
+			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
+					.searchService(IReceptorMensajesService.class, receptor);
+
+			persona.addResultListener(new IResultListener<IReceptorMensajesService>() {
+
+				@Override
+				public void resultAvailable(IReceptorMensajesService result) {
+
+					result.Team(emisor);
+
+				}
+
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					getLog().setFatal(exception.getMessage());
+				}
+
+			});
+
+		}
+
+		
+	}
+
 
 	@Override
 	public void derrumbarEdifice(IComponentIdentifier cidEdifice) {
@@ -1164,10 +1197,13 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 	@Override
 	public void setDead(IComponentIdentifier agent) {
-
-		PersonAction info = new PersonAction("muerte", new PersonPojo(agent.getLocalName(),
+     		PersonAction info = new PersonAction("muerte", new PersonPojo(agent.getLocalName(),
 				Traslator.getTraslator().getUbicacion(this.getCoordenada(agent)), "muerte"));
 		this.bandejaMsg.put(agent.getLocalName(), info.toJson());
 	}
+
+
+
+	
 
 }

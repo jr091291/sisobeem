@@ -7,4 +7,10 @@ public interface IGetInformationService {
 	 * @return
 	 */
 	public String getEstado();
+	
+	/***
+	 * Metodo que devulve el liderazgo
+	 * @return
+	 */
+	public double getLiderazgo();
 }

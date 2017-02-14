@@ -31,7 +31,9 @@ import sisobeem.capabilitys.MoveCapability;
 import sisobeem.capabilitys.MoveCapability.Aleatorio;
 import sisobeem.capabilitys.ResguardarseCapability;
 import sisobeem.capabilitys.SuicidioCapability;
+import sisobeem.capabilitys.TeamCapability;
 import sisobeem.services.edificeServices.IEvacuarService;
+import sisobeem.services.personServices.ITeamService;
 import sisobeem.services.personServices.IGetInformationService;
 import sisobeem.services.personServices.IReceptorMensajesService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
@@ -61,9 +63,10 @@ import static sisobeem.artifacts.Log.getLog;
     @ProvidedService(type=IGetInformationService.class),
     @ProvidedService(type=ISetBeliefPersonService.class),
     @ProvidedService(type=IReceptorMensajesService.class),
+    @ProvidedService(type=ITeamService.class),
     @ProvidedService(type=IsetDerrumbeService.class)
     })  
-public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStartService,IReceptorMensajesService,IGetInformationService,IsetDerrumbeService {
+public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStartService,IReceptorMensajesService,IGetInformationService,IsetDerrumbeService,ITeamService {
     
 	@Belief
 	Boolean start;
@@ -103,6 +106,10 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	@Belief 
 	Coordenada myPosition;
 	
+	
+	@Belief
+	protected ArrayList<Coordenada> rute;
+	
 	@Belief
 	Coordenada myDestiny;
 
@@ -122,6 +129,12 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	@Belief
 	protected ArrayList<IComponentIdentifier> cidsPeopleHelp;
 	
+	@Belief
+	protected ArrayList<IComponentIdentifier> team;
+	
+	@Belief
+	protected Boolean contextTeam = false;
+	
 	/**
 	 * Capacidades
 	 */
@@ -137,11 +150,14 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	@Capability(beliefmapping=@Mapping(target="cidsPeopleHelp", value = "cidsPeopleHelp"))
 	protected FindPersonHelpCapability FindPersonHelpCapability = new FindPersonHelpCapability();
 	
+	@Capability(beliefmapping=@Mapping(target="team", value = "team"))
+	protected TeamCapability grupo = new TeamCapability();
+	
 	@Capability
 	protected EvacuarCapability EvacuarEdificio = new EvacuarCapability();
 
 	@Capability(beliefmapping=@Mapping(target="salud", value = "salud"))
-	protected SuicidioCapability Suicidio = new SuicidioCapability();
+	protected SuicidioCapability suicidio = new SuicidioCapability();
 	/**
 	 *  Get the agent.
 	 *  @return The agent.
@@ -319,8 +335,36 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	}
 	
 
+	@Override
+	public double getLiderazgo() {
+		return liderazgo;
+	}
+
 	
-	
+	@Override
+	public String getEstado() {
+		return this.estado;
+	}
+
+
+	@Override
+	public void entrar(IComponentIdentifier agente) {
+		if(!this.team.contains(agente))this.team.add(agente);
+	}
+
+
+	@Override
+	public void salir(IComponentIdentifier agente) {
+		if(this.team.contains(agente))this.team.remove(agente);
+	}
+
+
+	@Override
+	public void setRute(ArrayList<Coordenada> rute) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 	
 	

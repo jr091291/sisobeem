@@ -65,4 +65,11 @@ public interface IReceptorMensajesService {
 	 * Confianza,miedo y tristeza
 	 */
 	public void MotivacionMsj();
+	
+	
+	/**
+	 * Mensaje para recepcionar los pedidos de team
+	 * @param parner
+	 */
+	public void Team(IComponentIdentifier parner);
 }

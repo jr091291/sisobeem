@@ -111,5 +111,11 @@ public class SaludAgentBDI extends PersonAgentBDI{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
+	@Override
+	public void Team(IComponentIdentifier parner) {
+		
+	}
 	
 }

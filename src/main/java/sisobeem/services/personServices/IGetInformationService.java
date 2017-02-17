@@ -13,4 +13,10 @@ public interface IGetInformationService {
 	 * @return
 	 */
 	public double getLiderazgo();
+	
+	/**
+	 * Metoodo que devuelve el estado de salud
+	 * @return
+	 */
+	public int getSalud();
 }

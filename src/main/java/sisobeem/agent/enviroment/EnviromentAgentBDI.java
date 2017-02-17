@@ -343,17 +343,6 @@ public abstract class EnviromentAgentBDI implements IComunicarMensajesService,IG
 	
 	
 
-	@Override
-	public ArrayList<IComponentIdentifier> getPeopleHelp() {
-		// TODO Auto-generated method stub
-		
-		System.out.println("Generando Listado");
-		ArrayList<IComponentIdentifier> listado = new ArrayList<IComponentIdentifier>();
-		
-	    // Codigo para conseguir a los agentes que necesiten ayuda
-		
-		listado.add(this.agent.getComponentIdentifier());
-		return listado;
-	}
+
 
 }

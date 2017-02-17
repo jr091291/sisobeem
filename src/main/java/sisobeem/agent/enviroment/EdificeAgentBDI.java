@@ -321,7 +321,7 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 
 	@Override
 	public int getSalidasDisponibles(double conocimientoDeLaZona) {
-		if (conocimientoDeLaZona > 50) {
+		if (conocimientoDeLaZona > 0) {
 			return salidas;
 		}
 
@@ -488,6 +488,19 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 	public void Team(IComponentIdentifier emisor) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public ArrayList<IComponentIdentifier> getPeopleHelp(IComponentIdentifier agent) {
+		// TODO Auto-generated method stub
+		
+		System.out.println("Generando Listado");
+		ArrayList<IComponentIdentifier> listado = new ArrayList<IComponentIdentifier>();
+		
+	    // Codigo para conseguir a los agentes que necesiten ayuda
+		
+		listado.add(this.agent.getComponentIdentifier());
+		return listado;
 	}
 
 

@@ -54,6 +54,17 @@ public class EvacuarCapability {
 			this.cidEdifice = cidEdifice;
 			CambiarDePiso();
 		}
+		
+		public Evacuar(IInternalAccess agent, double conocimientoZona, IComponentIdentifier cidPiso,
+				IComponentIdentifier cidEdifice, IComponentIdentifier lider) {
+			// System.out.println(agent.getComponentIdentifier().getLocalName());
+			//getLog().setDebug(" Entró a la capacidad de Evacuar");
+			this.agent = agent;
+			this.conocimientoZona = 2;
+			this.cidPiso = cidPiso;
+			this.cidEdifice = cidEdifice;
+			CambiarDePiso();
+		}
 
 		/**
 		 * Plan que consulta los cids de las personas que necesitan ayuda

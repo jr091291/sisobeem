@@ -118,6 +118,20 @@ public class BusquedaYRescateAgentBDI extends PersonAgentBDI{
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	@Override
+	public void TomaDeDecisiones() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public int getSalud() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	
 
 }

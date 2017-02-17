@@ -59,7 +59,7 @@ public class FindPersonHelpCapability {
 
 				@Override
 				public void resultAvailable(IGetPersonHelpService result) {
-					setCidsPeopleHelp(result.getPeopleHelp());
+					setCidsPeopleHelp(result.getPeopleHelp(agent.getComponentIdentifier()));
 				}
 
 				@Override

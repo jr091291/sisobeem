@@ -519,6 +519,42 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 		}
 		
 	}
+	
+	@Override
+	public ArrayList<IComponentIdentifier> getPeopleHelp(IComponentIdentifier agent) {
+		// TODO Auto-generated method stub
+		
+		System.out.println("Generando Listado");
+		ArrayList<IComponentIdentifier> listado = new ArrayList<IComponentIdentifier>();
+		
+	    // Codigo para conseguir a los agentes que necesiten ayuda
+		
+		for (IComponentIdentifier receptor : cidsPerson) {
+			IFuture<IGetInformationService> persona = getAgent().getComponentFeature(IRequiredServicesFeature.class)
+					.searchService(IGetInformationService.class, receptor);
+
+			persona.addResultListener(new IResultListener<IGetInformationService>() {
+
+				@Override
+				public void resultAvailable(IGetInformationService result) {
+
+					if(result.getSalud()<70){
+						listado.add(receptor);
+					}
+
+				}
+
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					getLog().setFatal(exception.getMessage());
+				}
+
+			});
+		}
+		
+		//listado.add(this.agent.getComponentIdentifier());
+		return listado;
+	}
 
 
 	

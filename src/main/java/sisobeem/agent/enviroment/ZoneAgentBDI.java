@@ -47,6 +47,7 @@ import sisobeem.core.simulation.SimulationConfig;
 import sisobeem.interfaces.ISismo;
 import sisobeem.services.coordinadorService.ISetZone;
 import sisobeem.services.edificeServices.ISetBeliefEdificeService;
+import sisobeem.services.personServices.IGetInformationService;
 import sisobeem.services.personServices.IReceptorMensajesService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 import sisobeem.services.personServices.ISetStartService;
@@ -1202,7 +1203,42 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		this.bandejaMsg.put(agent.getLocalName(), info.toJson());
 	}
 
+	@Override
+	public ArrayList<IComponentIdentifier> getPeopleHelp(IComponentIdentifier agent) {
+		// TODO Auto-generated method stub
+		
+		ArrayList<IComponentIdentifier> agents = this.getAgentsInMyRange(agent);
+		//System.out.println("Generando Listado");
+		ArrayList<IComponentIdentifier> listado = new ArrayList<IComponentIdentifier>();
+		
+	    // Codigo para conseguir a los agentes que necesiten ayuda
+		for (IComponentIdentifier a : agents) {
 
+			IFuture<IGetInformationService> persona = getAgent().getComponentFeature(IRequiredServicesFeature.class)
+					.searchService(IGetInformationService.class, a);
+
+			persona.addResultListener(new IResultListener<IGetInformationService>() {
+
+				@Override
+				public void resultAvailable(IGetInformationService result){
+					if(result.getSalud()<70){
+						listado.add(a);
+					}
+
+				}
+
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					getLog().setFatal(exception.getMessage());
+				}
+
+			});
+
+		}
+
+
+		return listado;
+	}
 
 	
 

@@ -29,7 +29,7 @@ public class ResguardarseCapability {
 
 		@Plan
 		protected void MovimientoOff() {
-			SetContextCaminar(false);
+			SetContextResguardarse(true);
 		
 		}
 
@@ -40,12 +40,12 @@ public class ResguardarseCapability {
 	 * Get the contextCaminar
 	 */
 	@Belief
-	public native Boolean getContextCaminar();
+	public native Boolean getContextResguardarse();
 
 	/**
 	 * Set contextCaminar
 	 * @param Boolean
 	 */
 	@Belief
-	public native void SetContextCaminar(Boolean valor);
+	public native void SetContextResguardarse(Boolean valor);
 }

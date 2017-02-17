@@ -5,6 +5,9 @@ package sisobeem.agent.person;
 
 import java.util.ArrayList;
 import java.util.Map;
+
+import org.junit.experimental.categories.Category;
+
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Mapping;
@@ -24,14 +27,17 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import sisobeem.artifacts.Coordenada;
+import sisobeem.capabilitys.ComunicarseCapability;
 import sisobeem.capabilitys.EvacuarCapability;
 import sisobeem.capabilitys.FindPersonHelpCapability;
+import sisobeem.capabilitys.FindSalidasDisponiblesCapability;
 import sisobeem.capabilitys.IdentificarZonasSegurasCapability;
 import sisobeem.capabilitys.MoveCapability;
 import sisobeem.capabilitys.MoveCapability.Aleatorio;
 import sisobeem.capabilitys.ResguardarseCapability;
 import sisobeem.capabilitys.SuicidioCapability;
 import sisobeem.capabilitys.TeamCapability;
+import sisobeem.interfaces.ITomarDecisiones;
 import sisobeem.services.edificeServices.IEvacuarService;
 import sisobeem.services.personServices.ITeamService;
 import sisobeem.services.personServices.IGetInformationService;
@@ -66,7 +72,7 @@ import static sisobeem.artifacts.Log.getLog;
     @ProvidedService(type=ITeamService.class),
     @ProvidedService(type=IsetDerrumbeService.class)
     })  
-public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStartService,IReceptorMensajesService,IGetInformationService,IsetDerrumbeService,ITeamService {
+public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStartService,IReceptorMensajesService,IGetInformationService,IsetDerrumbeService,ITeamService,ITomarDecisiones {
     
 	@Belief
 	Boolean start;
@@ -104,6 +110,9 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	double liderazgo,conocimientoZona,riesgo;
 	
 	@Belief 
+	int salidasDisponibles;
+	
+	@Belief 
 	Coordenada myPosition;
 	
 	
@@ -115,6 +124,12 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 
 	@Belief
 	protected Boolean contextCaminar;
+	
+	@Belief
+	protected Boolean contextSismo;
+	
+	@Belief
+	protected Boolean contextResguardarse;
 	
 	@Belief
 	int velocidad;
@@ -144,7 +159,7 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	@Capability(beliefmapping=@Mapping(target="myDestiny", value = "myDestiny"))
 	protected IdentificarZonasSegurasCapability IdentificarZonas = new IdentificarZonasSegurasCapability();
 	
-	@Capability(beliefmapping=@Mapping(target="contextCaminar", value = "contextCaminar"))
+	@Capability(beliefmapping=@Mapping(target="contextResguardarse", value = "contextResguardarse"))
 	protected ResguardarseCapability resguardarse = new ResguardarseCapability();
 	
 	@Capability(beliefmapping=@Mapping(target="cidsPeopleHelp", value = "cidsPeopleHelp"))
@@ -158,6 +173,12 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 
 	@Capability(beliefmapping=@Mapping(target="salud", value = "salud"))
 	protected SuicidioCapability suicidio = new SuicidioCapability();
+	
+	@Capability
+	protected ComunicarseCapability msg = new ComunicarseCapability();
+    
+	@Capability(beliefmapping=@Mapping(target="salidasDisponibles", value = "salidasDisponibles")) 
+	protected FindSalidasDisponiblesCapability findsalidas = new FindSalidasDisponiblesCapability();
 	/**
 	 *  Get the agent.
 	 *  @return The agent.
@@ -198,6 +219,8 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 		this.riesgo = 0;
 		this.estado="Nomal";
 		
+		this.contextSismo = false;
+		this.salidasDisponibles = -1;
 		
 		
 	}
@@ -219,6 +242,7 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	public void start()
 	{   
 		
+		this.TomaDeDecisiones();
 		//getLog().setDebug(this.getAgent().getComponentIdentifier().getLocalName()+" : "+this.conocimientoZona);
 		
 		if(this.cidPlant==null){
@@ -284,8 +308,16 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 
 	@Override
 	public void setSismo(double intensidad) {
-		this.intensidadSismo=intensidad;
-		//getLog().setDebug(""+intensidad);
+		
+		if(intensidad>=0){
+			this.intensidadSismo=intensidad;
+			if(!this.contextSismo){
+				this.contextSismo = true;
+			}
+			//getLog().setDebug(""+intensidad);
+		}else{
+			this.contextSismo = false;
+		}
 	}
 	
 	

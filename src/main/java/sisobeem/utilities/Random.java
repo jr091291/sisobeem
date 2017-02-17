@@ -80,10 +80,10 @@ public  class Random {
     	
 		for (int i = 0; i < salud.length; i++) {
 			if(cBajo>0){
-				salud[i] = getIntRandom(0, 50);
+				salud[i] = getIntRandom(0, 70);
 				cBajo--;
 			}else{
-				salud[i] = getIntRandom(50, 100);
+				salud[i] = getIntRandom(70, 100);
 			}
 		}
 		

@@ -10,6 +10,6 @@ public interface IGetPersonHelpService {
 	 * Servicio que presta el ambiente para consultar el listado de personas que necesitan ayuda
 	 * @return
 	 */
-	public ArrayList<IComponentIdentifier> getPeopleHelp();
+	public ArrayList<IComponentIdentifier> getPeopleHelp(IComponentIdentifier agent);
 
 }

@@ -162,6 +162,64 @@ public class TeamCapability {
 	}
 	
 	
+
+	/**
+	 *  Conformacion de grupos
+	 * @author Erley
+	 *
+	 */
+	@Goal(excludemode = ExcludeMode.Never)
+	public class AddPersonNeedHelp {
+		
+		@GoalParameter
+		IInternalAccess agent;
+		
+		@GoalParameter
+		IComponentIdentifier enviroment;
+		
+		@GoalParameter
+		IComponentIdentifier receptor;
+		
+		@GoalParameter
+		ArrayList<IComponentIdentifier> listado;
+
+		public AddPersonNeedHelp(IInternalAccess agent,IComponentIdentifier enviroment, ArrayList<IComponentIdentifier> listado) {
+			this.agent = agent;
+			this.enviroment = enviroment;
+			this.listado = listado;
+			sendMensaje(this.agent,this.enviroment,this.listado);
+		}
+		
+	
+		@Plan
+		protected void sendMensaje(IInternalAccess agent,IComponentIdentifier enviroment, ArrayList<IComponentIdentifier> listado) {
+			
+		  for (IComponentIdentifier a : listado) {
+			
+				IFuture<IComunicarMensajesService> zoneService = agent.getComponentFeature(IRequiredServicesFeature.class)
+						.searchService(IComunicarMensajesService.class, a);
+
+				zoneService.addResultListener(new IResultListener<IComunicarMensajesService>() {
+
+					@Override
+					public void resultAvailable(IComunicarMensajesService result) {
+						result.Team(agent.getComponentIdentifier());
+					}
+
+					@Override
+					public void exceptionOccurred(Exception exception) {
+	                     getLog().setError(exception.getMessage());
+					}
+
+				});
+		}
+
+		}
+		
+		
+	}
+	
+	
 	
 	
 	

@@ -117,5 +117,19 @@ public class SaludAgentBDI extends PersonAgentBDI{
 	public void Team(IComponentIdentifier parner) {
 		
 	}
+
+
+	@Override
+	public void TomaDeDecisiones() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public int getSalud() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	
 }

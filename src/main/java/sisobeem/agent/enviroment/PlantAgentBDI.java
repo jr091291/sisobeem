@@ -20,6 +20,10 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import sisobeem.artifacts.Coordenada;
+import sisobeem.artifacts.print.pojo.EdificePojo;
+import sisobeem.services.edificeServices.IEvacuarService;
+import sisobeem.services.edificeServices.IGetEstadisticasService;
 import sisobeem.services.personServices.IGetInformationService;
 import sisobeem.services.personServices.IReceptorMensajesService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
@@ -29,6 +33,8 @@ import sisobeem.services.plantServices.IDerrumbePlantService;
 import sisobeem.services.plantServices.IEvacuarPisoService;
 import sisobeem.services.plantServices.ISetBelifePlantService;
 import sisobeem.services.zoneServices.IGetInformationZoneService;
+import sisobeem.services.zoneServices.ISetInformationService;
+import sisobeem.utilities.Traslator;
 
 @Agent
 @Description("Abstrae el comportamiento de una Piso")
@@ -38,20 +44,34 @@ import sisobeem.services.zoneServices.IGetInformationZoneService;
 @ProvidedServices({ @ProvidedService(name = "IEvacuarPisoService",type = IEvacuarPisoService.class),
 	                @ProvidedService(name = "ISetStartService",type = ISetStartService.class),
 	                @ProvidedService(name = "IDerrumbePlantService",type = IDerrumbePlantService.class),
-	                @ProvidedService(name = "ISetBelifePlantService", type = ISetBelifePlantService.class) })
-public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlantService,ISetStartService,IEvacuarPisoService,IDerrumbePlantService {
+	                @ProvidedService(name = "ISetBelifePlantService", type = ISetBelifePlantService.class),
+	                @ProvidedService(name = "IGetEstadisticasService", type = IGetEstadisticasService.class)  })
+public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlantService,ISetStartService,IEvacuarPisoService,IDerrumbePlantService, IGetEstadisticasService {
 
 	@Belief
 	IComponentIdentifier cidEdifice;
 	@Belief
 	IComponentIdentifier cidZone;
+	
+
 
 	@SuppressWarnings("unchecked")
 	@AgentCreated
 	public void init() {
+		
+
+		this.contMsgAyuda= new ArrayList<IComponentIdentifier>();
+		this.contMsgDeCalma=new ArrayList<IComponentIdentifier>();
+		this.contMsgDeConfianza= new ArrayList<IComponentIdentifier>();
+		this.contMsgFrsutracion=new ArrayList<IComponentIdentifier>();
+		this.contMsgHostilidad=new ArrayList<IComponentIdentifier>();
+		this.contMsgPanico= new ArrayList<IComponentIdentifier>();
+		this.contMsgPrimerosAux= new ArrayList<IComponentIdentifier>();
+		this.contMsgResguardo= new ArrayList<IComponentIdentifier>();
+		this.contMsgMotivacion= new ArrayList<IComponentIdentifier>();
 		// Accedemos a los argumentos del agente
 		this.arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
-
+       
 		// Obtenemos los cid de las personas en la Zona
 		cidsPerson = (ArrayList<IComponentIdentifier>) arguments.get("cidsPerson");
 
@@ -158,6 +178,7 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 		}
 	}
 
+	
 	/**
 	 * Servicios de comunicacion de mensajes en rango de escucha
 	 */
@@ -165,6 +186,8 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	public void AyudaMsj(IComponentIdentifier emisor) {
 
 		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Ayuda");
+		this.contMsgAyuda.add(emisor);
+	//	System.out.println(this.contMsgAyuda);
 		for (IComponentIdentifier receptor : cidsPerson) {
 			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IReceptorMensajesService.class, receptor);
@@ -192,6 +215,9 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	public void PrimeroAuxMsj(IComponentIdentifier emisor) {
 
 		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de PrimeroAux");
+		this.contMsgPrimerosAux.add(emisor);
+		System.out.println(this.contMsgPrimerosAux);
+		
 		for (IComponentIdentifier receptor : cidsPerson) {
 			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IReceptorMensajesService.class, receptor);
@@ -219,6 +245,8 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	public void CalmaMsj(IComponentIdentifier emisor) {
 		
 		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Calma");
+		this.contMsgDeCalma.add(emisor);
+	//	System.out.println(this.contMsgDeCalma);
 		for (IComponentIdentifier receptor : cidsPerson) {
 			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IReceptorMensajesService.class, receptor);
@@ -246,6 +274,8 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	public void ConfianzaMsj(IComponentIdentifier emisor) {
 		
 		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Confianza");
+		this.contMsgDeConfianza.add(emisor);
+		//System.out.println(this.contMsgDeConfianza);
 		for (IComponentIdentifier receptor : cidsPerson) {
 			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IReceptorMensajesService.class, receptor);
@@ -273,6 +303,7 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	public void FrustracionMsj(IComponentIdentifier emisor) {
 		
 		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Frustracion");
+		this.contMsgFrsutracion.add(emisor);
 		for (IComponentIdentifier receptor : cidsPerson) {
 			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IReceptorMensajesService.class, receptor);
@@ -299,7 +330,8 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	@Override
 	public void HostilMsj(IComponentIdentifier emisor) {
 		
-		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje Hostil");
+	//	getLog().setInfo(emisor.getLocalName() + ": Envia mensaje Hostil");
+		this.contMsgHostilidad.add(emisor);
 		for (IComponentIdentifier receptor : cidsPerson) {
 			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IReceptorMensajesService.class, receptor);
@@ -327,6 +359,7 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	public void PanicoMsj(IComponentIdentifier emisor) {
 		
 		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Panico");
+		this.contMsgPanico.add(emisor);
 		for (IComponentIdentifier receptor : cidsPerson) {
 			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IReceptorMensajesService.class, receptor);
@@ -352,7 +385,8 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	@Override
 	public void ResguardoMsj(IComponentIdentifier emisor) {
 		
-		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Resguardo");
+	//	getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Resguardo");
+		this.contMsgResguardo.add(emisor);
 		for (IComponentIdentifier receptor : cidsPerson) {
 			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IReceptorMensajesService.class, receptor);
@@ -379,7 +413,8 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	@Override
 	public void Motivacion(IComponentIdentifier emisor) {
 		
-		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Motivacion");
+		//getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Motivacion");
+		this.contMsgMotivacion.add(emisor);
 		for (IComponentIdentifier receptor : cidsPerson) {
 			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IReceptorMensajesService.class, receptor);
@@ -403,30 +438,6 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 
 	}
 	
-	@Override
-	public void Team(IComponentIdentifier emisor) {
-		getLog().setInfo(emisor.getLocalName() + ": Armando team");
-		for (IComponentIdentifier receptor : cidsPerson) {
-			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
-					.searchService(IReceptorMensajesService.class, receptor);
-
-			persona.addResultListener(new IResultListener<IReceptorMensajesService>() {
-
-				@Override
-				public void resultAvailable(IReceptorMensajesService result) {
-
-					result.Team(emisor);
-
-				}
-
-				@Override
-				public void exceptionOccurred(Exception exception) {
-					getLog().setFatal(exception.getMessage());
-				}
-
-			});
-		}
-	}
 
 
 	@Override
@@ -555,6 +566,100 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 		//listado.add(this.agent.getComponentIdentifier());
 		return listado;
 	}
+
+	@Override
+	public void Team(IComponentIdentifier emisor, double liderazgo) {
+		
+			getLog().setInfo(emisor.getLocalName() + ": Armando team");
+			for (IComponentIdentifier receptor : cidsPerson) {
+				IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
+						.searchService(IReceptorMensajesService.class, receptor);
+
+				persona.addResultListener(new IResultListener<IReceptorMensajesService>() {
+
+					@Override
+					public void resultAvailable(IReceptorMensajesService result) {
+
+						result.Team(emisor,liderazgo);
+
+					}
+
+					@Override
+					public void exceptionOccurred(Exception exception) {
+						getLog().setFatal(exception.getMessage());
+					}
+
+				});
+			}
+	
+
+		
+	}
+
+	@Override
+	public void Suicidar(IComponentIdentifier agent) {
+		IFuture<IEvacuarService> persona = getAgent().getComponentFeature(IRequiredServicesFeature.class)
+				.searchService(IEvacuarService.class, cidEdifice);
+
+		persona.addResultListener(new IResultListener<IEvacuarService>() {
+
+			@Override
+			public void resultAvailable(IEvacuarService result) {
+				result.Suicidar(agent);
+
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception) {
+				getLog().setFatal(exception.getMessage());
+			}
+
+		});
+	}
+
+	@Override
+	public EdificePojo getEstiditicas() {
+		  EdificePojo datos = new EdificePojo(getAgent().getComponentIdentifier().getLocalName(),Traslator.getTraslator().getUbicacion(new Coordenada(0,0)) , "estadisticas"); 
+		
+		//	datos.setPersonasMuertas(this.cidPersonDead.size());
+		
+				datos.setMsgAyuda(this.contMsgAyuda.size());
+				datos.setMsgDeCalma(this.contMsgDeCalma.size());
+				datos.setMsgDeConfianza(this.contMsgDeConfianza.size());
+				datos.setMsgFrsutracion(this.contMsgFrsutracion.size());
+				datos.setMsgHostilidad(this.contMsgHostilidad.size());
+				datos.setMsgMotivacion(this.contMsgMotivacion.size());
+				datos.setMsgPanico(this.contMsgPanico.size());
+				datos.setMsgPrimerosAux(this.contMsgPrimerosAux.size());
+				datos.setMsgResguardo(this.contMsgResguardo.size());
+				SetEstadisticas(datos);
+		    return datos;
+	}
+	
+	
+	public void SetEstadisticas(EdificePojo datos) {
+		IFuture<ISetInformationService> persona = getAgent().getComponentFeature(IRequiredServicesFeature.class)
+				.searchService(ISetInformationService.class, cidEdifice);
+
+		persona.addResultListener(new IResultListener<ISetInformationService>() {
+
+			@Override
+			public void resultAvailable(ISetInformationService result) {
+				result.setEstadisticasEdifice(datos);
+
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception) {
+				getLog().setFatal(exception.getMessage());
+			}
+
+		});
+	}
+	
+	
+	
+
 
 
 	

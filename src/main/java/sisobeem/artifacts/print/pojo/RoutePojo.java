@@ -5,15 +5,16 @@ import sisobeem.artifacts.Ubicacion;
 
 public class RoutePojo {
 	
-	private IComponentIdentifier agent;
+	private String agent;
 	private Ubicacion origen;
 	private Ubicacion destino;
 	private Ubicacion[] coordenadas;
 
-	public RoutePojo(Ubicacion origen, Ubicacion destino, IComponentIdentifier agent) {
+	public RoutePojo(Ubicacion origen, Ubicacion destino, String agent) {
 		super();
 		this.origen = origen;
 		this.destino = destino;
+		
 		this.setAgent(agent);
 	}
 
@@ -47,12 +48,12 @@ public class RoutePojo {
 	}
 
 
-	public IComponentIdentifier getAgent() {
+	public String getAgent() {
 		return agent;
 	}
 
 
-	public void setAgent(IComponentIdentifier agent) {
+	public void setAgent(String agent) {
 		this.agent = agent;
 	}
 }

@@ -48,6 +48,7 @@ import sisobeem.services.personServices.IsetDerrumbeService;
 import sisobeem.services.plantServices.IEvacuarPisoService;
 import sisobeem.services.plantServices.ISetBelifePlantService;
 import sisobeem.services.zoneServices.IMapaService;
+import sisobeem.services.zoneServices.ISetInformationService;
 import sisobeem.utilities.Random;
 import static sisobeem.artifacts.Log.getLog;
 
@@ -126,7 +127,7 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	protected Boolean contextCaminar;
 	
 	@Belief
-	protected Boolean contextSismo;
+	protected Boolean contextSismo = false;
 	
 	@Belief
 	protected Boolean contextResguardarse;
@@ -220,7 +221,10 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 		this.estado="Nomal";
 		
 		this.contextSismo = false;
+		
+		System.out.println("sss:"+ contextSismo);
 		this.salidasDisponibles = -1;
+
 		
 		
 	}
@@ -356,7 +360,47 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	private void ValidarVida(){
 		if(this.salud<1){
 			this.vivo=false;
-			getLog().setInfo("EL agente: "+getAgent().getComponentIdentifier().getLocalName()+" está muerto");
+			
+		    if(this.cidPlant==null){
+		    	IFuture<ISetInformationService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
+						.searchService(ISetInformationService.class, this.cidZone);
+
+				persona.addResultListener(new IResultListener<ISetInformationService>() {
+
+					@Override
+					public void resultAvailable(ISetInformationService result) {
+
+						result.setDead(getAgent().getComponentIdentifier());
+
+					}
+
+					@Override
+					public void exceptionOccurred(Exception exception) {
+						getLog().setFatal(exception.getMessage());
+					}
+
+				});
+		    }else{
+		    	IFuture<ISetInformationService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
+						.searchService(ISetInformationService.class, this.cidEdifice);
+
+				persona.addResultListener(new IResultListener<ISetInformationService>() {
+
+					@Override
+					public void resultAvailable(ISetInformationService result) {
+
+						result.setDead(getAgent().getComponentIdentifier());
+
+					}
+
+					@Override
+					public void exceptionOccurred(Exception exception) {
+						getLog().setFatal(exception.getMessage());
+					}
+
+				});
+		    	
+		    }
 		}
 	}
 	
@@ -393,13 +437,13 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 
 	@Override
 	public void setRute(ArrayList<Coordenada> rute) {
-		// TODO Auto-generated method stub
-		
+		getLog().setInfo("Ruta recibidaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!! GRACIAS!!!");
+
+		if(this.rute.isEmpty()||this.rute==null){
+			this.rute = rute;
+		}
 	}
 
-	
-	
-	
 
 	
 

@@ -243,8 +243,9 @@ function factoryAction(data){
 	case "route":
 		console.log("recibiendo mensaje de ruta");
 		var data = data.data;
-		var route = getRoute(data.origen, data.destino);
-		sendMensaje(route);
+		var route = getRoute(data.agent, data.origen, data.destino, function(route){
+			sendMensaje(JSON.stringify(route));
+		});
 	default:
 		console.log("Accion " + data.name + " Desconocido" );
 		break;
@@ -252,7 +253,8 @@ function factoryAction(data){
 }
 
 var AgentsMarkets = {};
-var Route = function Route(origen,destino, coordenadas){
+var Route = function Route(agent, origen,destino, coordenadas){
+	this.agent = agent;
 	this.origen = origen;
 	this.destino = destino;
 	this.coordenadas = coordenadas;
@@ -282,7 +284,7 @@ function move(idAgent, latLng, mapa, image){
 	
 }
 
-function getRoute(origen, destino){
+function getRoute(agent, origen, destino, callback){
 	 var directionsService = new google.maps.DirectionsService;
 	 
 	 directionsService.route(
@@ -295,9 +297,9 @@ function getRoute(origen, destino){
 		    // Route the directions and pass the response to a function to create
 		    // markers for each step.
 		    if (status === google.maps.DirectionsStatus.OK) {
-				return new Route(origen, destino, response.routes[0].overview_path);
+		    	callback(new Route(agent ,origen, destino, response.routes[0].overview_path));
 		    } else {
-		        return new Route(origen, destino, []);
+		        callback( new Route(agent ,origen, destino, []));
 		    }
 	});
 }

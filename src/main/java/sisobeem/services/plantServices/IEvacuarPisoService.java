@@ -17,5 +17,8 @@ public interface IEvacuarPisoService {
 	 * @param agent
 	 */
 	public void Adicionar(IComponentIdentifier agent);
+	
+	
+	public void Suicidar(IComponentIdentifier agent);
 }
 

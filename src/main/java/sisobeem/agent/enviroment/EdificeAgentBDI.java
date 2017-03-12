@@ -6,6 +6,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -19,7 +20,9 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import sisobeem.artifacts.Coordenada;
 import sisobeem.artifacts.Ubicacion;
+import sisobeem.artifacts.print.pojo.EdificePojo;
 import sisobeem.services.edificeServices.IEvacuarService;
+import sisobeem.services.edificeServices.IGetEstadisticasService;
 import sisobeem.services.edificeServices.IGetSalidasService;
 import sisobeem.services.edificeServices.ISetBeliefEdificeService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
@@ -29,6 +32,7 @@ import sisobeem.services.plantServices.IEvacuarPisoService;
 import sisobeem.services.plantServices.ISetBelifePlantService;
 import sisobeem.services.zoneServices.IAdicionarPersonasService;
 import sisobeem.services.zoneServices.IMapaService;
+import sisobeem.services.zoneServices.ISetInformationService;
 import sisobeem.utilities.Traslator;
 
 import static sisobeem.artifacts.Log.getLog;
@@ -44,13 +48,17 @@ import sisobeem.utilities.Random;
 @ProvidedServices({ @ProvidedService(name = "IEvacuarService", type = IEvacuarService.class),
 		@ProvidedService(name = "IGetSalidasService", type = IGetSalidasService.class),
 		@ProvidedService(name = "ISetStartService", type = ISetStartService.class),
+		@ProvidedService(name = "IGetEstadisticasService", type = IGetEstadisticasService.class),
+		@ProvidedService(name = "ISetInformationService", type = ISetInformationService.class),
+		
 		@ProvidedService(name = "ISetBelifeEdificeService", type = ISetBeliefEdificeService.class) })
 public class EdificeAgentBDI extends EnviromentAgentBDI
-		implements ISetBeliefEdificeService, ISetStartService, IGetSalidasService, IEvacuarService {
+		implements ISetBeliefEdificeService, ISetStartService, IGetSalidasService, IEvacuarService, ISetInformationService, IGetEstadisticasService{
 
 	ArrayList<IComponentIdentifier> cidsPlants;
 	
-	
+	int suicidios = 0;
+	int derrumbar = 0;
 
 	@Belief
 	IComponentIdentifier cidZone;
@@ -60,6 +68,8 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 
 	@Belief
 	int salidas;
+	
+	 EdificePojo datos;
 
 	@Belief
 	float resistencia;
@@ -67,7 +77,17 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 	@SuppressWarnings("unchecked")
 	@AgentCreated
 	public void init() {
+		this.contMsgAyuda= new ArrayList<IComponentIdentifier>();
+		this.contMsgDeCalma=new ArrayList<IComponentIdentifier>();
+		this.contMsgDeConfianza= new ArrayList<IComponentIdentifier>();
+		this.contMsgFrsutracion=new ArrayList<IComponentIdentifier>();
+		this.contMsgHostilidad=new ArrayList<IComponentIdentifier>();
+		this.contMsgPanico= new ArrayList<IComponentIdentifier>();
+		this.contMsgResguardo= new ArrayList<IComponentIdentifier>();
+		this.contMsgMotivacion= new ArrayList<IComponentIdentifier>();
+		
 		this.cidsPlants = new ArrayList<IComponentIdentifier>();
+		this.cidPersonDead = new ArrayList<IComponentIdentifier>();
 		// Accedemos a los argumentos del agente
 		this.arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
 
@@ -77,6 +97,7 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 		this.salidas = (int) arguments.get("salidas");
 		this.resistencia = (float) arguments.get("resistencia");
 		this.myPosition = Traslator.getTraslator().getCoordenada((Ubicacion) arguments.get("ubicacion"));
+		datos = new EdificePojo(getAgent().getComponentIdentifier().getLocalName(),Traslator.getTraslator().getUbicacion(myPosition) , "estadisticas");
 
 	}
 
@@ -157,6 +178,7 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 	
 	private void Derrumbar(){
 		
+		this.derrumbar = 1;
 		IFuture<IMapaService> zoneService = agent.getComponentFeature(IRequiredServicesFeature.class)
 				.searchService(IMapaService.class, cidZone);
 		zoneService.addResultListener(new IResultListener<IMapaService>() {
@@ -484,11 +506,7 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 
 	}
 
-	@Override
-	public void Team(IComponentIdentifier emisor) {
-		// TODO Auto-generated method stub
-		
-	}
+
 	
 	@Override
 	public ArrayList<IComponentIdentifier> getPeopleHelp(IComponentIdentifier agent) {
@@ -503,5 +521,90 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 		return listado;
 	}
 
+	@Override
+	public void Team(IComponentIdentifier emisor, double liderazgo) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setDead(IComponentIdentifier agent) {
+          this.cidPersonDead.add(agent);
+	}
+
+	@Override
+	public void Suicidar(IComponentIdentifier agent) {
+	   this.suicidios++;
+	}
+
+	@Override
+	public EdificePojo getEstiditicas() {
+	     datos = new EdificePojo(getAgent().getComponentIdentifier().getLocalName(),Traslator.getTraslator().getUbicacion(myPosition) , "estadisticas"); 
+		datos.setDerrumbado(derrumbar);
+		datos.setPersonasMuertas(this.cidPersonDead.size());
+		datos.setSuicidios(suicidios);
+		
+		for (IComponentIdentifier cid : cidsPlants) {
+		
+			//datos.setPersonasAtrapadas(this.cidsPerson.size()-this.cidPersonDead.size());
+			IFuture<IGetEstadisticasService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
+					.searchService(IGetEstadisticasService.class, cid);
+
+			persona.addResultListener(new IResultListener<IGetEstadisticasService>() {
+
+				@Override
+				public void resultAvailable(IGetEstadisticasService result) {
+				    result.getEstiditicas();
+					
+				}
+
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					getLog().setFatal(exception.getMessage());
+				}
+
+			});
+
+
+		}
+		//datos.setPersonasAtrapadas(this.cidsPerson.size()-this.cidPersonDead.size());
+		agent.getComponentFeature(IExecutionFeature.class)
+		.waitForDelay(10).get();
+	    return datos;
+	}
+
+	@Override
+	public void setEstadisticasEdifice(EdificePojo info) {
+		//System.out.println("Recibiendo estadisticas");
+		datos.setMsgAyuda(info.getMsgAyuda()+datos.getMsgAyuda());
+		datos.setMsgDeCalma(info.getMsgDeCalma()+datos.getMsgDeCalma());
+		datos.setMsgDeConfianza(info.getMsgDeConfianza()+datos.getMsgDeConfianza());
+		datos.setMsgFrsutracion(info.getMsgFrsutracion()+datos.getMsgFrsutracion());
+		datos.setMsgHostilidad(info.getMsgHostilidad()+datos.getMsgHostilidad());
+		datos.setMsgMotivacion(info.getMsgMotivacion()+datos.getMsgMotivacion());
+		datos.setMsgPanico(info.getMsgPanico()+datos.getMsgPanico());
+		datos.setMsgPrimerosAux(info.getMsgPrimerosAux()+datos.getMsgPrimerosAux());
+		datos.setMsgResguardo(info.getMsgResguardo()+datos.getMsgResguardo());
+		
+	}
+	
+	public void sendEstadisticas(){
+		IFuture<ISetInformationService> zoneService = agent.getComponentFeature(IRequiredServicesFeature.class)
+				.searchService(ISetInformationService.class, cidZone);
+		zoneService.addResultListener(new IResultListener<ISetInformationService>() {
+
+			@Override
+			public void resultAvailable(ISetInformationService result) {
+                   result.setEstadisticasEdifice(datos);
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception) {
+
+			}
+
+		});
+
+	}
 
 }

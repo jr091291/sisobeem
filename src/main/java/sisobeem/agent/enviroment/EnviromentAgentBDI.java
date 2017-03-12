@@ -51,6 +51,23 @@ public abstract class EnviromentAgentBDI implements IComunicarMensajesService,IG
 
 	@Belief
 	protected double intensidadSismo;
+	
+	
+	
+	//Estadisticas
+	ArrayList<IComponentIdentifier> contMsgAyuda;
+	ArrayList<IComponentIdentifier> contMsgDeCalma;
+	ArrayList<IComponentIdentifier> contMsgDeConfianza;
+	ArrayList<IComponentIdentifier>contMsgFrsutracion;
+	ArrayList<IComponentIdentifier> contMsgHostilidad;
+	ArrayList<IComponentIdentifier> contMsgPanico;
+	ArrayList<IComponentIdentifier> contMsgPrimerosAux;
+	ArrayList<IComponentIdentifier> contMsgResguardo;
+	ArrayList<IComponentIdentifier> contMsgMotivacion;
+	
+	ArrayList<IComponentIdentifier> cidPersonDead;
+
+
 
 	public IInternalAccess getAgent() {
 		return agent;
@@ -322,7 +339,7 @@ public abstract class EnviromentAgentBDI implements IComunicarMensajesService,IG
 				public void resultAvailable(IReceptorMensajesService result) {
 					getLog().setInfo("Enviando mensaje Team de: " + emisor.getLocalName() + " para:"
 							+ receptor.getLocalName());
-					result.Team(emisor);
+				//	result.Team(emisor);
 
 				}
 

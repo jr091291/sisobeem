@@ -40,23 +40,28 @@ public class TeamCapability {
 		
 		@GoalParameter
 		IComponentIdentifier receptor;
+		
+		@GoalParameter
+		double liderazgo ;
 
-		public MensajeDeTeam(IInternalAccess agent,IComponentIdentifier enviroment) {
+		public MensajeDeTeam(IInternalAccess agent,IComponentIdentifier enviroment, double liderazgo) {
 			this.agent = agent;
 			this.enviroment = enviroment;
-			sendMensaje(this.agent,this.enviroment);
+			this.liderazgo = liderazgo;
+			sendMensaje(this.agent,this.enviroment, this.liderazgo);
 		}
 		
-		public MensajeDeTeam(IInternalAccess agent,IComponentIdentifier enviroment, IComponentIdentifier receptor) {
+		public MensajeDeTeam(IInternalAccess agent,IComponentIdentifier enviroment, IComponentIdentifier receptor,double liderazgo) {
 			this.agent = agent;
 			this.enviroment = enviroment;
 			this.receptor = receptor;
-			sendMensaje(this.agent,this.enviroment);
+			this.liderazgo = liderazgo;
+			sendMensaje(this.agent,this.enviroment, this.liderazgo);
 		}
 		
 		
 		@Plan
-		protected void sendMensaje(IInternalAccess agent,IComponentIdentifier enviroment) {
+		protected void sendMensaje(IInternalAccess agent,IComponentIdentifier enviroment, double liderazgo) {
 			
 			IFuture<IComunicarMensajesService> zoneService = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IComunicarMensajesService.class, enviroment);
@@ -65,7 +70,7 @@ public class TeamCapability {
 
 				@Override
 				public void resultAvailable(IComunicarMensajesService result) {
-					result.Team(agent.getComponentIdentifier());
+					result.Team(agent.getComponentIdentifier(),liderazgo);
 				}
 
 				@Override
@@ -78,7 +83,7 @@ public class TeamCapability {
 		}
 		
 		@Plan
-		protected void sendMensajeEspecifico(IInternalAccess agent,IComponentIdentifier enviroment, IComponentIdentifier receptor) {
+		protected void sendMensajeEspecifico(IInternalAccess agent,IComponentIdentifier enviroment, IComponentIdentifier receptor, double liderazgo) {
 			
 			IFuture<IComunicarMensajesService> zoneService = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IComunicarMensajesService.class, enviroment);
@@ -181,18 +186,22 @@ public class TeamCapability {
 		IComponentIdentifier receptor;
 		
 		@GoalParameter
+		double liderazgo;
+		
+		@GoalParameter
 		ArrayList<IComponentIdentifier> listado;
 
-		public AddPersonNeedHelp(IInternalAccess agent,IComponentIdentifier enviroment, ArrayList<IComponentIdentifier> listado) {
+		public AddPersonNeedHelp(IInternalAccess agent,IComponentIdentifier enviroment, ArrayList<IComponentIdentifier> listado, double liderazgo) {
 			this.agent = agent;
 			this.enviroment = enviroment;
 			this.listado = listado;
-			sendMensaje(this.agent,this.enviroment,this.listado);
+			this.liderazgo = liderazgo;
+			sendMensaje(this.agent,this.enviroment,this.listado,this.liderazgo);
 		}
 		
 	
 		@Plan
-		protected void sendMensaje(IInternalAccess agent,IComponentIdentifier enviroment, ArrayList<IComponentIdentifier> listado) {
+		protected void sendMensaje(IInternalAccess agent,IComponentIdentifier enviroment, ArrayList<IComponentIdentifier> listado, double liderazgo) {
 			
 		  for (IComponentIdentifier a : listado) {
 			
@@ -203,7 +212,7 @@ public class TeamCapability {
 
 					@Override
 					public void resultAvailable(IComunicarMensajesService result) {
-						result.Team(agent.getComponentIdentifier());
+						result.Team(agent.getComponentIdentifier(),liderazgo);
 					}
 
 					@Override

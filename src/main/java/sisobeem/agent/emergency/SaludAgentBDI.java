@@ -114,12 +114,6 @@ public class SaludAgentBDI extends PersonAgentBDI{
 
 
 	@Override
-	public void Team(IComponentIdentifier parner) {
-		
-	}
-
-
-	@Override
 	public void TomaDeDecisiones() {
 		// TODO Auto-generated method stub
 		
@@ -130,6 +124,13 @@ public class SaludAgentBDI extends PersonAgentBDI{
 	public int getSalud() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+
+	@Override
+	public void Team(IComponentIdentifier parner, double liderazgo) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

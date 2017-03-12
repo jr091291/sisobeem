@@ -113,11 +113,7 @@ public class BusquedaYRescateAgentBDI extends PersonAgentBDI{
 	}
 
 
-	@Override
-	public void Team(IComponentIdentifier parner) {
-		// TODO Auto-generated method stub
-		
-	}
+
 
 
 	@Override
@@ -131,6 +127,13 @@ public class BusquedaYRescateAgentBDI extends PersonAgentBDI{
 	public int getSalud() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+
+	@Override
+	public void Team(IComponentIdentifier parner, double liderazgo) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 

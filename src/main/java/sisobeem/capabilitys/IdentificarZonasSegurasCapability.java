@@ -60,7 +60,7 @@ public class IdentificarZonasSegurasCapability {
 
 				@Override
 				public void resultAvailable(IGetDestinyService result) {
-					setMyDestiny(result.getDestiny());
+					setMyDestiny(result.getDestiny(agent.getComponentIdentifier()));
 				}
 
 				@Override

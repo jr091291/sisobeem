@@ -39,9 +39,7 @@ public class SuicidioCapability {
 
 		@Plan
 		protected void Saltar(IInternalAccess agent, IComponentIdentifier piso) {
-			
-			
-	       			
+				       			
 			//System.out.println(conocimientoZona+" "+cidPiso.getLocalName()+" "+cidEdifice.getLocalName());
 			IFuture<IEvacuarPisoService> pisoService = agent.getComponentFeature(IRequiredServicesFeature.class)
 					.searchService(IEvacuarPisoService.class, piso);
@@ -51,7 +49,7 @@ public class SuicidioCapability {
 				@Override
 				public void resultAvailable(IEvacuarPisoService result) {
 					SetSalud(-3);
-					result.Evacuar(agent.getComponentIdentifier());
+					result.Suicidar(agent.getComponentIdentifier());
 					//getLog().setDebug("Agente Suicidado");
 				}
 
@@ -66,6 +64,29 @@ public class SuicidioCapability {
 
 	}
 	
+
+	@Goal(excludemode = ExcludeMode.Never)
+	public class HacerNada {
+
+		@GoalParameter
+		IInternalAccess agent;
+
+		@GoalParameter
+		IComponentIdentifier cidPiso;
+		
+		public HacerNada() {
+		Saltar();
+		}
+	
+
+		@Plan
+		protected void Saltar() {
+				       			
+			//System.out.println(conocimientoZona+" "+cidPiso.getLocalName()+" "+cidEdifice.getLocalName());
+
+		}
+
+	}
 
 	@Belief
 	public native int getSalud();

@@ -185,19 +185,7 @@ public class MoveCapability {
 
 	}
 
-	/**
-	 * Meta movimiento a sitio especifico
-	 */
 
-	@Goal
-	public class Ruta {
-		@GoalParameter
-		protected ArrayList<Coordenada> ruta;
-
-		public Ruta(ArrayList<Coordenada> r) {
-			this.ruta = r;
-		}
-	}
 
 	/**
 	 * Get the wordtable.

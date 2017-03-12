@@ -71,5 +71,5 @@ public interface IReceptorMensajesService {
 	 * Mensaje para recepcionar los pedidos de team
 	 * @param parner
 	 */
-	public void Team(IComponentIdentifier parner);
+	public void Team(IComponentIdentifier parner, double liderazgo);
 }

@@ -158,7 +158,8 @@ public interface IComunicarMensajesService {
 	 * Servicio que envia un mensaje de adesion al grupo
 	 * @param emisor
 	 */
-	public void Team(IComponentIdentifier emisor);
+
+	public void Team(IComponentIdentifier emisor, double liderazgo);
 	
 	public void Team(IComponentIdentifier emisor, IComponentIdentifier receptor);
 }

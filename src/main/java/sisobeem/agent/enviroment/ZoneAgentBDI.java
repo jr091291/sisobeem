@@ -1282,10 +1282,15 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 				}
 			}
 		}
+		
+		if(contador>9){
+			contador=0;
+		}
 
 		EdificeAction info = new EdificeAction("derrumbe", new EdificePojo(cidEdifice.getLocalName(),
 				Traslator.getTraslator().getUbicacion(edificio), "derrumbe"));
-		this.bandejaMsg.put(cidEdifice.getLocalName(), info.toJson());
+		this.bandejaMsg.put("Zone"+contador, info.toJson());
+		contador++;
 	}
 
 	@Override
@@ -1345,10 +1350,11 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 				contador=0;
 			}
 			
-			contador++;
+			
 			PuntoAction info = new PuntoAction("punto",
 					new PuntoPojo(Traslator.getTraslator().getUbicacion(coordenada), "seguro"));
 			this.bandejaMsg.put("Zone" + contador, info.toJson());
+			contador++;
 		}
 
 	}
@@ -1380,10 +1386,11 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 			}
 			
 			
-			contador++;
+		
 			PuntoAction info = new PuntoAction("punto",
 					new PuntoPojo(Traslator.getTraslator().getUbicacion(coordenada), "inseguro"));
 			this.bandejaMsg.put("Zone" + contador, info.toJson());
+			contador++;
 		}
 
 	}

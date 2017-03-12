@@ -15,11 +15,11 @@ public class Mensajero extends Thread{
 
 	
 	Map <String,String> bandejaMsg;
-	ArrayList<IComponentIdentifier> cidsPerson ;
+	ArrayList<String> cidsPerson ;
 	int inicioPerson,finPerson;
 	
 	public Mensajero(int incioPerson, int finPerson,
-			        ArrayList<IComponentIdentifier> cidsPerson,
+			        ArrayList<String> cidsPerson,
 			        Map <String,String> bandejaMsg,
 			        zoneClientEndpoint clientEndPoint,
 					zoneClientEndpoint clientEndPoint2,
@@ -46,6 +46,13 @@ public class Mensajero extends Thread{
 	this.clientEndPoint8 = clientEndPoint8;
 	this.clientEndPoint9 = clientEndPoint9;
 	this.clientEndPoint10= clientEndPoint10;
+	
+//	System.out.println("Inicio: "+ incioPerson);
+//	System.out.println("Final: "+ finPerson);
+	//for (String string : cidsPerson) {
+	//	System.out.println(string);
+	//}
+	//System.out.println("¨************************************************");
 		
 		
 	}
@@ -71,11 +78,13 @@ public class Mensajero extends Thread{
 	  // System.out.println("Personas :"+this.inicioPerson);
 		for (int i = inicioPerson; i < finPerson;) {
 			// System.out.println(cidsPerson.get(i).getLocalName()); 
-			 String data = bandejaMsg.get(cidsPerson.get(i).getLocalName());
-			 
-			 bandejaMsg.remove(cidsPerson.get(i).getLocalName()); // Eliminamos el mensaje  despues de tenerlo guardado
+			 String data = bandejaMsg.get(cidsPerson.get(i));
+					 
+			// bandejaMsg.remove(cidsPerson.get(i)); // Eliminamos el mensaje  despues de tenerlo guardado
 			 // System.out.println(data); 
 			  if(data!=null){
+				  
+				  
 				
 				switch (bandera) {
 					case 0:
@@ -89,20 +98,20 @@ public class Mensajero extends Thread{
 						  sendMensaje(clientEndPoint2,data);
 						  bandera++;
 						  i++;
-						  //System.out.println("enviando msg 2");
+						  //  System.out.println("enviando msg 2");
 					break;
 					
 					case 2:
 						  sendMensaje(clientEndPoint3,data);
 						  bandera++;
 						  i++;
-						 // System.out.println("enviando msg 3");
+						  //System.out.println("enviando msg 3");
 					break;
 					case 3:
 						  sendMensaje(clientEndPoint4,data);
 						  bandera++;
 						  i++;
-						 // System.out.println("enviando msg 4");
+						  //System.out.println("enviando msg 4");
 				    break;	
 					case 4:
 				     	  sendMensaje(clientEndPoint5,data);
@@ -121,7 +130,7 @@ public class Mensajero extends Thread{
 						  sendMensaje(clientEndPoint7,data);
 						  bandera++;
 						  i++;
-						  //System.out.println("enviando msg 7");
+						  // System.out.println("enviando msg 7");
 					break;
 					
 					case 7:

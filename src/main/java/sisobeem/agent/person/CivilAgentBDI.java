@@ -18,7 +18,7 @@ import sisobeem.capabilitys.MoveCapability.Aleatorio;
 import sisobeem.utilities.Random;
 
 @Agent
-@Description("Agente vicil, encargados de vivir la experiencia del terremoto.")
+@Description("Agente civil, encargados de vivir la experiencia del terremoto.")
 @ProvidedServices({})
 public class CivilAgentBDI extends PersonAgentBDI {
 
@@ -45,9 +45,9 @@ public class CivilAgentBDI extends PersonAgentBDI {
 	 */
 	@Plan(trigger = @Trigger(factchangeds = "contextCaminar"))
 	public void caminar() {
-		this.velocidad = Random.getIntRandom(1, 5);
-		getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
-				super.move.new Aleatorio(this.getAgent(), this.velocidad, this.getPosition(), cidZone));
+	//	this.velocidad = Random.getIntRandom(1, 5);
+		//getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
+			//	super.move.new Aleatorio(this.getAgent(), this.velocidad, this.getPosition(), cidZone));
 
 	}
 
@@ -174,7 +174,9 @@ public class CivilAgentBDI extends PersonAgentBDI {
 
 	@Override
 	public void TomaDeDecisiones() {
+		
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
+		this.velocidad = Random.getIntRandom(1, 5);
 		if (this.vivo) {
 
 			// Lideres
@@ -275,7 +277,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 									//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+": Moviendo");
 									getAgent().getComponentFeature(IBDIAgentFeature.class)
 											.dispatchTopLevelGoal(super.move.new Aleatorio(this.getAgent(),
-													this.velocidad, this.getPosition(), cidZone));
+													this.velocidad, this.getPosition(), cidZone,this.tipo));
 								}
 
 								break;
@@ -390,7 +392,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 			if (this.cidPlant == null) {
 				// Si está en la calle
 				getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
-						super.move.new Aleatorio(this.getAgent(), this.velocidad, this.getPosition(), cidZone));
+						super.move.new Aleatorio(this.getAgent(), this.velocidad, this.getPosition(), cidZone,this.tipo));
 			} else {
 				// Si está en un edificio
 				//System.out.println("Estoy en un edifcio y no esta temblando");
@@ -421,7 +423,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 					//	getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+": Enviando mensa");
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 						.dispatchTopLevelGoal(super.move.new Aleatorio(this.getAgent(), this.velocidad,
-								this.getPosition(), cidZone));
+								this.getPosition(), cidZone,this.tipo));
 						contextResguardarse = false;
 						break;
 
@@ -436,7 +438,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 				
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 								.dispatchTopLevelGoal(super.move.new Aleatorio(this.getAgent(), this.velocidad,
-										this.getPosition(), cidZone));
+										this.getPosition(), cidZone,this.tipo));
 						contextResguardarse = false;
 
 					} else {
@@ -445,7 +447,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 					//	getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+": Moviendome en ruta");
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 								.dispatchTopLevelGoal(super.move.new rute(this.getAgent(), this.velocidad,
-										this.getPosition(), cidZone, this.rute.get(0)));
+										this.getPosition(), cidZone, this.rute.get(0),this.tipo));
 
 						this.rute.remove(0);
 					}
@@ -479,7 +481,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 			if (this.cidPlant == null) {
 				// Si está en la calle
 				getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
-						super.move.new Aleatorio(this.getAgent(), this.velocidad, this.getPosition(), cidZone));
+						super.move.new Aleatorio(this.getAgent(), this.velocidad, this.getPosition(), cidZone,this.tipo));
 			} else {
 				// Si está en un edificio
 				//System.out.println("Estoy en un edifcio y no esta temblando");
@@ -502,7 +504,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 					case 1:
 						 getAgent().getComponentFeature(IBDIAgentFeature.class)
 							.dispatchTopLevelGoal(super.move.new Aleatorio(this.getAgent(), this.velocidad,
-									this.getPosition(), cidZone));
+									this.getPosition(), cidZone,this.tipo));
 				     	contextResguardarse = false;
 						break;
 					case 2:
@@ -538,12 +540,12 @@ public class CivilAgentBDI extends PersonAgentBDI {
             		 if(this.rute == null){
             			 getAgent().getComponentFeature(IBDIAgentFeature.class)
 							.dispatchTopLevelGoal(super.move.new Aleatorio(this.getAgent(), this.velocidad,
-									this.getPosition(), cidZone));
+									this.getPosition(), cidZone,this.tipo));
             		 }else{
             		//	 getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Moviendome en ruta");
             			 getAgent().getComponentFeature(IBDIAgentFeature.class)
 							.dispatchTopLevelGoal(super.move.new rute(this.getAgent(), this.velocidad,
-									this.getPosition(), cidZone,this.rute.get(0)));
+									this.getPosition(), cidZone,this.rute.get(0),this.tipo));
             			 
             			 this.rute.remove(0);
             		 }
@@ -629,7 +631,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 				// Si está en la calle
         	//	System.out.println("Me muevo en la calle");
 				getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
-						super.move.new Aleatorio(this.getAgent(), this.velocidad, this.getPosition(), cidZone));
+						super.move.new Aleatorio(this.getAgent(), this.velocidad, this.getPosition(), cidZone,this.tipo));
 			} else {
 				// Si está en un edificio
 			//	System.out.println("Estoy en un edifcio y no esta temblando");

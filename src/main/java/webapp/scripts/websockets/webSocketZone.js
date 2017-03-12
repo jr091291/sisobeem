@@ -43,6 +43,7 @@ var socketZone37 = new WebSocket(BASE_URL + "/simulacion/jadex37" );
 var socketZone38 = new WebSocket(BASE_URL + "/simulacion/jadex38" );
 var socketZone39 = new WebSocket(BASE_URL + "/simulacion/jadex39" );
 var socketZone40 = new WebSocket(BASE_URL + "/simulacion/jadex40" );
+var socketZoneZONE = new WebSocket(BASE_URL + "/simulacion/jadexZONE");
 
 
 
@@ -219,7 +220,7 @@ socketZone40.onmessage = function(event) {
 
 
 function sendMensaje(mensaje) {
-	socketZone.send(mensaje);	
+	socketZoneZONE.send(mensaje);	
 }
 
 

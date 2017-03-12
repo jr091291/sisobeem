@@ -24,6 +24,7 @@ public class EstructuraPuntoMapa {
 	public void setAgents(CopyOnWriteArrayList<IComponentIdentifier> agents) {
 		this.agents = agents;
 	}
+
 	public double getDaño() {
 		return daño;
 	}

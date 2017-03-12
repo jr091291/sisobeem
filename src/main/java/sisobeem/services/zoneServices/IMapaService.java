@@ -15,7 +15,7 @@ public interface IMapaService {
     *  @param nueva
     *   @param cid
     */
-   public boolean changePosition(Coordenada nueva, IComponentIdentifier cid);
+   public boolean changePosition(Coordenada nueva, IComponentIdentifier cid, String tipo);
    
    
    /**

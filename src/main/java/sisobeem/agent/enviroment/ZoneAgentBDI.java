@@ -5,6 +5,7 @@ import static sisobeem.artifacts.Log.getLog;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -113,7 +114,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 			clientEndPoint18, clientEndPoint19, clientEndPoint20, clientEndPoint21, clientEndPoint22, clientEndPoint23,
 			clientEndPoint24, clientEndPoint25, clientEndPoint26, clientEndPoint27, clientEndPoint28, clientEndPoint29,
 			clientEndPoint30, clientEndPoint31, clientEndPoint32, clientEndPoint33, clientEndPoint34, clientEndPoint35,
-			clientEndPoint36, clientEndPoint37, clientEndPoint38, clientEndPoint39, clientEndPoint40;
+			clientEndPoint36, clientEndPoint37, clientEndPoint38, clientEndPoint39, clientEndPoint40, clientEndPonintZONE;
 
 	/**
 	 * Creencias
@@ -129,6 +130,10 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	private Sismo sismo;
 
 	private ArrayList<IComponentIdentifier> cidsEdifices;
+	
+	private ArrayList<IComponentIdentifier> AgentsEmergency;
+	
+	ArrayList<String> listaDeEmisores;
 
 	@Belief
 	private Cronometro cronometro;
@@ -163,10 +168,35 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 		// Accedemos a los argumentos del agente
 		this.arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
+     
+		
+		AgentsEmergency = new ArrayList<IComponentIdentifier>();
+		listaDeEmisores = new ArrayList<String>();
+		
+		AgentsEmergency.addAll((Collection<? extends IComponentIdentifier>) arguments.get("cidsSalud"));
+		AgentsEmergency.addAll((Collection<? extends IComponentIdentifier>) arguments.get("cidsBusqueda"));
+		AgentsEmergency.addAll((Collection<? extends IComponentIdentifier>) arguments.get("cidsSeguridad"));
+		
+		
+		
+		for (IComponentIdentifier a : AgentsEmergency) {
+			listaDeEmisores.add(a.getLocalName());
+		}
 
 		// Obtenemos los cid de las personas en la Zona
 		cidsPerson = (ArrayList<IComponentIdentifier>) arguments.get("cidsPerson");
-
+        
+		for (IComponentIdentifier a : cidsPerson) {
+			listaDeEmisores.add(a.getLocalName());
+		}
+		
+		
+		for (int p = 0; p < 10; p++) {
+			listaDeEmisores.add("Zone"+contador);
+			contador++;
+		}
+		
+		contador = 0;
 		// Obtenemos los cid de las edificaciones
 		cidsEdifices = (ArrayList<IComponentIdentifier>) arguments.get("cidsEdifices");
 		
@@ -188,7 +218,8 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		} catch (Exception e) {
 			getLog().setError("Mapa demasiado grande");
 		}
-
+        
+		
 		/**
 		 * Configurando los sockets y los mensajeros
 		 */
@@ -203,6 +234,8 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		setMetoPerson();
 		setMetoEdifices();
 		sendMeToCoordinator();
+		
+		
 
 		/**
 		 * Iniciando agentes
@@ -229,7 +262,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		this.startCoordinadorEmergencia();
 		
 		agent.getComponentFeature(IExecutionFeature.class)
-		.waitForDelay(((this.simulacionConfig.getDuracion()- this.simulacionConfig.getDuracionSismo())* 1000)).get();
+		.waitForDelay(((this.simulacionConfig.getDuracion()- this.simulacionConfig.getDuracionSismo())* 1000)+5000).get();
 		getEstadisticas();
 
 	}
@@ -262,8 +295,12 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 					System.out.println("Muertes totales : "+d.getPersonasMuertas());
 					System.out.println("Suicidios : "+d.getSuicidios());
 					
+					if(contador>9){
+						contador=0;
+					}
+					
 					EdificeAction info = new EdificeAction("estadistica",d);
-					bandejaMsg.put(agent.getComponentIdentifier().getLocalName() + contador, info.toJson());
+					bandejaMsg.put("Zone"+ contador, info.toJson());
                     contador++;
 				}
 
@@ -290,8 +327,12 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 					datos.setMsgPrimerosAux(this.contMsgPrimerosAux.size());
 					datos.setMsgResguardo(this.contMsgResguardo.size());
 		
+					
+					if(contador>9){
+						contador=0;
+					}
 					EdificeAction info = new EdificeAction("estadistica",datos);
-					bandejaMsg.put(agent.getComponentIdentifier().getLocalName() + contador, info.toJson());
+					bandejaMsg.put("Zone" + contador, info.toJson());
                     contador++;
 		
 		System.out.println("********************************************************************");
@@ -314,19 +355,19 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	 */
 	public void createMensajeros() {
 
-		m1 = new Mensajero(0, this.cidsPerson.size() / 4, this.cidsPerson, bandejaMsg, clientEndPoint, clientEndPoint2,
+		m1 = new Mensajero(0, this.listaDeEmisores.size() / 4, this.listaDeEmisores, bandejaMsg, clientEndPoint, clientEndPoint2,
 				clientEndPoint3, clientEndPoint4, clientEndPoint5, clientEndPoint6, clientEndPoint7, clientEndPoint8,
 				clientEndPoint9, clientEndPoint10);
 
-		m2 = new Mensajero(this.cidsPerson.size() / 4, this.cidsPerson.size() / 2, this.cidsPerson, bandejaMsg,
+		m2 = new Mensajero(this.listaDeEmisores.size() / 4, this.listaDeEmisores.size() / 2, this.listaDeEmisores, bandejaMsg,
 				clientEndPoint11, clientEndPoint12, clientEndPoint13, clientEndPoint14, clientEndPoint15,
 				clientEndPoint16, clientEndPoint17, clientEndPoint18, clientEndPoint19, clientEndPoint20);
 
-		m3 = new Mensajero(this.cidsPerson.size() / 2, this.cidsPerson.size() * 3 / 4, this.cidsPerson, bandejaMsg,
+		m3 = new Mensajero(this.listaDeEmisores.size() / 2, this.listaDeEmisores.size() * 3 / 4, this.listaDeEmisores, bandejaMsg,
 				clientEndPoint21, clientEndPoint22, clientEndPoint23, clientEndPoint24, clientEndPoint25,
 				clientEndPoint26, clientEndPoint27, clientEndPoint28, clientEndPoint29, clientEndPoint30);
 
-		m4 = new Mensajero(this.cidsPerson.size() * 3 / 4, this.cidsPerson.size(), this.cidsPerson, bandejaMsg,
+		m4 = new Mensajero(this.listaDeEmisores.size() * 3 / 4, this.listaDeEmisores.size(), this.listaDeEmisores, bandejaMsg,
 				clientEndPoint31, clientEndPoint32, clientEndPoint33, clientEndPoint34, clientEndPoint35,
 				clientEndPoint36, clientEndPoint37, clientEndPoint38, clientEndPoint39, clientEndPoint40);
 		
@@ -344,9 +385,9 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		getLog().setInfo("Enviando mensajes a la vista");
 		if (contextSendMsg) {
 			m1.iniciar();
-			m2.iniciar();
-			m3.iniciar();
-			m4.iniciar();
+		    m2.iniciar();
+		    m3.iniciar();
+		    m4.iniciar();
 		//	repartidor.iniciar();
 		} else {
 			m1.parar();
@@ -402,9 +443,9 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 			clientEndPoint38 = new zoneClientEndpoint(new URI("ws://localhost:8080/sisobeem/simulacion/jadex38"));
 			clientEndPoint39 = new zoneClientEndpoint(new URI("ws://localhost:8080/sisobeem/simulacion/jadex39"));
 			clientEndPoint40 = new zoneClientEndpoint(new URI("ws://localhost:8080/sisobeem/simulacion/jadex40"));
-
+            clientEndPonintZONE = new zoneClientEndpoint(new URI("ws://localhost:8080/sisobeem/simulacion/jadexZONE"));
 			// add listener
-			clientEndPoint.addMessageHandler(new zoneClientEndpoint.MessageHandler() {
+            clientEndPonintZONE.addMessageHandler(new zoneClientEndpoint.MessageHandler() {
 				public void handleMessage(String message) {
 					
 					/*
@@ -416,7 +457,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 				 */
 				    
 					//System.out.println(message);
-					//System.out.println("Ruta agregada!");
+					System.out.println("Ruta agregada!");
 					Gson gson = new Gson();
 					RoutePojo route = gson.fromJson(message, RoutePojo.class);
 					//rutasDisponibles.add(route);
@@ -559,8 +600,8 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 			@Override
 			public void resultAvailable(ISetZone result) {
+			result.setZone(agent.getComponentIdentifier());
 
-				result.setZone(agent.getComponentIdentifier());
 			}
 
 			@Override
@@ -627,6 +668,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 			}
 
 		});
+
 	}
 
 	/**
@@ -660,6 +702,9 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 			this.mapa[Random.getIntRandom(0, this.mapa.length - 1)][Random.getIntRandom(0, this.mapa[0].length - 1)]
 					.getAgents().add(cidsPerson.get(i));
 		}
+		
+		
+		this.mapa[5][5].getAgents().addAll(this.AgentsEmergency);
 
 	}
 
@@ -720,33 +765,38 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	}
 
 	@Override
-	public boolean changePosition(Coordenada nueva, IComponentIdentifier cid) {
+	public boolean changePosition(Coordenada nueva, IComponentIdentifier cid, String tipo) {
 
 		// System.out.println("Cambiando posicion de:"+cid.getLocalName());
 
 		if (validateInMap(nueva)) {
 			Coordenada antigua = getCoordenada(cid);
-			synchronized (this.mapa) {
-				this.mapa[antigua.getX()][antigua.getY()].getAgents().remove(cid);
-				this.mapa[nueva.getX()][nueva.getY()].getAgents().add(cid);
-			}
+	        if(antigua!=null){
+	    		synchronized (this.mapa) {
+					this.mapa[antigua.getX()][antigua.getY()].getAgents().remove(cid);
+					this.mapa[nueva.getX()][nueva.getY()].getAgents().add(cid);
+				}
 
-			// for (IComponentIdentifier c :
-			// this.mapa[nueva.getX()][nueva.getY()].getAgents()) {
-			// System.out.println(c.getLocalName());
-			// }
+				// for (IComponentIdentifier c :
+				// this.mapa[nueva.getX()][nueva.getY()].getAgents()) {
+				// System.out.println(c.getLocalName());
+				// }
 
-			// contador++;
+				// contador++;
 
-			//
+				//
 
-			MoveAction info = new MoveAction("move",
-					new MovePojo(cid.getLocalName(), Traslator.getTraslator().getUbicacion(nueva)));
-			this.bandejaMsg.put(cid.getLocalName(), info.toJson());
-			// System.out.println(this.bandejaMsg.size());
-			// sendMensaje();
+				MoveAction info = new MoveAction("move",
+						new MovePojo(cid.getLocalName(), Traslator.getTraslator().getUbicacion(nueva),tipo));
+				this.bandejaMsg.put(cid.getLocalName(), info.toJson());
+				// System.out.println(this.bandejaMsg.size());
+				// sendMensaje();
 
-			return true;
+				return true;
+	        }else{
+	        	 System.out.println("Error al buscar el agente");
+	 			return false;
+	        }
 		} else {
 
 			// System.out.println("Error en la direccion");
@@ -1290,10 +1340,15 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	private void sendPuntosSeguros(ArrayList<Coordenada> puntosSeguros) {
 
 		for (Coordenada coordenada : puntosSeguros) {
+			
+			if(contador>9){
+				contador=0;
+			}
+			
 			contador++;
 			PuntoAction info = new PuntoAction("punto",
 					new PuntoPojo(Traslator.getTraslator().getUbicacion(coordenada), "seguro"));
-			this.bandejaMsg.put(agent.getComponentIdentifier().getLocalName() + contador, info.toJson());
+			this.bandejaMsg.put("Zone" + contador, info.toJson());
 		}
 
 	}
@@ -1320,10 +1375,15 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	private void sendPuntosInseguros(ArrayList<Coordenada> pInseguro) {
 
 		for (Coordenada coordenada : pInseguro) {
+			if(contador>9){
+				contador=0;
+			}
+			
+			
 			contador++;
 			PuntoAction info = new PuntoAction("punto",
 					new PuntoPojo(Traslator.getTraslator().getUbicacion(coordenada), "inseguro"));
-			this.bandejaMsg.put(agent.getComponentIdentifier().getLocalName() + contador, info.toJson());
+			this.bandejaMsg.put("Zone" + contador, info.toJson());
 		}
 
 	}
@@ -1416,7 +1476,19 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 	}
 
-
+	/**
+	public void AddAgentsEmergency(ArrayList<IComponentIdentifier> agents) {
+	     
+		synchronized (this.mapa) {
+		  this.mapa[0][0].getAgents().addAll(agents);
+		}
+		
+		this.cidsPerson.addAll(agents);
+		
+		
+	}
+	
+	**/
 	
 
 }

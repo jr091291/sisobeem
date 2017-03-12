@@ -314,10 +314,18 @@ public class CoordinadorEmergenciaAgentBDI implements ISetStartService, ISetZone
 	}
 
 	@Override
-	public void setZone(IComponentIdentifier zone) {
+	public ArrayList<IComponentIdentifier> setZone(IComponentIdentifier zone) {
 	    this.cidZone = zone;
 	    
 	    sendBelief();
+	    
+	    ArrayList<IComponentIdentifier> agents = new ArrayList<IComponentIdentifier>();
+	    
+	    agents.addAll(this.cidsSeguridad);
+	    agents.addAll(this.cidsSalud);
+	    agents.addAll(this.cidsBusqueda);
+	    
+	    return agents;
 	}
 	
 

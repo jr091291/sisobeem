@@ -88,7 +88,7 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
     Map <String,Object> arguments;
 	
     @Belief
-    IComponentIdentifier cidZone ;
+   protected IComponentIdentifier cidZone ;
     
     @Belief
     IComponentIdentifier cidEdifice ;
@@ -113,15 +113,16 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	@Belief 
 	int salidasDisponibles;
 	
+	protected String tipo;
 	@Belief 
-	Coordenada myPosition;
+	protected Coordenada myPosition;
 	
 	
 	@Belief
 	protected ArrayList<Coordenada> rute;
 	
 	@Belief
-	Coordenada myDestiny;
+	protected Coordenada myDestiny;
 
 	@Belief
 	protected Boolean contextCaminar;
@@ -203,6 +204,14 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
     	this.arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
 		//Creencias Enviadas en la configuracion
 		this.edad = (int) this.arguments.get("edad");
+		
+		if(this.edad<25){
+			this.tipo = "niño";
+		}else if(this.edad>45){
+			this.tipo = "anciano";
+		}else{
+			this.tipo = "adulto";
+		}
 		this.conocimientoZona = (double) this.arguments.get("conocimientoZona");
 		
 		
@@ -222,7 +231,7 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 		
 		this.contextSismo = false;
 		
-		System.out.println("sss:"+ contextSismo);
+	//	System.out.println("sss:"+ contextSismo);
 		this.salidasDisponibles = -1;
 
 		
@@ -443,6 +452,8 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 			this.rute = rute;
 		}
 	}
+
+
 
 
 	

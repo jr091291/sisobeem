@@ -17,6 +17,10 @@ import sisobeem.utilities.Random;
 import static sisobeem.artifacts.Log.getLog;
 
 public class BuildAgents extends BuildAgentsAbstract {
+	
+	ArrayList<IComponentIdentifier> respuesta1;
+	ArrayList<IComponentIdentifier> respuesta2;
+	ArrayList<IComponentIdentifier> respuesta3;
 
 	/**
 	 * Constructor
@@ -193,16 +197,19 @@ public class BuildAgents extends BuildAgentsAbstract {
 	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<IComponentIdentifier> createAtencionEmergency(EmergencyConfig emergencyConfig) {
-		
-		
+		  
+		ArrayList<IComponentIdentifier> respuesta = new ArrayList<IComponentIdentifier>();
+
 		getLog().setInfo("Creando Coordinador de la emergencia...");
 
 		ArrayList<CreationInfo> infos = new ArrayList<CreationInfo>();
 		Map<String, Object> arguments = new HashMap<String, Object>();
-
-		arguments.put("cidsBusqueda", createBusqueda(emergencyConfig.getPersonalBusquedaRescate()));
-		arguments.put("cidsSalud", CreateSalud(emergencyConfig.getPersonalSalud()));
-		arguments.put("cidsSeguridad", createSeguridad(emergencyConfig.getPersonalSeguridad()));
+        respuesta1 = createBusqueda(emergencyConfig.getPersonalBusquedaRescate());
+        respuesta2 = CreateSalud(emergencyConfig.getPersonalSalud());
+        respuesta3 = createSeguridad(emergencyConfig.getPersonalSeguridad());
+		arguments.put("cidsBusqueda", respuesta1);
+		arguments.put("cidsSalud", respuesta2 );
+		arguments.put("cidsSeguridad", respuesta3);
 
 		CreationInfo info = new CreationInfo(arguments);
 		infos.add(info);
@@ -289,6 +296,9 @@ public class BuildAgents extends BuildAgentsAbstract {
 		arguments.put("cidsPerson", transeuntes);
 		arguments.put("cidEmergencia", emergency.get(0));
 		arguments.put("cidsEdifices", edifices);
+		arguments.put("cidsSalud", respuesta2);
+		arguments.put("cidsBusqueda", respuesta1);
+		arguments.put("cidsSeguridad", respuesta3);
 		arguments.put("simulacionConfig", simulacionConfig);
 		arguments.put("edificesConfig", edificesConfig);
 		Coordenada c = super.getTraductor().getTamaño();

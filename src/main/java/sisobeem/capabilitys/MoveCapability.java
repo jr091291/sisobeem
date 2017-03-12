@@ -43,12 +43,14 @@ public class MoveCapability {
 		protected int velocidad;
 
 		@GoalParameter
+		protected String tipo;
+		@GoalParameter
 		IComponentIdentifier zone;
 
 		@GoalParameter
 		protected Coordenada position;
 
-		public Aleatorio(IInternalAccess agent, int velocidad, Coordenada position, IComponentIdentifier zone) {
+		public Aleatorio(IInternalAccess agent, int velocidad, Coordenada position, IComponentIdentifier zone, String tipo) {
 			// System.out.println(agent.getComponentIdentifier().getLocalName());
 
 			// System.out.println("Entro a la capacidad Aleatoria"+velocidad);
@@ -57,7 +59,8 @@ public class MoveCapability {
 			this.velocidad = velocidad;
 			this.position = position;
 			this.zone = zone;
-			aleatorio(agent, velocidad, position, zone);
+			this.tipo = tipo;
+			aleatorio(agent, velocidad, position, zone, tipo);
 
 		}
 
@@ -68,7 +71,7 @@ public class MoveCapability {
 	 */
 
 	@Plan
-	protected void aleatorio(IInternalAccess agent, int velocidad, Coordenada position, IComponentIdentifier zone) {
+	protected void aleatorio(IInternalAccess agent, int velocidad, Coordenada position, IComponentIdentifier zone, String tipo) {
 		// System.out.println("Entró en el trigger");
 		// System.out.println("Plan movimiento aleatorio: "+velocidad+"
 		// "+position.getX()+","+position.getY());
@@ -104,7 +107,7 @@ public class MoveCapability {
 				// System.out.println(getMyPosition().getX()+" -
 				// "+getMyPosition().getY()+" to "+nueva.getX()+" -
 				// "+nueva.getY());
-				if (result.changePosition(nueva, agent.getComponentIdentifier()))
+				if (result.changePosition(nueva, agent.getComponentIdentifier(),tipo))
 					setMyPosition(nueva);
 
 			}
@@ -208,6 +211,10 @@ public class MoveCapability {
 
 		@GoalParameter
 		protected int velocidad;
+		
+		
+		@GoalParameter
+		protected String tipo;
 
 		@GoalParameter
 		IComponentIdentifier zone;
@@ -218,14 +225,15 @@ public class MoveCapability {
 		@GoalParameter
 		protected Coordenada destino;
 
-		public rute(IInternalAccess agent, int velocidad, Coordenada position, IComponentIdentifier zone, Coordenada destino) {
+		public rute(IInternalAccess agent, int velocidad, Coordenada position, IComponentIdentifier zone, Coordenada destino, String tipo) {
 		
 			this.agent = agent;
 			this.velocidad = velocidad;
 			this.position = position;
 			this.destino = destino;
+			this.tipo = tipo;
 			
-			ruta(agent, velocidad, position, zone,destino);
+			ruta(agent, velocidad, position, zone,destino,tipo);
 
 		}
 
@@ -236,7 +244,7 @@ public class MoveCapability {
 	 */
 
 	@Plan
-	protected void ruta(IInternalAccess agent, int velocidad, Coordenada position, IComponentIdentifier zone,Coordenada destino) {
+	protected void ruta(IInternalAccess agent, int velocidad, Coordenada position, IComponentIdentifier zone,Coordenada destino, String tipo) {
 		// System.out.println("Entró en el trigger");
 		// System.out.println("Plan movimiento aleatorio: "+velocidad+"
 		// "+position.getX()+","+position.getY());
@@ -272,7 +280,7 @@ public class MoveCapability {
 				// System.out.println(getMyPosition().getX()+" -
 				// "+getMyPosition().getY()+" to "+nueva.getX()+" -
 				// "+nueva.getY());
-				if (result.changePosition(nueva, agent.getComponentIdentifier())){
+				if (result.changePosition(nueva, agent.getComponentIdentifier(),tipo)){
 					setMyPosition(nueva);
                     
 				}

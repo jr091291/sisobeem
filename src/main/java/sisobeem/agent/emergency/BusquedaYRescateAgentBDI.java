@@ -1,5 +1,8 @@
 package sisobeem.agent.emergency;
 
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentIdentifier;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -8,6 +11,9 @@ import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredServices;
 import sisobeem.agent.person.PersonAgentBDI;
+import sisobeem.artifacts.Coordenada;
+import sisobeem.capabilitys.MoveCapability.Aleatorio;
+import sisobeem.services.personServices.ISetBeliefPersonService;
 
 @Agent
 @Description("BusquedaYRescateAgentBDI: encargado de rescatar personas atrapadas")
@@ -18,17 +24,18 @@ import sisobeem.agent.person.PersonAgentBDI;
 @ProvidedServices({ 
 	
 })
-public class BusquedaYRescateAgentBDI extends PersonAgentBDI{
+public class BusquedaYRescateAgentBDI extends PersonAgentBDI {
 	
 
+	//String tipo = "busqueda";
+	//IComponentIdentifier cidZone;
 	/**
 	 * Configuraciones Iniciales
 	 */
 	@AgentCreated
 	public void init()
 	{   
-		
-		
+		this.myPosition  = new Coordenada(5,5);
 	}
 	
 	
@@ -38,9 +45,11 @@ public class BusquedaYRescateAgentBDI extends PersonAgentBDI{
 	@AgentBody
 	public void body()
 	{
+		this.cidZone = null;
 	       	
 	   
 	}
+	
 
 
 	@Override
@@ -113,13 +122,18 @@ public class BusquedaYRescateAgentBDI extends PersonAgentBDI{
 	}
 
 
-
+	@Override
+	public void setZone(IComponentIdentifier zone) {
+		cidZone = zone;
+	}
 
 
 	@Override
 	public void TomaDeDecisiones() {
-		// TODO Auto-generated method stub
-		
+		  if(this.cidZone!=null){
+		    	System.out.println("COORDINADOR TRATANDO DE CAMINAR: "+this.getAgent().getComponentIdentifier().getLocalName());
+				getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(super.move.new Aleatorio(this.getAgent(), 5, this.getPosition(), this.cidZone,this.tipo));
+		    }
 	}
 
 

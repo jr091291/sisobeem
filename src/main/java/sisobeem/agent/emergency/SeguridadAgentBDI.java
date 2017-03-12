@@ -1,5 +1,6 @@
 package sisobeem.agent.emergency;
 
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentIdentifier;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -8,6 +9,8 @@ import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredServices;
 import sisobeem.agent.person.PersonAgentBDI;
+import sisobeem.artifacts.Coordenada;
+import sisobeem.capabilitys.MoveCapability.Aleatorio;
 
 @Agent
 @Description("SeguridadAgentBDI: encargado de prestar la seguridad a las personas")
@@ -20,14 +23,14 @@ import sisobeem.agent.person.PersonAgentBDI;
 })
 public class SeguridadAgentBDI extends PersonAgentBDI {
 	
-
+    String tipo = "seguridad";
 	/**
 	 * Configuraciones Iniciales
 	 */
 	@AgentCreated
 	public void init()
 	{   
-		
+		this.myPosition  = new Coordenada(5,5);
 		
 	}
 	
@@ -115,13 +118,6 @@ public class SeguridadAgentBDI extends PersonAgentBDI {
 
 
 	@Override
-	public void TomaDeDecisiones() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
 	public int getSalud() {
 		// TODO Auto-generated method stub
 		return 0;
@@ -134,5 +130,21 @@ public class SeguridadAgentBDI extends PersonAgentBDI {
 		
 	}
 	
+	
+
+	@Override
+	public void setZone(IComponentIdentifier zone) {
+		cidZone = zone;
+	}
+
+
+	@Override
+	public void TomaDeDecisiones() {
+	    if(this.cidZone!=null){
+	    	System.out.println("COORDINADOR TRATANDO DE CAMINAR: "+this.getAgent().getComponentIdentifier().getLocalName());
+			getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(super.move.new Aleatorio(this.getAgent(), 5, this.getPosition(), this.cidZone,this.tipo));
+	    }
+	}
+
 
 }

@@ -1,9 +1,11 @@
 package sisobeem.services.coordinadorService;
 
+import java.util.ArrayList;
+
 import jadex.bridge.IComponentIdentifier;
 
 public interface ISetZone {
 
 	
-	public void setZone(IComponentIdentifier zone);
+	public ArrayList<IComponentIdentifier> setZone(IComponentIdentifier zone);
 }

@@ -45,9 +45,6 @@ var socketZone39 = new WebSocket(BASE_URL + "/simulacion/jadex39" );
 var socketZone40 = new WebSocket(BASE_URL + "/simulacion/jadex40" );
 var socketZoneZONE = new WebSocket(BASE_URL + "/simulacion/jadexZONE");
 
-
-
-var contador=0;
 socketZone.onmessage = function(event) {
 	factoryAction(JSON.parse(event.data));
 };
@@ -237,10 +234,69 @@ function factoryAction(data){
 	switch (data.name) {
 	case "move":
 		var data = data.data;
-		move(data.idAgent, data.moveTo, map.getMap, "/sisobeem/img/simulacion/agent_civil.png");
-		contador++;
-		console.log(contador);
+		move(data.idAgent, data.moveTo, map.getMap, "/sisobeem/img/simulacion/caminando.png","/sisobeem/img/simulacion/"+data.Tipo+".png");
 		break;
+		
+	case "punto":
+		var imagen = "";
+		data = data.data;
+		if(data.Tipo == "seguro"){
+			imagen = "/sisobeem/img/simulacion/seguro.png";
+		}
+		else{
+			imagen = "/sisobeem/img/simulacion/inseguro.png";
+		}
+		if(imagen){
+			var marketNew = new google.maps.Marker({
+		        position: data.posicion ,
+		        map: map.getMap,
+		        icon: imagen
+		    });
+			marketNew.setMap(map.getMap);
+		}
+		break;
+	
+	case "estadistica":
+		data = data.data;
+		if(data.idAgent =="Zone"){
+			
+		}
+		else{
+			infoEstadisticaEdificio(data);
+		}
+		break;
+	
+	case "derrumbe":
+		var agent = data.data.idAgent;
+		var arrayAgent = agent.split("EdificeAgent");
+		var _market = null;
+		if(arrayAgent.length>0 && arrayAgent.length > 1 ){
+			if(arrayAgent[1]==""){
+				_market = marketList.get(arrayAgent[0]);
+			}
+			else{
+				_market = marketList.get(arrayAgent[1]);
+			} 
+		}
+		if(_market){
+			var icon = "/sisobeem/img/simulacion/edificio_derrumbado.png";
+			var icon2 ="/sisobeem/img/simulacion/edificio_averiado.png";
+			
+			if(_market.icon != icon && _market.icon != icon2){
+				changeIcon(_market,icon2, map.getMap);
+		
+				setTimeout(() => {
+					changeIcon(_market, icon , map.getMap);
+				}, 2000);
+			}
+		}
+		break;
+		
+	case "muerto":
+		var market = AgentsMarkets[data.data.idAgent];
+		changeIcon(market,"/sisobeem/img/simulacion/muerto.png", map.getMap());
+		break;	
+	
 	case "route":
 		console.log("recibiendo mensaje de ruta");
 		var data = data.data;
@@ -260,15 +316,57 @@ var Route = function Route(agent, origen,destino, coordenadas){
 	this.destino = destino;
 	this.coordenadas = coordenadas;
 }
+var _marketInfoEsta = null;
+function infoEstadisticaEdificio(data){
+	var arrayAgent = data.idAgent.split("EdificeAgent");
+	var _marketInfoEsta = null;
+	if(arrayAgent.length>0 && arrayAgent.length > 1 ){
+		if(arrayAgent[1]==""){
+			_marketInfoEsta = marketList.get(arrayAgent[0]);
+		}
+		else{
+			_marketInfoEsta = marketList.get(arrayAgent[1]);
+		}
+		if(_marketInfoEsta){
+			var aux = "En Pie";
+			if(data.derrumbado){
+				aux = "Edificio Derrumbado";
+		    }
+			var infowindow = new google.maps.InfoWindow({
+			    content: '<div id="headWindowEdifice">'+ aux +'</div>'+
+			    '<div id="bodyWindowEdifice"> '+
+				'  <div><strong>Mensajes De Ayuda: </strong>' + data.MsgAyuda+'<div>'+
+				'  <div><strong>Mensajes De Ayuda: </strong>' + data.MsgDeCalma+'<div>'+
+				'  <div><strong>Mensajes De Ayuda: </strong>' +  data.MsgDeConfianza +'<div>'+
+				'  <div><strong>Mensajes De Ayuda: </strong>' +  data.MsgFrsutracion +'<div>'+
+				'  <div><strong>Mensajes De Ayuda: </strong>' + data.MsgHostilidad +'<div>'+
+				'  <div><strong>Mensajes De Ayuda: </strong>' + data.MsgMotivacion +'<div>'+
+				'  <div><strong>Mensajes De Ayuda: </strong>' + data.MsgPanico +'<div>'+
+				'  <div><strong>Mensajes De Ayuda: </strong>' + data.MsgPrimerosAux +'<div>'+
+				'  <div><strong>Mensajes De Ayuda: </strong>' + data.MsgResguardo +'<div>'+
+				'  <div><strong>Mensajes De Ayuda: </strong>' + data.PersonasAtrapadas +'<div>'+
+				'  <div><strong>Mensajes De Ayuda: </strong>' +  data.PersonasMuertas +'<div>'+
+				'  <div><strong>Mensajes De Ayuda: </strong>' +   data.Suicidios +'<div>'+
+				'</div>',
+			    maxWidth: 200
+			  });
+			
+			_marketInfoEsta.addListener('click', function() {
+			    infowindow.open(map.getMap, _marketInfoEsta);
+			  });
+		}
+	}
+}
 
 /* Funciones de acciones*/
-function move(idAgent, latLng, mapa, image){
+function move(idAgent, latLng, mapa, image, iconFinal){
 	var market = AgentsMarkets[idAgent];
 	
 	if(market){
 		if(market.position.lat()!= latLng.lat && market.position.lng() != latLng.lng){
 			market.setMap(null);
 			market.position =  new google.maps.LatLng(latLng.lat,latLng.lng);
+			market.icon = image;
 			market.setMap(mapa);
 		}
 	}
@@ -280,11 +378,26 @@ function move(idAgent, latLng, mapa, image){
 		    });
 			marketNew.setMap(mapa);
 			AgentsMarkets[idAgent] = marketNew;
+			market = marketNew;
 		
 	}
-	
+	setTimeout(() => {
+		if(market.icon != iconFinal){
+			market.setMap(null);
+			market.icon = iconFinal;
+			market.setMap(mapa);
+		}
+	}, 1800);	
 }
 
+function changeIcon(market, routeIcon, mapa){
+	if(market){
+		market.setMap(null);
+		market.icon =  routeIcon;
+		market.setMap(mapa);	
+	}
+}
+	
 function getRoute(agent, origen, destino, callback){
 	 var directionsService = new google.maps.DirectionsService;
 	 
@@ -304,7 +417,6 @@ function getRoute(agent, origen, destino, callback){
 		    }
 	});
 }
-
 
 
 

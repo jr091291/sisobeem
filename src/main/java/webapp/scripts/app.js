@@ -95,14 +95,18 @@ function printEdificio(latLng, mapa){
 * */
 function getImagen(pisos){
     var image ="";
-    if(pisos <= 6){
+    if(pisos <= 2){
         image  = "/sisobeem/img/simulacion/edificio_pequeno.png";
     }
-    else if(pisos<=12){
+    else if(pisos<= 6){
         image  = "/sisobeem/img/simulacion/edificio_mediano.png";
     }
-    else{
+
+    else if(pisos<= 12){
         image  = "/sisobeem/img/simulacion/edificio_grande.png";
+    }
+    else{
+        image  = "/sisobeem/img/simulacion/edificio_gigante.png";
     }
     return image
 }

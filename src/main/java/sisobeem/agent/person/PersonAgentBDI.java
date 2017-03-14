@@ -205,9 +205,9 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 		//Creencias Enviadas en la configuracion
 		this.edad = (int) this.arguments.get("edad");
 		
-		if(this.edad<25){
-			this.tipo = "niño";
-		}else if(this.edad>45){
+		if(this.edad<18){
+			this.tipo = "nino";
+		}else if(this.edad>50){
 			this.tipo = "anciano";
 		}else{
 			this.tipo = "adulto";

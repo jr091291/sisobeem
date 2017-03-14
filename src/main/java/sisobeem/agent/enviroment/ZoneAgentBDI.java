@@ -1436,9 +1436,15 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 	@Override
 	public void setDead(IComponentIdentifier agent) {
+		
+		if(contador>9){
+			contador =0;
+		}
      		PersonAction info = new PersonAction("muerte", new PersonPojo(agent.getLocalName(),
 				Traslator.getTraslator().getUbicacion(this.getCoordenada(agent)), "muerte"));
-		this.bandejaMsg.put(agent.getLocalName(), info.toJson());
+		this.bandejaMsg.put("Zone"+contador, info.toJson());
+		contador++;
+		
 	}
 
 	@Override

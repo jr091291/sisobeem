@@ -15,7 +15,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import sisobeem.artifacts.Coordenada;
 import sisobeem.services.enviromentService.IGetPersonHelpService;
+import sisobeem.services.zoneServices.IMapaService;
 
 @Capability
 public class FindPersonHelpCapability {
@@ -69,6 +71,64 @@ public class FindPersonHelpCapability {
 
 			});
 
+		}
+
+	}
+	
+	/**
+	 * Meta  buscar persona que necesiten ayuda
+	 */
+	@Goal(excludemode = ExcludeMode.Never)
+	public class SolicitarRuta {
+
+		@GoalParameter
+		IInternalAccess agent;
+	    
+		@GoalParameter
+		IComponentIdentifier enviroment;
+		
+		 
+		@GoalParameter
+		Coordenada destino;
+		
+		
+		
+
+		public SolicitarRuta(IInternalAccess agent,IComponentIdentifier enviroment, Coordenada c) {
+			// System.out.println(agent.getComponentIdentifier().getLocalName());
+           // getLog().setDebug(" Entró a la capacidad");
+		     
+			this.agent = agent;
+			this.enviroment = enviroment;
+			this.destino = c;
+		
+			solicitar(agent, enviroment);
+
+		}
+		
+		
+		/**
+		 * Plan que consulta los cids de las personas que necesitan ayuda
+		 */
+
+		@Plan
+		protected void solicitar(IInternalAccess agent,IComponentIdentifier enviroment) {
+			
+			IFuture<IMapaService> zone = agent.getComponentFeature(IRequiredServicesFeature.class)
+					.searchService(IMapaService.class, enviroment);
+			zone.addResultListener(new IResultListener<IMapaService>() {
+
+				@Override
+				public void resultAvailable(IMapaService result) {
+					result.getRuta(agent.getComponentIdentifier(), destino);
+				}
+
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					getLog().setError(exception.getMessage());
+				}
+
+			});
 		}
 
 	}

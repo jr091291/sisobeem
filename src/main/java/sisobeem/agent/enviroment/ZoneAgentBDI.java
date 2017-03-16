@@ -1546,6 +1546,8 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		@SuppressWarnings("unchecked")
 		ArrayList<Coordenada> depurada = (ArrayList<Coordenada>) reducirPuntos(lista).clone();
 		sendPuntosInseguros(depurada);
+		
+	    System.err.println("PUNTOS INSEGUROS ENCONTRADOS");
 		return depurada;
 	}
 

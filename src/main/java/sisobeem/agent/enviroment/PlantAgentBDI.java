@@ -185,7 +185,7 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	@Override
 	public void AyudaMsj(IComponentIdentifier emisor) {
 
-		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Ayuda");
+		//getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Ayuda");
 		this.contMsgAyuda.add(emisor);
 	//	System.out.println(this.contMsgAyuda);
 		for (IComponentIdentifier receptor : cidsPerson) {
@@ -244,7 +244,7 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	@Override
 	public void CalmaMsj(IComponentIdentifier emisor) {
 		
-		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Calma");
+	//	getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Calma");
 		this.contMsgDeCalma.add(emisor);
 	//	System.out.println(this.contMsgDeCalma);
 		for (IComponentIdentifier receptor : cidsPerson) {
@@ -273,7 +273,7 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	@Override
 	public void ConfianzaMsj(IComponentIdentifier emisor) {
 		
-		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Confianza");
+		//getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Confianza");
 		this.contMsgDeConfianza.add(emisor);
 		//System.out.println(this.contMsgDeConfianza);
 		for (IComponentIdentifier receptor : cidsPerson) {
@@ -302,7 +302,7 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	@Override
 	public void FrustracionMsj(IComponentIdentifier emisor) {
 		
-		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Frustracion");
+	//	getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Frustracion");
 		this.contMsgFrsutracion.add(emisor);
 		for (IComponentIdentifier receptor : cidsPerson) {
 			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
@@ -358,7 +358,7 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	@Override
 	public void PanicoMsj(IComponentIdentifier emisor) {
 		
-		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Panico");
+	//	getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Panico");
 		this.contMsgPanico.add(emisor);
 		for (IComponentIdentifier receptor : cidsPerson) {
 			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)

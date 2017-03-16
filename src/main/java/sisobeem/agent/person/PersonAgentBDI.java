@@ -337,6 +337,7 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	/**
 	 * Método que solicita una ruta si existe la creencia myDestiny
 	 */
+	@Plan()
 	public void solicitarRuta(){
 	
 	  if(this.myDestiny!=null&&this.cidZone!=null&&this.vivo==true){
@@ -458,6 +459,31 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	}
 
 
+	@Plan(trigger = @Trigger(goalfinisheds ={sisobeem.capabilitys.ComunicarseCapability.MensajeAyuda.class,
+            sisobeem.capabilitys.ComunicarseCapability.MensajeDeFrustracion.class,
+            sisobeem.capabilitys.ComunicarseCapability.MensajeDeHostilidad.class,
+            sisobeem.capabilitys.ComunicarseCapability.MensajeDePanico.class,
+            sisobeem.capabilitys.ComunicarseCapability.MensajeDeCalma.class,
+            sisobeem.capabilitys.ComunicarseCapability.MensajeDeConfianza.class,
+            sisobeem.capabilitys.ComunicarseCapability.MensajeDeMotivacion.class,
+            sisobeem.capabilitys.ComunicarseCapability.MensajeDePrimerosAux.class,
+            sisobeem.capabilitys.ComunicarseCapability.MensajeDeResguardo.class,
+            sisobeem.capabilitys.EvacuarCapability.Evacuar.class,
+            sisobeem.capabilitys.FindPersonHelpCapability.FindPerson.class,
+            sisobeem.capabilitys.FindPersonHelpCapability.SolicitarRuta.class,
+            sisobeem.capabilitys.FindSalidasDisponiblesCapability.salidas.class,
+            sisobeem.capabilitys.IdentificarZonasSegurasCapability.FindZonaSegura.class,
+            sisobeem.capabilitys.MoveCapability.Aleatorio.class,
+            sisobeem.capabilitys.MoveCapability.rute.class,
+            sisobeem.capabilitys.ResguardarseCapability.Resguardarse.class,
+            sisobeem.capabilitys.SuicidioCapability.SaltarDelEdificio.class,
+            sisobeem.capabilitys.SuicidioCapability.HacerNada.class,
+            sisobeem.capabilitys.TeamCapability.MensajeDeTeam.class,
+            sisobeem.capabilitys.TeamCapability.AddPersonNeedHelp.class,			          
+            sisobeem.capabilitys.TeamCapability.EnviarRuta.class}))
+public void endgoals() {
+this.TomaDeDecisiones();
+}
 
 
 	

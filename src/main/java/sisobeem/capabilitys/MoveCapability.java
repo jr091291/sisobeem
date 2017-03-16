@@ -77,6 +77,7 @@ public class MoveCapability {
 		// "+position.getX()+","+position.getY());
 		// System.out.println(agent.getComponentIdentifier().getLocalName());
 
+		/*
 		try {
 			Thread.sleep(velocidad * 1000);
 		} catch (InterruptedException e) {
@@ -85,6 +86,8 @@ public class MoveCapability {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		*/
 
 		// System.out.println("voy a moverme");
 
@@ -250,6 +253,7 @@ public class MoveCapability {
 		// "+position.getX()+","+position.getY());
 		// System.out.println(agent.getComponentIdentifier().getLocalName());
 
+		/*
 		try {
 			Thread.sleep(velocidad * 1000);
 		} catch (InterruptedException e) {
@@ -257,7 +261,7 @@ public class MoveCapability {
 			System.out.println("error");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 
 		// System.out.println("voy a moverme");
 

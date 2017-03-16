@@ -54,7 +54,7 @@ public class ComunicarseCapability {
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-                     getLog().setError(exception.getMessage());
+                  //   getLog().setError(exception.getMessage());
 				}
 
 			});
@@ -112,7 +112,7 @@ public class ComunicarseCapability {
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-                     getLog().setError(exception.getMessage());
+                   //  getLog().setError(exception.getMessage());
 				}
 
 			});
@@ -192,7 +192,7 @@ public class ComunicarseCapability {
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-                     getLog().setError(exception.getMessage());
+                  //   getLog().setError(exception.getMessage());
 				}
 
 			});
@@ -271,7 +271,7 @@ public class ComunicarseCapability {
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-                     getLog().setError(exception.getMessage());
+                    // getLog().setError(exception.getMessage());
 				}
 
 			});
@@ -351,7 +351,7 @@ public class ComunicarseCapability {
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-                     getLog().setError(exception.getMessage());
+                   //  getLog().setError(exception.getMessage());
 				}
 
 			});
@@ -430,7 +430,7 @@ public class ComunicarseCapability {
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-                     getLog().setError(exception.getMessage());
+                 //    getLog().setError(exception.getMessage());
 				}
 
 			});
@@ -509,7 +509,7 @@ public class ComunicarseCapability {
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-                     getLog().setError(exception.getMessage());
+                  //   getLog().setError(exception.getMessage());
 				}
 
 			});
@@ -588,7 +588,7 @@ public class ComunicarseCapability {
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-                     getLog().setError(exception.getMessage());
+                  //   getLog().setError(exception.getMessage());
 				}
 
 			});
@@ -667,7 +667,7 @@ public class ComunicarseCapability {
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-                     getLog().setError(exception.getMessage());
+                    // getLog().setError(exception.getMessage());
 				}
 
 			});
@@ -684,7 +684,8 @@ public class ComunicarseCapability {
 
 				@Override
 				public void resultAvailable(IComunicarMensajesService result) {
-					result.Motivacion(agent.getComponentIdentifier(), receptor);;	}
+					result.Motivacion(agent.getComponentIdentifier(), receptor);
+					}
 
 				@Override
 				public void exceptionOccurred(Exception exception) {

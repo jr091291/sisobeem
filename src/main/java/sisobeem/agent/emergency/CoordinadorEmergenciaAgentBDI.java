@@ -108,7 +108,7 @@ public class CoordinadorEmergenciaAgentBDI implements ISetStartService, ISetZone
 			this.getPuntosSeguros();
 			this.getPuntosInseguros();
 			
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000).get();
+			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(4000).get();
 			
 			for (Coordenada c : puntosSeguros) {
 				System.out.println(c.getX()+"-"+c.getY());

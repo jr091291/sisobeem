@@ -227,7 +227,6 @@ socketZone.onclose = function(event){
 };
 
 
-
 /*Factory  de acciones*/
 function factoryAction(data){
 	

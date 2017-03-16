@@ -362,7 +362,9 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	
 	@Override
 	public void recibirDerumbe(int daño) {
-	     this.salud = this.salud - daño;
+	     if(this.salud>1){
+	    	 this.salud = this.salud - daño;
+	     }
 	}
 	
 	@Plan(trigger=@Trigger(factchangeds="salud"))
@@ -446,10 +448,12 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 
 	@Override
 	public void setRute(ArrayList<Coordenada> rute) {
-		getLog().setInfo("Ruta recibidaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!! GRACIAS!!!");
+		
 
-		if(this.rute.isEmpty()||this.rute==null){
+		if(this.rute != null){
 			this.rute = rute;
+			
+			//getLog().setInfo("Ruta recibidaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!! GRACIAS!!!");
 		}
 	}
 

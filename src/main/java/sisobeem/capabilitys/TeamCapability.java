@@ -75,7 +75,7 @@ public class TeamCapability {
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-                     getLog().setError(exception.getMessage());
+                   //  getLog().setError(exception.getMessage());
 				}
 
 			});
@@ -97,7 +97,7 @@ public class TeamCapability {
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-                     getLog().setError(exception.getMessage());
+                   //  getLog().setError(exception.getMessage());
 				}
 
 			});
@@ -153,7 +153,7 @@ public class TeamCapability {
 
 					@Override
 					public void exceptionOccurred(Exception exception) {
-	                     getLog().setError(exception.getMessage());
+	                     //getLog().setError(exception.getMessage());
 					}
 
 				});
@@ -189,9 +189,9 @@ public class TeamCapability {
 		double liderazgo;
 		
 		@GoalParameter
-		ArrayList<IComponentIdentifier> listado;
+		IComponentIdentifier[] listado;
 
-		public AddPersonNeedHelp(IInternalAccess agent,IComponentIdentifier enviroment, ArrayList<IComponentIdentifier> listado, double liderazgo) {
+		public AddPersonNeedHelp(IInternalAccess agent,IComponentIdentifier enviroment, IComponentIdentifier[] listado, double liderazgo) {
 			this.agent = agent;
 			this.enviroment = enviroment;
 			this.listado = listado;
@@ -201,7 +201,7 @@ public class TeamCapability {
 		
 	
 		@Plan
-		protected void sendMensaje(IInternalAccess agent,IComponentIdentifier enviroment, ArrayList<IComponentIdentifier> listado, double liderazgo) {
+		protected void sendMensaje(IInternalAccess agent,IComponentIdentifier enviroment, IComponentIdentifier[] listado, double liderazgo) {
 			
 		  for (IComponentIdentifier a : listado) {
 			
@@ -217,7 +217,7 @@ public class TeamCapability {
 
 					@Override
 					public void exceptionOccurred(Exception exception) {
-	                     getLog().setError(exception.getMessage());
+	                 //    getLog().setError(exception.getMessage());
 					}
 
 				});

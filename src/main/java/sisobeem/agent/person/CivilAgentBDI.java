@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.micro.annotation.Agent;
@@ -292,7 +293,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 							//	getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+": Creando Team");
 								getAgent().getComponentFeature(IBDIAgentFeature.class)
 										.dispatchTopLevelGoal(grupo.new AddPersonNeedHelp(this.getAgent(),
-												this.cidZone, this.cidsPeopleHelp,this.liderazgo));
+												this.cidZone,ArrayListToArray(this.cidsPeopleHelp),this.liderazgo));
 							} else {
 								// Mensaje de team
 							//	getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+": Enviando mensaje de Team");
@@ -372,7 +373,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 						//		getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+": Conformando grupo");
 								getAgent().getComponentFeature(IBDIAgentFeature.class)
 										.dispatchTopLevelGoal(grupo.new AddPersonNeedHelp(this.getAgent(),
-												this.cidPlant, this.cidsPeopleHelp,this.liderazgo));
+												this.cidPlant, ArrayListToArray(this.cidsPeopleHelp),this.liderazgo));
 							}
 						}
 
@@ -647,6 +648,17 @@ public class CivilAgentBDI extends PersonAgentBDI {
 		// TODO Auto-generated method stub
 		return this.salud;
 	}
+	
+    public IComponentIdentifier[] ArrayListToArray(ArrayList<IComponentIdentifier> lista){
+    	IComponentIdentifier[] a = new IComponentIdentifier[lista.size()];
+    	int i=0;
+    	for (IComponentIdentifier agent : lista) {
+			a[i]= agent;
+			i++;
+		}
+    	
+    	return a;
+    }
 
 
 }

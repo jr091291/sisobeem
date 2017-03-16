@@ -4,6 +4,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
@@ -130,8 +131,9 @@ public class BusquedaYRescateAgentBDI extends PersonAgentBDI {
 
 	@Override
 	public void TomaDeDecisiones() {
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
 		  if(this.cidZone!=null){
-		    	System.out.println("COORDINADOR TRATANDO DE CAMINAR: "+this.getAgent().getComponentIdentifier().getLocalName());
+		    //	System.out.println("COORDINADOR TRATANDO DE CAMINAR: "+this.getAgent().getComponentIdentifier().getLocalName());
 				getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(super.move.new Aleatorio(this.getAgent(), 5, this.getPosition(), this.cidZone,this.tipo));
 		    }
 	}

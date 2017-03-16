@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -43,11 +44,13 @@ import sisobeem.artifacts.print.MoveAction;
 import sisobeem.artifacts.print.PersonAction;
 import sisobeem.artifacts.print.PuntoAction;
 import sisobeem.artifacts.print.RouteAction;
+import sisobeem.artifacts.print.SismoAction;
 import sisobeem.artifacts.print.pojo.EdificePojo;
 import sisobeem.artifacts.print.pojo.MovePojo;
 import sisobeem.artifacts.print.pojo.PersonPojo;
 import sisobeem.artifacts.print.pojo.PuntoPojo;
 import sisobeem.artifacts.print.pojo.RoutePojo;
+import sisobeem.artifacts.print.pojo.SismoPojo;
 import sisobeem.core.simulation.EdificesConfig;
 import sisobeem.core.simulation.EmergencyConfig;
 import sisobeem.core.simulation.PersonsConfig;
@@ -60,6 +63,7 @@ import sisobeem.services.personServices.IGetInformationService;
 import sisobeem.services.personServices.IReceptorMensajesService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 import sisobeem.services.personServices.ISetStartService;
+import sisobeem.services.personServices.IsetDerrumbeService;
 import sisobeem.services.zoneServices.IAdicionarPersonasService;
 import sisobeem.services.zoneServices.IGetDestinyService;
 import sisobeem.services.zoneServices.IGetInformationZoneService;
@@ -92,6 +96,9 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	public Boolean contextSendMsg;
 
 	int contador = 0;
+	ArrayList<Coordenada > sitiosSeguros;
+	
+	Boolean inicioSismo;
 	
 
 	/**
@@ -161,6 +168,8 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		this.contMsgPrimerosAux= new ArrayList<IComponentIdentifier>();
 		this.contMsgResguardo= new ArrayList<IComponentIdentifier>();
 		this.contMsgMotivacion= new ArrayList<IComponentIdentifier>();
+		
+		this.inicioSismo = false;
 
 		getLog().setInfo("Agente " + agent.getComponentIdentifier().getLocalName() + " creado");
 
@@ -249,12 +258,14 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(4000).get();
 		contextSendMsg = true;
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(4000).get();
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10000).get();
 
 		// Cronometro crono = new Cronometro();
 		// crono.iniciarCronometro();
 
 		// Iniciamos el sismo
+		//System.err.println("INICIANDO SISMO");
+		//System.out.println("INICIANDO SISMO");
 		this.iniciarSismo();
 		// Iniciamos mecanismos de atencion de emergencias
 		agent.getComponentFeature(IExecutionFeature.class)
@@ -347,6 +358,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		System.out.println("Msj Panico : "+this.contMsgPanico.size());
 		System.out.println("Msj Primeros Aux : "+this.contMsgPrimerosAux.size());
 		System.out.println("Msj Resguardo : "+this.contMsgResguardo.size());
+		System.out.println("Agentes muertos : "+this.cidPersonDead.size());
 
 	}
 
@@ -457,7 +469,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 				 */
 				    
 					//System.out.println(message);
-					System.out.println("Ruta agregada!");
+				//	System.out.println("Ruta agregada!");
 					Gson gson = new Gson();
 					RoutePojo route = gson.fromJson(message, RoutePojo.class);
 					//rutasDisponibles.add(route);
@@ -470,7 +482,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
                      
 					IComponentIdentifier ag = getAgent(route.getAgent());
 					if(ag!=null){
-						System.out.println("Existe este agente!");
+					//	System.out.println("Existe este agente!");
 						IFuture<ISetBeliefPersonService> zoneService = getAgent()
 								.getComponentFeature(IRequiredServicesFeature.class)
 								.searchService(ISetBeliefPersonService.class, ag);
@@ -479,7 +491,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 							@Override
 							public void resultAvailable(ISetBeliefPersonService result) {
-								System.out.println("Ruta enviada a :"+ag.getLocalName());
+								//System.out.println("Ruta enviada a :"+ag.getLocalName());
 								result.setRute(ruta);
 							}
 
@@ -901,12 +913,39 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	 * @param intesidad
 	 */
 	public void generateDamage(double intesidad) {
-
+       // ArrayList<IComponentIdentifier> listado = new ArrayList<IComponentIdentifier>();
 		for (int i = 0; i < this.mapa.length; i++) {
 			for (int j = 0; j < this.mapa[i].length; j++) {
 				this.mapa[i][j].setDaño(Random.getDoubleRandom(1, intesidad));
+							
 			}
 		}
+		
+		sendDañoToAgents(this.cidsPerson, intesidad);
+	}
+	
+	public void sendDañoToAgents(ArrayList<IComponentIdentifier> agents, double intensidad){
+
+	  for (IComponentIdentifier a : agents) {
+			IFuture<IsetDerrumbeService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)
+					.searchService(IsetDerrumbeService.class, a);
+
+			persona.addResultListener(new IResultListener<IsetDerrumbeService>() {
+
+				@Override
+				public void resultAvailable(IsetDerrumbeService result) {
+
+					result.recibirDerumbe((int)intensidad);
+
+				}
+
+				@Override
+				public void exceptionOccurred(Exception exception) {
+					getLog().setFatal(exception.getMessage());
+				}
+
+			});
+	}
 	}
 
 	/**
@@ -919,12 +958,19 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 	@Override
 	public void setIntensidadSismo(double intensidad) {
+		
+		
 		agent.getExternalAccess().scheduleStep(iAccess -> {
 			intensidadSismo = intensidad;
 			// now you are on the component's thread
+			
 			return Future.DONE;
 
 		});
+		
+	
+		
+
 		// System.out.println("modificando intensidad: "+intensidad);
 	}
 
@@ -933,6 +979,41 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		setIntensidadSismoToEdifices(this.intensidadSismo);
 		setIntensidadSismoToPerson(this.intensidadSismo);
 		generateDamage(this.intensidadSismo);
+		
+		
+		if(inicioSismo==false){
+            inicioSismo = true;
+			
+			//Enviamos la accion a la vista
+			if(contador>9){
+				contador =0;
+			}
+	     		SismoAction info = new SismoAction("mensaje", new SismoPojo(true));
+	     		
+	     		System.err.println("Enviado mensaje de inicio de sismo");
+			this.bandejaMsg.put("Zone" + contador, info.toJson());
+			contador++;
+		}else{
+			
+			if(this.intensidadSismo<0){
+				//Enviamos la accion a la vista
+				if(contador>9){
+					contador =0;
+				}
+		     		SismoAction info = new SismoAction("mensaje", new SismoPojo(false));
+				this.bandejaMsg.put("Zone" + contador, info.toJson());
+				contador++;
+				
+				inicioSismo= false;
+				
+				System.err.println("Sismo Terminado");
+			}else{
+				  			
+				System.err.println("Intensidad:"+this.intensidadSismo);
+			}
+			
+		}
+
 	}
 
 	/**
@@ -943,8 +1024,25 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	 * @return ArrayList<IComponentIdentifier> agents
 	 */
 	public ArrayList<IComponentIdentifier> getAgentsInMyRange(IComponentIdentifier emisor) {
-
-		return new ArrayList<IComponentIdentifier>();
+        
+		Coordenada agent = this.getCoordenada(emisor);
+		
+		ArrayList<IComponentIdentifier> list= new ArrayList<IComponentIdentifier>();
+		for (int i = 0; i < this.mapa.length; i++) {
+			for (int j = 0; j < this.mapa[i].length; j++) {
+				if (((i >= agent.getX() - 5) && (i <= agent.getX() + 5)) && ((j >= agent.getY() - 5)
+						&& (j <= agent.getY() + 5))) {
+					for (IComponentIdentifier  a : this.mapa[i][j].getAgents()) {
+						if(cidsPerson.contains(a)){
+							list.add(a);
+						}
+					}
+					
+				}
+			}
+		}
+		
+		return list;
 
 	}
 
@@ -955,6 +1053,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	public void AyudaMsj(IComponentIdentifier emisor) {
 
 		ArrayList<IComponentIdentifier> listado = this.getAgentsInMyRange(emisor);
+	
         this.contMsgAyuda.add(emisor);
 		//getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de Ayuda ");
 
@@ -974,13 +1073,15 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-					getLog().setFatal(exception.getMessage());
+				//	getLog().setFatal(exception.getMessage());
 				}
 
 			});
 
 		}
-
+     		PersonAction info = new PersonAction("mensaje", new PersonPojo(emisor.getLocalName(), "ayuda"));
+		this.bandejaMsg.put(emisor.getLocalName(), info.toJson());
+	
 	}
 
 	@Override
@@ -1006,12 +1107,19 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-					getLog().setFatal(exception.getMessage());
+					//getLog().setFatal(exception.getMessage());
 				}
 
 			});
 
 		}
+		
+		
+	
+     		PersonAction info = new PersonAction("mensaje", new PersonPojo(emisor.getLocalName(), "primerosauxilios"));
+		this.bandejaMsg.put(emisor.getLocalName(), info.toJson());
+	
+
 
 	}
 
@@ -1038,12 +1146,19 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-					getLog().setFatal(exception.getMessage());
+					//getLog().setFatal(exception.getMessage());
 				}
 
 			});
 
 		}
+		
+		
+	
+     		PersonAction info = new PersonAction("mensaje", new PersonPojo(emisor.getLocalName(), "calma"));
+		this.bandejaMsg.put(emisor.getLocalName(), info.toJson());
+	
+
 
 	}
 
@@ -1068,12 +1183,18 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-					getLog().setFatal(exception.getMessage());
+					//getLog().setFatal(exception.getMessage());
 				}
 
 			});
 
 		}
+		
+		//Enviamos la accion a la vista
+     		PersonAction info = new PersonAction("mensaje", new PersonPojo(emisor.getLocalName(), "confianza"));
+		this.bandejaMsg.put(emisor.getLocalName(), info.toJson());
+
+
 
 	}
 
@@ -1100,12 +1221,19 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-					getLog().setFatal(exception.getMessage());
+					//getLog().setFatal(exception.getMessage());
 				}
 
 			});
 
 		}
+		
+		//Enviamos la accion a la vista
+	
+     		PersonAction info = new PersonAction("mensaje", new PersonPojo(emisor.getLocalName(), "frustracion"));
+		this.bandejaMsg.put(emisor.getLocalName(), info.toJson());
+		
+
 
 	}
 
@@ -1132,12 +1260,19 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-					getLog().setFatal(exception.getMessage());
+					//getLog().setFatal(exception.getMessage());
 				}
 
 			});
 
 		}
+		
+		//Enviamos la accion a la vista
+
+     		PersonAction info = new PersonAction("mensaje", new PersonPojo(emisor.getLocalName(), "hostil"));
+		this.bandejaMsg.put(emisor.getLocalName(), info.toJson());
+
+
 
 	}
 
@@ -1164,12 +1299,18 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-					getLog().setFatal(exception.getMessage());
+				//	getLog().setFatal(exception.getMessage());
 				}
 
 			});
 
 		}
+     
+		//Enviamos la accion a la vista
+
+     		PersonAction info = new PersonAction("mensaje", new PersonPojo(emisor.getLocalName(), "panico"));
+		this.bandejaMsg.put(emisor.getLocalName(), info.toJson());
+
 
 	}
 
@@ -1196,12 +1337,19 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-					getLog().setFatal(exception.getMessage());
+					//getLog().setFatal(exception.getMessage());
 				}
 
 			});
 
 		}
+		
+		//Enviamos la accion a la vista
+	
+     		PersonAction info = new PersonAction("mensaje", new PersonPojo(emisor.getLocalName(), "resguardo"));
+		this.bandejaMsg.put(emisor.getLocalName(), info.toJson());
+
+
 
 	}
 
@@ -1228,12 +1376,19 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-					getLog().setFatal(exception.getMessage());
+				//	getLog().setFatal(exception.getMessage());
 				}
 
 			});
 
 		}
+		
+		//Enviamos la accion a la vista
+	
+     		PersonAction info = new PersonAction("mensaje", new PersonPojo(emisor.getLocalName(), "motivacion"));
+		this.bandejaMsg.put(emisor.getLocalName(), info.toJson());
+
+
 
 	}
 	
@@ -1259,13 +1414,13 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-					getLog().setFatal(exception.getMessage());
+					//getLog().setFatal(exception.getMessage());
 				}
 
 			});
 
 		}
-
+		
 		
 	}
 
@@ -1273,12 +1428,21 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	@Override
 	public void derrumbarEdifice(IComponentIdentifier cidEdifice) {
 		Coordenada edificio = this.getCoordenada(cidEdifice);
-
+       
 		for (int i = 0; i < this.mapa.length; i++) {
 			for (int j = 0; j < this.mapa[i].length; j++) {
-				if ((i <= edificio.getX() - 8) && (i >= edificio.getX() + 8) && (j <= edificio.getY() - 8)
-						&& (j >= edificio.getY() + 8)) {
+				if (((i >= edificio.getX() - 8) && (i <= edificio.getX() + 8)) && ((j >= edificio.getY() - 8)
+						&& (j <= edificio.getY() + 8))) {
 					this.mapa[i][j].setDaño(9);
+					 ArrayList<IComponentIdentifier> listado  = new ArrayList<IComponentIdentifier>();
+					for (IComponentIdentifier a : this.mapa[i][j].getAgents()) {
+						if(this.cidsPerson.contains(a)){
+							listado.add(a);
+						}
+					}
+					
+					System.out.println(listado.size());
+					sendDañoToAgents(listado,9);
 				}
 			}
 		}
@@ -1315,7 +1479,9 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 	@Override
 	public Coordenada getDestiny(IComponentIdentifier agent) {
-        ArrayList<Coordenada > sitiosSeguros = getPuntosSeguros();
+       if(sitiosSeguros==null){
+    	   sitiosSeguros = getPuntosSeguros();
+       }
         
        return sitiosSeguros.get(Random.getIntRandom(0, sitiosSeguros.size()-1));
         
@@ -1324,6 +1490,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	@Override
 	public ArrayList<Coordenada> getPuntosSeguros() {
 
+	if(this.sitiosSeguros==null){
 		ArrayList<Coordenada> lista = new ArrayList<Coordenada>();
 
 		for (int i = 0; i < this.mapa.length; i++) {
@@ -1338,8 +1505,12 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 		ArrayList<Coordenada> depurada = (ArrayList<Coordenada>) reducirPuntos(lista).clone();
 
 		sendPuntosSeguros(depurada);
-
 		return depurada;
+	}else{
+		return sitiosSeguros;
+	}
+
+		
 	}
 
 	private void sendPuntosSeguros(ArrayList<Coordenada> puntosSeguros) {
@@ -1437,12 +1608,14 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	@Override
 	public void setDead(IComponentIdentifier agent) {
 		
+		
+		this.cidPersonDead.add(agent);
 		if(contador>9){
 			contador =0;
 		}
      		PersonAction info = new PersonAction("muerte", new PersonPojo(agent.getLocalName(),
 				Traslator.getTraslator().getUbicacion(this.getCoordenada(agent)), "muerte"));
-		this.bandejaMsg.put("Zone"+contador, info.toJson());
+		this.bandejaMsg.put(agent.getLocalName(), info.toJson());
 		contador++;
 		
 	}

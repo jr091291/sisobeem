@@ -13,6 +13,11 @@ public class PersonPojo {
 		this.posicion = p;
 		this.Tipo = t;
 	}
+	
+	public PersonPojo(String id, String t){
+		this.idAgent = id;
+		this.Tipo = t;
+	}
 
 	public String getIdAgent() {
 		return idAgent;

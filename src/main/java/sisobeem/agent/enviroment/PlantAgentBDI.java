@@ -497,7 +497,7 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 
 				@Override
 				public void exceptionOccurred(Exception exception) {
-					  getLog().setError(exception.getMessage());
+					//  getLog().setError(exception.getMessage());
 				}
 
 			});

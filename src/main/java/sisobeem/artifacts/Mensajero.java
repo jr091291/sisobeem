@@ -2,6 +2,7 @@ package sisobeem.artifacts;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.zip.ZipInputStream;
 
 import jadex.bridge.IComponentIdentifier;
 import sisobeem.websocket.client.zoneClientEndpoint;
@@ -78,14 +79,17 @@ public class Mensajero extends Thread{
 	  // System.out.println("Personas :"+this.inicioPerson);
 		for (int i = inicioPerson; i < finPerson;) {
 			// System.out.println(cidsPerson.get(i).getLocalName()); 
-			 String data = bandejaMsg.get(cidsPerson.get(i));
-					 
-			// bandejaMsg.remove(cidsPerson.get(i)); // Eliminamos el mensaje  despues de tenerlo guardado
+			String agent = cidsPerson.get(i);
+			 String data = bandejaMsg.get(agent);
+			// String data = bandejaMsg.
+			  
+			//synchronized(bandejaMsg){
+			   bandejaMsg.put(agent, null);
+			// }
+			 // Eliminamos el mensaje  despues de tenerlo guardado
 			 // System.out.println(data); 
 			  if(data!=null){
-				  
-				  
-				
+
 				switch (bandera) {
 					case 0:
 						  sendMensaje(clientEndPoint,data);
@@ -165,7 +169,7 @@ public class Mensajero extends Thread{
 			   }
 					  
 			   try {
-				   Thread.sleep(9);	
+				   Thread.sleep(12);	
 			   } catch (InterruptedException e) {
 				 // TODO Auto-generated catch block
 				  e.printStackTrace();

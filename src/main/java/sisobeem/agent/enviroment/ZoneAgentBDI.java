@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.xalan.xsltc.compiler.sym;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
@@ -369,19 +371,19 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 		m1 = new Mensajero(0, this.listaDeEmisores.size() / 4, this.listaDeEmisores, bandejaMsg, clientEndPoint, clientEndPoint2,
 				clientEndPoint3, clientEndPoint4, clientEndPoint5, clientEndPoint6, clientEndPoint7, clientEndPoint8,
-				clientEndPoint9, clientEndPoint10);
+				clientEndPoint9, clientEndPoint10,1);
 
 		m2 = new Mensajero(this.listaDeEmisores.size() / 4, this.listaDeEmisores.size() / 2, this.listaDeEmisores, bandejaMsg,
 				clientEndPoint11, clientEndPoint12, clientEndPoint13, clientEndPoint14, clientEndPoint15,
-				clientEndPoint16, clientEndPoint17, clientEndPoint18, clientEndPoint19, clientEndPoint20);
+				clientEndPoint16, clientEndPoint17, clientEndPoint18, clientEndPoint19, clientEndPoint20,2);
 
 		m3 = new Mensajero(this.listaDeEmisores.size() / 2, this.listaDeEmisores.size() * 3 / 4, this.listaDeEmisores, bandejaMsg,
 				clientEndPoint21, clientEndPoint22, clientEndPoint23, clientEndPoint24, clientEndPoint25,
-				clientEndPoint26, clientEndPoint27, clientEndPoint28, clientEndPoint29, clientEndPoint30);
+				clientEndPoint26, clientEndPoint27, clientEndPoint28, clientEndPoint29, clientEndPoint30,3);
 
 		m4 = new Mensajero(this.listaDeEmisores.size() * 3 / 4, this.listaDeEmisores.size(), this.listaDeEmisores, bandejaMsg,
 				clientEndPoint31, clientEndPoint32, clientEndPoint33, clientEndPoint34, clientEndPoint35,
-				clientEndPoint36, clientEndPoint37, clientEndPoint38, clientEndPoint39, clientEndPoint40);
+				clientEndPoint36, clientEndPoint37, clientEndPoint38, clientEndPoint39, clientEndPoint40,4);
 		
 	//	repartidor = new RepartidorDeRutas(this.getAgent(),this.rutasDisponibles,this.cidsPerson,this.coordinador);
 
@@ -466,7 +468,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 				    JsonArray array = parser.parse(message).getAsJsonArray();
 				    IComponentIdentifier sim = gson.fromJson(array.get(0), IComponentIdentifier.class);
 				    Ubicacion[] edi = gson.fromJson(array.get(1), Ubicacion[].class );
-				 */
+				 
 				    
 					//System.out.println(message);
 				//	System.out.println("Ruta agregada!");
@@ -474,11 +476,15 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 					RoutePojo route = gson.fromJson(message, RoutePojo.class);
 					//rutasDisponibles.add(route);
 					
-					ArrayList<Coordenada> ruta = new ArrayList<Coordenada>();
+					Ubicacion[] rutaU= route.getCoordenadas();
+				
+					Coordenada[] ruta = new Coordenada[rutaU.length];
 
-					for (Ubicacion u : route.getCoordenadas()) {
-						ruta.add(Traslator.traductor.getCoordenada(u));
-					}
+				  for (int j = 0; j <rutaU.length; j++) {
+					  ruta[j]= Traslator.traductor.getCoordenada(rutaU[j]);
+				  }
+						
+					
                      
 					IComponentIdentifier ag = getAgent(route.getAgent());
 					if(ag!=null){
@@ -492,7 +498,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 							@Override
 							public void resultAvailable(ISetBeliefPersonService result) {
 								//System.out.println("Ruta enviada a :"+ag.getLocalName());
-								result.setRute(ruta);
+								result.setRute(rutaU);
 							}
 
 							@Override
@@ -502,6 +508,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 						});
 					}
+					*/
 				}
 			});
 
@@ -780,13 +787,19 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	public boolean changePosition(Coordenada nueva, IComponentIdentifier cid, String tipo) {
 
 		// System.out.println("Cambiando posicion de:"+cid.getLocalName());
-
+		Coordenada antigua;
 		if (validateInMap(nueva)) {
-			Coordenada antigua = getCoordenada(cid);
+			antigua = getCoordenada(cid);
 	        if(antigua!=null){
-	    		synchronized (this.mapa) {
-					this.mapa[antigua.getX()][antigua.getY()].getAgents().remove(cid);
-					this.mapa[nueva.getX()][nueva.getY()].getAgents().add(cid);
+	    		
+	        	
+	        	try {
+	        		synchronized (this.mapa) {
+						this.mapa[antigua.getX()][antigua.getY()].getAgents().remove(cid);
+						this.mapa[nueva.getX()][nueva.getY()].getAgents().add(cid);
+					}
+				} catch (Exception e) {
+					System.err.println("POR FUERA DEL MAPA!");
 				}
 
 				// for (IComponentIdentifier c :
@@ -798,7 +811,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 				//
 
-				MoveAction info = new MoveAction("move",
+	    		MoveAction info = new MoveAction("move",
 						new MovePojo(cid.getLocalName(), Traslator.getTraslator().getUbicacion(nueva),tipo));
 				this.bandejaMsg.put(cid.getLocalName(), info.toJson());
 				// System.out.println(this.bandejaMsg.size());
@@ -806,14 +819,16 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 				return true;
 	        }else{
-	        	 System.out.println("Error al buscar el agente");
-	 			return false;
+	        	
+	          return false;
+		        
 	        }
 		} else {
 
 			// System.out.println("Error en la direccion");
 			return false;
 		}
+
 
 	}
 
@@ -827,10 +842,18 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	private boolean validateInMap(Coordenada c) {
 		// System.out.println(c.getX()+" "+this.mapa.length);
 		// System.out.println(c.getY()+" "+this.mapa[0].length);
-		if (c.getX() >= this.mapa.length || c.getY() >= this.mapa[0].length || c.getX() < 0 || c.getY() < 0)
-			return false;
+		
+		if(c!=null){
+			if (c.getX() < this.mapa.length && c.getY() < this.mapa[1].length && c.getX() >= 0 && c.getY() >= 0){
+				return true;
+			}
+				
 
-		return true;
+			return false;
+		}else{
+			System.err.println("COORDENADA NULL");
+			return false;
+		}
 
 	}
 
@@ -935,7 +958,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 				@Override
 				public void resultAvailable(IsetDerrumbeService result) {
 
-					result.recibirDerumbe((int)intensidad);
+					result.recibirDerumbe((int)intensidad/100);
 
 				}
 
@@ -1466,16 +1489,75 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	}
 
 	@Override
-	public void getRuta(IComponentIdentifier agent, Coordenada destino) {
+	public Coordenada[] getRuta(IComponentIdentifier agent, Coordenada destino, double conocimientoDelaZona) {
 		Coordenada inicio = this.getCoordenada(agent);
+		/*
+				
+					 RouteAction info = new RouteAction("route", new RoutePojo(Traslator.getTraslator().getUbicacion(inicio),
+								Traslator.getTraslator().getUbicacion(destino), agent.getLocalName()));
 
-		RouteAction info = new RouteAction("route", new RoutePojo(Traslator.getTraslator().getUbicacion(inicio),
-				Traslator.getTraslator().getUbicacion(destino), agent.getLocalName()));
-
-		this.bandejaMsg.put(agent.getLocalName(), info.toJson());
-
-		//getLog().setDebug("Enviando mensaje con la peticion de la ruta");
+						this.bandejaMsg.put(agent.getLocalName(), info.toJson());
+						// Thread.sleep(300);
+		*/
+		
+		Coordenada [] res = construirRuta(inicio,destino);
+		return res;
+		
 	}
+	
+	private Coordenada[] construirRuta(Coordenada inicio, Coordenada fin){
+		
+		Coordenada[] res = algoritmo1(inicio, fin);
+				
+		
+		return res;
+	}
+	
+	private Coordenada[] algoritmo1(Coordenada inicio, Coordenada fin){
+		int xI = inicio.getX();
+		int yI = inicio.getY();
+		int xF = fin.getX();
+		int yF = fin.getY();
+		
+		ArrayList<Coordenada> lista = new ArrayList<Coordenada>();
+		
+		
+		
+		while(xI!=xF||yI!=yF){
+			int xD = xI - xF;
+			int yD = yI - yF;
+			if(xD<0){
+				xI= xI+1;
+			}else if(xD==0){
+				
+			}else{
+				xI = xI-1;
+			}
+			
+			if(yD<0){
+				yI= yI+1;
+			}else if(yD==0){
+				
+			}else{
+				yI = yI-1;
+			}
+			
+			lista.add(new Coordenada(xI, yI));
+		}
+		
+	   Coordenada [] rute = new Coordenada[lista.size()];
+		for (int i = 0; i < lista.size(); i++) {
+			rute[i]= lista.get(i);
+		}
+		return rute;
+	}
+	
+	private Coordenada[] algoritmo2(Coordenada inicio, Coordenada fin){
+		
+		return null;
+	}
+	
+	
 
 	@Override
 	public Coordenada getDestiny(IComponentIdentifier agent) {
@@ -1662,6 +1744,29 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 	@Override
 	public void setEstadisticasEdifice(EdificePojo info) {
 
+	}
+
+	@Override
+	public boolean changePosition(Ubicacion nueva, IComponentIdentifier cid, String tipo) {
+		//Coordenada x= Traslator.getTraslator().getCoordenada(nueva);
+		
+		//System.out.println(x.getX());
+		//System.out.println(x.getY());
+		/*
+		if(x.getX()!=null)
+		
+		
+		
+		if (validateInMap()) {
+		return false;
+		
+		*/
+		
+		MoveAction info = new MoveAction("move",
+				new MovePojo(cid.getLocalName(), nueva,tipo));
+		this.bandejaMsg.put(cid.getLocalName(), info.toJson());
+		
+		return true;
 	}
 
 	/**

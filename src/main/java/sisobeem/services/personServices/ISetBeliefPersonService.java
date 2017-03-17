@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import jadex.bridge.IComponentIdentifier;
 import sisobeem.artifacts.Coordenada;
+import sisobeem.artifacts.Ubicacion;
 
 /**
  * Servicio de modificacion de creencias de los agentes persona
@@ -45,6 +46,6 @@ public interface ISetBeliefPersonService {
 	
 	public void setToCoordinador(IComponentIdentifier coordinador);
 	
-	public void setRute(ArrayList<Coordenada> rute);
+	public void setRute(Coordenada [] rute);
     
 }

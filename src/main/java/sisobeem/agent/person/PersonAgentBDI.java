@@ -27,6 +27,7 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import sisobeem.artifacts.Coordenada;
+import sisobeem.artifacts.Ubicacion;
 import sisobeem.capabilitys.ComunicarseCapability;
 import sisobeem.capabilitys.EvacuarCapability;
 import sisobeem.capabilitys.FindPersonHelpCapability;
@@ -78,6 +79,8 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	@Belief
 	Boolean start;
 	
+	Boolean seguirCorriendo = false;
+	
 	@Agent 
 	public IInternalAccess agent;
 	
@@ -119,7 +122,7 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 	
 	
 	@Belief
-	protected ArrayList<Coordenada> rute;
+	protected Coordenada[] rute;
 	
 	@Belief
 	protected Coordenada myDestiny;
@@ -326,6 +329,7 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 			this.intensidadSismo=intensidad;
 			if(!this.contextSismo){
 				this.contextSismo = true;
+				seguirCorriendo = true;
 			}
 			//getLog().setDebug(""+intensidad);
 		}else{
@@ -347,7 +351,7 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 
 				@Override
 				public void resultAvailable(IMapaService result) {
-					result.getRuta(getAgent().getComponentIdentifier(), myDestiny);
+				   rute=result.getRuta(getAgent().getComponentIdentifier(), myDestiny,conocimientoZona);
 				}
 
 				@Override
@@ -448,13 +452,13 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 
 
 	@Override
-	public void setRute(ArrayList<Coordenada> rute) {
+	public void setRute(Coordenada[] rute) {
 		
 
-		if(this.rute != null){
+		if(this.rute == null){
 			this.rute = rute;
 			
-			//getLog().setInfo("Ruta recibidaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!! GRACIAS!!!");
+			getLog().setInfo("Ruta recibidaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!! GRACIAS!!!");
 		}
 	}
 
@@ -484,6 +488,21 @@ public abstract class PersonAgentBDI implements ISetBeliefPersonService,ISetStar
 public void endgoals() {
 this.TomaDeDecisiones();
 }
+	
+	
+	  public void EliminarPositionRoute( int pos) {
+	      
+	        for (int i = 0; i < this.rute.length; i++) {
+	            if (i == pos) {
+	                for (int j = i; j <  this.rute.length - 1; j++) {
+	                	 this.rute[j] =  this.rute[j+1];
+	                }
+	                this.rute[ this.rute.length - 1] = null;
+	      
+	            }
+	        }
+	   
+	    }
 
 
 	

@@ -120,7 +120,7 @@ public class FindPersonHelpCapability {
 
 				@Override
 				public void resultAvailable(IMapaService result) {
-					result.getRuta(agent.getComponentIdentifier(), destino);
+					//result.getRuta(agent.getComponentIdentifier(), destino);
 				}
 
 				@Override

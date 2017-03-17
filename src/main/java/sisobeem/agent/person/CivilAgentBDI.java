@@ -24,6 +24,8 @@ import sisobeem.utilities.Random;
 public class CivilAgentBDI extends PersonAgentBDI {
 
 	IComponentIdentifier cidlider;
+	
+	
 
 	/**
 	 * Configuraciones Iniciales
@@ -149,7 +151,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 	@Override
 	public void TomaDeDecisiones() {
 
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(500).get();
 		this.velocidad = Random.getIntRandom(1, 5);
 		if (this.vivo) {
 
@@ -197,21 +199,19 @@ public class CivilAgentBDI extends PersonAgentBDI {
 		// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+"
 		// Soy Lider");
 
-		if (this.contextSismo) { // Si esta temblando
+		if (this.contextSismo||seguirCorriendo) { // Si esta temblando
 
 			if (this.cidPlant == null) {// Si está en la calle
 				if (this.myDestiny == null) { // Si no tengo destino
 					// Solicitando destino
 
-					// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-					// Identificando punto seguro");
+				//	 getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+": Identificando punto seguro");
 					getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 							this.IdentificarZonas.new FindZonaSegura(this.getAgent(), this.cidZone));
 				} else {
 					if (this.cidsPeopleHelp == null) {
 						// Solicitar Personas que necesitan ayuda
-						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-						// Identificando Personas que necesitan ayuda");
+						//	 getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Identificando Personas que necesitan ayuda");
 						getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 								FindPersonHelpCapability.new FindPerson(this.getAgent(), this.cidZone));
 
@@ -228,21 +228,18 @@ public class CivilAgentBDI extends PersonAgentBDI {
 																		// al
 																		// grupo
 								case 1:
-									// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-									// Enviando mensaje de Calma");
+									//		 getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de Calma");
 									getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 											msg.new MensajeDeCalma(this.getAgent(), this.cidZone));
 									break;
 								case 2:
-									// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-									// Enviando mensaje de motivacion");
+									//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de motivacion");
 									getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 											msg.new MensajeDeMotivacion(this.getAgent(), this.cidZone));
 									break;
 
 								case 3:
-									// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-									// Enviando mensaje de confianza");
+									//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de confianza");
 									getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 											msg.new MensajeDeConfianza(this.getAgent(), this.cidZone));
 									break;
@@ -257,19 +254,23 @@ public class CivilAgentBDI extends PersonAgentBDI {
 
 							case 2: //
 								if (this.rute == null) {
-									// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-									// Moviendo");
+									//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+": Moviendo");
 									getAgent().getComponentFeature(IBDIAgentFeature.class)
 											.dispatchTopLevelGoal(super.move.new Aleatorio(this.getAgent(),
 													this.velocidad, this.getPosition(), cidZone, this.tipo));
 								} else {
-									getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()
-											+ ": Moviendome en ruta");
-									getAgent().getComponentFeature(IBDIAgentFeature.class)
-											.dispatchTopLevelGoal(super.move.new rute(this.getAgent(), this.velocidad,
-													this.getPosition(), cidZone, this.rute.get(0), this.tipo));
+									if(this.rute[0]==null){
+										//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de motivacion");
+										getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
+												msg.new MensajeDeMotivacion(this.getAgent(), this.cidZone));
+									}else{
+											//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+ ": Moviendome en ruta");
+											getAgent().getComponentFeature(IBDIAgentFeature.class)
+													.dispatchTopLevelGoal(super.move.new rute(this.getAgent(), this.velocidad,
+															this.getPosition(), cidZone, this.rute[0], this.tipo));
 
-									this.rute.remove(0);
+											EliminarPositionRoute(0);
+									}
 								}
 
 								break;
@@ -281,15 +282,13 @@ public class CivilAgentBDI extends PersonAgentBDI {
 								// Enviar invitacion a Team a las
 								// personas
 								// que necesitan ayuda
-								// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-								// Creando Team");
+								//	getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Creando Team");
 								getAgent().getComponentFeature(IBDIAgentFeature.class)
 										.dispatchTopLevelGoal(grupo.new AddPersonNeedHelp(this.getAgent(), this.cidZone,
 												ArrayListToArray(this.cidsPeopleHelp), this.liderazgo));
 							} else {
 								// Mensaje de team
-								// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-								// Enviando mensaje de Team");
+								//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de Team");
 								getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 										this.grupo.new MensajeDeTeam(this.getAgent(), this.cidZone, this.liderazgo));
 							}
@@ -303,16 +302,14 @@ public class CivilAgentBDI extends PersonAgentBDI {
 
 				if (this.salidasDisponibles < 0) {
 					// Solicitar salidas disponibles
-					// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-					// Buscando salidas disponibles");
+					//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Buscando salidas disponibles");
 					getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 							findsalidas.new salidas(this.getAgent(), this.conocimientoZona, this.cidEdifice));
 				} else if (this.salidasDisponibles > 0) {
 
 					if (this.cidsPeopleHelp == null) {
 						// Solicitar Personas que necesitan ayuda
-						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-						// Buscando personas que necesitan ayuda");
+						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Buscando personas que necesitan ayuda");
 						getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 								FindPersonHelpCapability.new FindPerson(this.getAgent(), this.cidPlant));
 
@@ -330,21 +327,18 @@ public class CivilAgentBDI extends PersonAgentBDI {
 
 								// grupo
 								case 1:
-									// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-									// Enviando mensaje de calma");
+									//		 getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de calma");
 									getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 											msg.new MensajeDeCalma(this.getAgent(), this.cidPlant));
 									break;
 								case 2:
-									// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-									// Enviando mensaje de motivacion");
+									//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de motivacion");
 									getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 											msg.new MensajeDeMotivacion(this.getAgent(), this.cidPlant));
 									break;
 
 								case 3:
-									/// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-									/// Enviando mesaje de confianza");
+									//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mesaje de confianza");
 									getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 											msg.new MensajeDeConfianza(this.getAgent(), this.cidPlant));
 									break;
@@ -357,8 +351,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 								break;
 
 							case 2: // evacuar
-								// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-								// Intentando evacuar");
+								//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Intentando evacuar");
 								getAgent().getComponentFeature(IBDIAgentFeature.class)
 										.dispatchTopLevelGoal(EvacuarEdificio.new Evacuar(this.getAgent(),
 												this.conocimientoZona, this.cidPlant, this.cidEdifice));
@@ -371,8 +364,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 								// Enviar invitacion a Team a las
 								// personas
 								// que necesitan ayuda
-								// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-								// Conformando grupo");
+								//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Conformando grupo");
 								getAgent().getComponentFeature(IBDIAgentFeature.class)
 										.dispatchTopLevelGoal(grupo.new AddPersonNeedHelp(this.getAgent(),
 												this.cidPlant, ArrayListToArray(this.cidsPeopleHelp), this.liderazgo));
@@ -386,8 +378,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 				} else {
 
 					// Solicitar salidas disponibles
-					// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-					// Buscando salidas disponibles");
+					// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Buscando salidas disponibles");
 					getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 							findsalidas.new salidas(this.getAgent(), this.conocimientoZona, this.cidEdifice));
 
@@ -398,12 +389,13 @@ public class CivilAgentBDI extends PersonAgentBDI {
 
 			if (this.cidPlant == null) {
 				// Si está en la calle
+				//getLog().setDebug("Moviendome aleatoriamente");
 				getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(super.move.new Aleatorio(
 						this.getAgent(), this.velocidad, this.getPosition(), cidZone, this.tipo));
 			} else {
 				// Si está en un edificio
 				// System.out.println("Estoy en un edifcio y no esta
-				// temblando");
+				 //temblando");
 				getAgent().getComponentFeature(IBDIAgentFeature.class)
 						.dispatchTopLevelGoal(this.suicidio.new HacerNada());
 			}
@@ -418,20 +410,18 @@ public class CivilAgentBDI extends PersonAgentBDI {
 		// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+"
 		// Soy Dependiente");
 
-		if (this.contextSismo) {
+		if (this.contextSismo||seguirCorriendo) {
 			if (this.cidPlant == null) { // estan en el zone
 				if (this.cidlider == null) { // Si no tiene lider
 					switch (Random.getIntRandom(1, 2)) {
 					case 1:
-						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-						// Enviando mensaje de ayuda");
+						//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de ayuda");
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 								.dispatchTopLevelGoal(msg.new MensajeAyuda(this.getAgent(), this.cidZone));
 						contextResguardarse = true;
 						break;
 					case 2:
-						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-						// Enviando mensa");
+						//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensa");
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 								.dispatchTopLevelGoal(super.move.new Aleatorio(this.getAgent(), this.velocidad,
 										this.getPosition(), cidZone, this.tipo));
@@ -449,28 +439,37 @@ public class CivilAgentBDI extends PersonAgentBDI {
 
 					if (this.rute == null) {
 
+						
+						//getLog().setDebug("Movimiento Aleatorio");
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 								.dispatchTopLevelGoal(super.move.new Aleatorio(this.getAgent(), this.velocidad,
 										this.getPosition(), cidZone, this.tipo));
 						contextResguardarse = false;
 
 					} else {
-						contextResguardarse = false;
-						// codigo para moverse por ruta
-						getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()
-								+ ":Dependiente, Moviendome en ruta");
-						getAgent().getComponentFeature(IBDIAgentFeature.class)
-								.dispatchTopLevelGoal(super.move.new rute(this.getAgent(), this.velocidad,
-										this.getPosition(), cidZone, this.rute.get(0), this.tipo));
+					      if(this.rute[0]==null){
+					    	//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de ayuda");
+								getAgent().getComponentFeature(IBDIAgentFeature.class)
+										.dispatchTopLevelGoal(msg.new MensajeAyuda(this.getAgent(), this.cidZone));
+								contextResguardarse = true;
+					    	  
+					      }else{
+					    		contextResguardarse = false;
+								// codigo para moverse por ruta
+								//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()
+								//	+ ":Dependiente, Moviendome en ruta");
+								getAgent().getComponentFeature(IBDIAgentFeature.class)
+										.dispatchTopLevelGoal(super.move.new rute(this.getAgent(), this.velocidad,
+												this.getPosition(), cidZone, this.rute[0], this.tipo));
 
-						this.rute.remove(0);
+								EliminarPositionRoute(0);
+					      }
 					}
 
 				}
 			} else { // Estan en un edificio
 				if (this.cidlider == null) { // Si no tiene lider
-					// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-					// Enviando mensaje de ayuda");
+					//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de ayuda");
 					getAgent().getComponentFeature(IBDIAgentFeature.class)
 							.dispatchTopLevelGoal(msg.new MensajeAyuda(this.getAgent(), this.cidPlant));
 
@@ -482,8 +481,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 						// evacuar con el lider
 
 						contextResguardarse = false;
-						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-						// Intentando evacuar con el grupo");
+						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Intentando evacuar con el grupo");
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 								.dispatchTopLevelGoal(EvacuarEdificio.new Evacuar(this.getAgent(),
 										this.conocimientoZona, this.cidPlant, this.cidEdifice, this.cidlider));
@@ -499,12 +497,14 @@ public class CivilAgentBDI extends PersonAgentBDI {
 
 			if (this.cidPlant == null) {
 				// Si está en la calle
+				//getLog().setDebug("Moviendo aleatoriamente");
 				getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(super.move.new Aleatorio(
 						this.getAgent(), this.velocidad, this.getPosition(), cidZone, this.tipo));
 			} else {
 				// Si está en un edificio
 				// System.out.println("Estoy en un edifcio y no esta
 				// temblando");
+				//getLog().setDebug("No hago nada");
 				getAgent().getComponentFeature(IBDIAgentFeature.class)
 						.dispatchTopLevelGoal(this.suicidio.new HacerNada());
 
@@ -519,38 +519,35 @@ public class CivilAgentBDI extends PersonAgentBDI {
 	private void independientes() {
 		// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+"
 		// Soy Independiente");
-		if (this.contextSismo) {
+		if (this.contextSismo||seguirCorriendo) {
 			if (this.cidPlant == null) { // si esta en el zone
 				if (this.myDestiny == null) {
 					switch (Random.getIntRandom(1, 5)) {
 					case 1:
+						//	getLog().setDebug("Movimiento aleatorio");
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 								.dispatchTopLevelGoal(super.move.new Aleatorio(this.getAgent(), this.velocidad,
 										this.getPosition(), cidZone, this.tipo));
 						contextResguardarse = false;
 						break;
 					case 2:
-						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":enviando
-						// mensaje de hostilidad");
+						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":enviando mensaje de hostilidad");
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 								.dispatchTopLevelGoal(msg.new MensajeDeHostilidad(this.getAgent(), this.cidZone));
 						break;
 
 					case 3:
-						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-						// Enviando mensaje de frustracion ");
+						//	getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de frustracion ");
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 								.dispatchTopLevelGoal(msg.new MensajeDeFrustracion(this.getAgent(), this.cidZone));
 						break;
 					case 4:
-						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-						// Enviando mensaje de panico");
+						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de panico");
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 								.dispatchTopLevelGoal(msg.new MensajeDePanico(this.getAgent(), this.cidZone));
 					case 5:
 						// Solicitando destino
-						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-						// Tratando de identificar punto seguro");
+						//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Tratando de identificar punto seguro");
 						getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 								this.IdentificarZonas.new FindZonaSegura(this.getAgent(), this.cidZone));
 
@@ -565,17 +562,25 @@ public class CivilAgentBDI extends PersonAgentBDI {
 				} else {
 
 					if (this.rute == null) {
+						//getLog().setDebug("Movimiento aleatorio");
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 								.dispatchTopLevelGoal(super.move.new Aleatorio(this.getAgent(), this.velocidad,
 										this.getPosition(), cidZone, this.tipo));
 					} else {
-						getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()
-								+ "Independiente :Moviendome en ruta");
+						
+						if(this.rute[0]!=null){
+							//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()
+							//+ "Independiente :Moviendome en ruta");
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 								.dispatchTopLevelGoal(super.move.new rute(this.getAgent(), this.velocidad,
-										this.getPosition(), cidZone, this.rute.get(0), this.tipo));
+										this.getPosition(), cidZone, this.rute[0], this.tipo));
 
-						this.rute.remove(0);
+						EliminarPositionRoute(0);
+						}else{
+							getAgent().getComponentFeature(IBDIAgentFeature.class)
+							.dispatchTopLevelGoal(this.suicidio.new HacerNada());
+					        
+						}
 					}
 
 				}
@@ -586,8 +591,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 
 				if (this.salidasDisponibles < 0) {
 					// Solicitar salidas disponibles
-					// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-					// Buscando salidas disponibles");
+					//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+": Buscando salidas disponibles");
 					getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 							findsalidas.new salidas(this.getAgent(), this.conocimientoZona, this.cidEdifice));
 				} else if (this.salidasDisponibles > 0) {
@@ -604,21 +608,18 @@ public class CivilAgentBDI extends PersonAgentBDI {
 					case 2:
 						switch (Random.getIntRandom(1, 3)) {
 						case 1:
-							// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-							// Enviando mensaje de hsotilidad");
+							//	getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+": Enviando mensaje de hsotilidad");
 							getAgent().getComponentFeature(IBDIAgentFeature.class)
 									.dispatchTopLevelGoal(msg.new MensajeDeHostilidad(this.getAgent(), this.cidPlant));
 							break;
 
 						case 2:
-							// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando
-							// mensaje de frustracion");
+							//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de frustracion");
 							getAgent().getComponentFeature(IBDIAgentFeature.class)
 									.dispatchTopLevelGoal(msg.new MensajeDeFrustracion(this.getAgent(), this.cidPlant));
 							break;
 						case 3:
-							// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-							// Enviando mensaje de panico");
+							//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de panico");
 							getAgent().getComponentFeature(IBDIAgentFeature.class)
 									.dispatchTopLevelGoal(msg.new MensajeDePanico(this.getAgent(), this.cidPlant));
 
@@ -641,20 +642,17 @@ public class CivilAgentBDI extends PersonAgentBDI {
 
 					switch (Random.getIntRandom(1, 3)) {
 					case 1:
-						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-						// Enviando mensaje de panico");
+						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de panico");
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 								.dispatchTopLevelGoal(msg.new MensajeDePanico(this.getAgent(), this.cidPlant));
 						break;
 					case 2:
-						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-						// Enviando mensaje de ayuda");
+						//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":Enviando mensaje de ayuda");
 						getAgent().getComponentFeature(IBDIAgentFeature.class)
 								.dispatchTopLevelGoal(msg.new MensajeAyuda(this.getAgent(), this.cidPlant));
 						break;
 					case 3:
-						// getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+":
-						// Me suicido!!");
+						//getLog().setDebug(getAgent().getComponentIdentifier().getLocalName()+": Me suicido!!");
 						getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(
 								this.suicidio.new SaltarDelEdificio(this.getAgent(), this.cidPlant));
 					default:
@@ -670,6 +668,7 @@ public class CivilAgentBDI extends PersonAgentBDI {
 			if (this.cidPlant == null) {
 				// Si está en la calle
 				// System.out.println("Me muevo en la calle");
+				//getLog().setDebug("Moienvo aleatorioamente");
 				getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(super.move.new Aleatorio(
 						this.getAgent(), this.velocidad, this.getPosition(), cidZone, this.tipo));
 			} else {

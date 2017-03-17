@@ -19,6 +19,8 @@ public class Mensajero extends Thread{
 	ArrayList<String> cidsPerson ;
 	int inicioPerson,finPerson;
 	
+	int numero;
+	
 	public Mensajero(int incioPerson, int finPerson,
 			        ArrayList<String> cidsPerson,
 			        Map <String,String> bandejaMsg,
@@ -31,8 +33,8 @@ public class Mensajero extends Thread{
 			        zoneClientEndpoint clientEndPoint7,
 			        zoneClientEndpoint clientEndPoint8,
 			        zoneClientEndpoint clientEndPoint9,
-			        zoneClientEndpoint clientEndPoint10) {
-		
+			        zoneClientEndpoint clientEndPoint10, int x) {
+	this.numero=x;	
 	this.bandejaMsg= bandejaMsg;
 	this.cidsPerson = cidsPerson;
 	this.inicioPerson = incioPerson;
@@ -82,14 +84,14 @@ public class Mensajero extends Thread{
 			String agent = cidsPerson.get(i);
 			 String data = bandejaMsg.get(agent);
 			// String data = bandejaMsg.
-			  
+			
 			//synchronized(bandejaMsg){
-			   bandejaMsg.put(agent, null);
-			// }
+			  // bandejaMsg.put(agent, null);
+			 //}
 			 // Eliminamos el mensaje  despues de tenerlo guardado
 			 // System.out.println(data); 
 			  if(data!=null){
-
+				 // System.out.println("Motor :"+numero+" ON");
 				switch (bandera) {
 					case 0:
 						  sendMensaje(clientEndPoint,data);

@@ -2,6 +2,7 @@ package sisobeem.services.zoneServices;
 
 import jadex.bridge.IComponentIdentifier;
 import sisobeem.artifacts.Coordenada;
+import sisobeem.artifacts.Ubicacion;
 
 /**
  * Servicios relacionados con el Mapa 
@@ -16,6 +17,8 @@ public interface IMapaService {
     *   @param cid
     */
    public boolean changePosition(Coordenada nueva, IComponentIdentifier cid, String tipo);
+  
+   public boolean changePosition(Ubicacion nueva, IComponentIdentifier cid, String tipo);
    
    
    /**
@@ -30,5 +33,5 @@ public interface IMapaService {
     * @param agent
     * @param destino
     */
-   public void getRuta(IComponentIdentifier agent, Coordenada destino);
+   public Coordenada[] getRuta(IComponentIdentifier agent, Coordenada destino, double conocimientoDelaZona);
 }

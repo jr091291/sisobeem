@@ -18,6 +18,7 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import sisobeem.artifacts.Coordenada;
+import sisobeem.artifacts.Ubicacion;
 import sisobeem.services.zoneServices.IMapaService;
 import sisobeem.utilities.Random;
 
@@ -247,7 +248,7 @@ public class MoveCapability {
 	 */
 
 	@Plan
-	protected void ruta(IInternalAccess agent, int velocidad, Coordenada position, IComponentIdentifier zone,Coordenada destino, String tipo) {
+	protected void ruta(IInternalAccess agent, int velocidad, Coordenada position, IComponentIdentifier zone,Coordenada  destino, String tipo) {
 		// System.out.println("Entró en el trigger");
 		// System.out.println("Plan movimiento aleatorio: "+velocidad+"
 		// "+position.getX()+","+position.getY());
@@ -279,13 +280,13 @@ public class MoveCapability {
 
 				// System.out.println(position.getX()+" -- "+position.getY());
 
-				Coordenada nueva = destino;
+				//Coordenada nueva = destino;
 
 				// System.out.println(getMyPosition().getX()+" -
 				// "+getMyPosition().getY()+" to "+nueva.getX()+" -
 				// "+nueva.getY());
-				if (result.changePosition(nueva, agent.getComponentIdentifier(),tipo)){
-					setMyPosition(nueva);
+				if (result.changePosition(destino, agent.getComponentIdentifier(),tipo)){
+					setMyPosition(destino);
                     
 				}
 					

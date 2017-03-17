@@ -16,6 +16,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import sisobeem.artifacts.Coordenada;
+import sisobeem.artifacts.Ubicacion;
 import sisobeem.services.enviromentService.IComunicarMensajesService;
 import sisobeem.services.personServices.ISetBeliefPersonService;
 
@@ -125,9 +126,9 @@ public class TeamCapability {
 		IComponentIdentifier receptor;
 		
 		@GoalParameter
-		ArrayList<Coordenada> ruta;
+		Coordenada[] ruta;
 
-		public EnviarRuta(IInternalAccess agent,IComponentIdentifier enviroment, ArrayList<Coordenada> ruta) {
+		public EnviarRuta(IInternalAccess agent,IComponentIdentifier enviroment,Coordenada[]  ruta) {
 			this.agent = agent;
 			this.enviroment = enviroment;
 			this.ruta = ruta;
@@ -137,7 +138,7 @@ public class TeamCapability {
 		
 		
 		@Plan
-		protected void sendMensaje(IInternalAccess agent,IComponentIdentifier enviroment,  ArrayList<Coordenada> ruta) {
+		protected void sendMensaje(IInternalAccess agent,IComponentIdentifier enviroment, Coordenada[]  ruta) {
 			
 			for (IComponentIdentifier person : getTeam()) {
 				

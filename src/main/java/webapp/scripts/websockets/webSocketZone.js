@@ -2,6 +2,7 @@
  * Created by Ricardo on 31/08/2016.
  */
 var BASE_URL = "ws://localhost:8080/sisobeem";
+var intervalSismo = null;
 
 var socketZone = new WebSocket(BASE_URL + "/simulacion/jadex");
 var socketZone2 = new WebSocket(BASE_URL + "/simulacion/jadex2" );
@@ -220,7 +221,13 @@ function sendMensaje(mensaje) {
 	socketZoneZONE.send(mensaje);	
 }
 
+function temblando(){
+	$('#map').animateCss('shake');
+}
 
+function endTemblor(){
+	clearInterval(intervalSismo);
+}
 
 socketZone.onclose = function(event){
 	console.log("Cerro Socket");
@@ -261,7 +268,6 @@ function factoryAction(data){
 			
 		}
 		else{
-			infoEstadisticaEdificio(data);
 		}
 		break;
 	
@@ -293,6 +299,7 @@ function factoryAction(data){
 		
 	case "muerto":
 		var market = AgentsMarkets[data.data.idAgent];
+		market.block = false;
 		changeIcon(market,"/sisobeem/img/simulacion/muerto.png", map.getMap());
 		break;	
 	
@@ -302,13 +309,71 @@ function factoryAction(data){
 		var route = getRoute(data.agent, data.origen, data.destino, function(route){
 			sendMensaje(JSON.stringify(route));
 		});
+		
+	case "mensaje":
+		data = data.data;
+		
+		if(!data.Tipo){
+			if(data.estado){
+				intervalSismo = setInterval(() => {
+					temblando();
+				}, 1000);;
+			}
+			else{
+				endTemblor();
+			}
+		}
+		else{
+			setMensage(data);
+		}
+		break;
 	default:
 		console.log("Accion " + data.name + " Desconocido" );
 		break;
 	}
 }
 
+function setMensage(data){
+	switch (data.Tipo) {
+		case "panico":
+			mensaje(data, "/sisobeem/img/simulacion/mensaje_panico.png");
+		break;
+	
+		case "hostil":
+			mensaje(data, "/sisobeem/img/simulacion/mensaje_hostil.png");
+		break;
+		
+		case "ayuda":
+			mensaje(data, "/sisobeem/img/simulacion/mensaje_ayuda.png");
+		break;
+		
+		case "frustracion":
+			mensaje(data, "/sisobeem/img/simulacion/mensaje_frustacion.png");
+		break;
+	}
+}
+
+function mensaje(data, icono){
+	var market = AgentsMarkets[data.idAgent];
+	if (market){
+		market.block = true;
+
+		if(market.icon != icono){
+			market.block = false;
+		}
+		
+		var icon = market.icon;
+		changeIcon(market, icono, map.getMap);
+		
+		setTimeout(() => {
+			market.block = false;
+			changeIcon(market, icon, map.getMap);
+		}, 2000);
+	}
+}
+
 var AgentsMarkets = {};
+
 var Route = function Route(agent, origen,destino, coordenadas){
 	this.agent = agent;
 	this.origen = origen;
@@ -390,7 +455,7 @@ function move(idAgent, latLng, mapa, image, iconFinal){
 }
 
 function changeIcon(market, routeIcon, mapa){
-	if(market){
+	if(market && !market.block){
 		market.setMap(null);
 		market.icon =  routeIcon;
 		market.setMap(mapa);	

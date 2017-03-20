@@ -1,6 +1,11 @@
 /*
 * estilos generales
 */
+
+#map {
+  -vendor-animation-iteration-count: infinite;
+}
+
 *{
     margin: 0;
     padding: 0;

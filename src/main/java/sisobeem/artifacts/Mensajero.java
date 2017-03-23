@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.zip.ZipInputStream;
 
 import jadex.bridge.IComponentIdentifier;
+import sisobeem.utilities.Random;
 import sisobeem.websocket.client.zoneClientEndpoint;
 
 public class Mensajero extends Thread{
@@ -72,6 +73,10 @@ public class Mensajero extends Thread{
 	
 	@Override
 	public void run() {
+		
+		System.out.println("Motor "+this.numero+" "+"Inicio: " +this.inicioPerson+" "+"Fin: " +this.finPerson);
+		//System.out.println("Motor: "+this.numero+" "+this);
+
 	
 		int bandera=0;
 		while (this.enviar) {
@@ -79,10 +84,13 @@ public class Mensajero extends Thread{
 	   //System.out.println("Fin :"+this.finPerson);
 	   //System.out.println("Bandeja :"+this.bandejaMsg.size());
 	  // System.out.println("Personas :"+this.inicioPerson);
-		for (int i = inicioPerson; i < finPerson;) {
-			// System.out.println(cidsPerson.get(i).getLocalName()); 
+		for (int i = inicioPerson; i <= finPerson;) {
+		
 			String agent = cidsPerson.get(i);
 			 String data = bandejaMsg.get(agent);
+				//if(this.numero==4){
+					//System.out.println(agent+" "+i); 
+				//}
 			// String data = bandejaMsg.
 			
 			//synchronized(bandejaMsg){
@@ -91,7 +99,7 @@ public class Mensajero extends Thread{
 			 // Eliminamos el mensaje  despues de tenerlo guardado
 			 // System.out.println(data); 
 			  if(data!=null){
-				 // System.out.println("Motor :"+numero+" ON");
+				// System.out.println("Motor :"+numero+" ON");
 				switch (bandera) {
 					case 0:
 						  sendMensaje(clientEndPoint,data);
@@ -161,20 +169,31 @@ public class Mensajero extends Thread{
 					
 
 				    default:
+				    	  i++;
 					break;
 				}
+			  }else{
+				  i++;
 			  }
-			
+			   
+			 
 			  
-			   if(i==finPerson){
+			   if(i>finPerson){
 			      i=inicioPerson;
+			   }else{
+				  
 			   }
+			   
+			
 					  
 			   try {
-				   Thread.sleep(12);	
+				   Thread.sleep(14);
+				  // System.out.println("Pausa: "+this.numero);
 			   } catch (InterruptedException e) {
 				 // TODO Auto-generated catch block
 				  e.printStackTrace();
+				  
+				 // System.err.println("errorrrrrrrrrrrrrrrr");
 			   }
 			
 		     }

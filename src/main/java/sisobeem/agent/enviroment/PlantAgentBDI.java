@@ -214,9 +214,9 @@ public class PlantAgentBDI extends EnviromentAgentBDI implements ISetBelifePlant
 	@Override
 	public void PrimeroAuxMsj(IComponentIdentifier emisor) {
 
-		getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de PrimeroAux");
+		//getLog().setInfo(emisor.getLocalName() + ": Envia mensaje de PrimeroAux");
 		this.contMsgPrimerosAux.add(emisor);
-		System.out.println(this.contMsgPrimerosAux);
+		//System.out.println(this.contMsgPrimerosAux);
 		
 		for (IComponentIdentifier receptor : cidsPerson) {
 			IFuture<IReceptorMensajesService> persona = agent.getComponentFeature(IRequiredServicesFeature.class)

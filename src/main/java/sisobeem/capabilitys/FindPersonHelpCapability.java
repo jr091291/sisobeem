@@ -61,7 +61,9 @@ public class FindPersonHelpCapability {
 
 				@Override
 				public void resultAvailable(IGetPersonHelpService result) {
-					setCidsPeopleHelp(result.getPeopleHelp(agent.getComponentIdentifier()));
+					//setCidsPeopleHelp(result.getPeopleHelp(agent.getComponentIdentifier()));
+					
+					result.getPeopleHelp(agent.getComponentIdentifier());
 				}
 
 				@Override
@@ -138,13 +140,13 @@ public class FindPersonHelpCapability {
 	 * Get the cidPeopleHelp
 	 */
 	@Belief
-	public native ArrayList<IComponentIdentifier> getCidsPeopleHelp();
+	public native IComponentIdentifier[] getCidsPeopleHelp();
 
 	/**
 	 * Set cidPeopleHelp
 	 * @param peopleNeedHelp
 	 */
 	@Belief
-	public native void setCidsPeopleHelp(ArrayList<IComponentIdentifier> peopleNeedHelp);
+	public native void setCidsPeopleHelp(IComponentIdentifier[] peopleNeedHelp);
 
 }

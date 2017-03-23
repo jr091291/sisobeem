@@ -2,6 +2,7 @@ package sisobeem.services.zoneServices;
 
 import java.util.ArrayList;
 
+import jadex.bridge.IComponentIdentifier;
 import sisobeem.artifacts.Coordenada;
 
 /**
@@ -24,4 +25,6 @@ public interface IGetInformationZoneService {
 	 * @return
 	 */
 	public ArrayList<Coordenada> getPuntosInseguros();
+	
+	public ArrayList<IComponentIdentifier> getAgentsHeridos(IComponentIdentifier agent);
 }

@@ -357,7 +357,16 @@ public abstract class EnviromentAgentBDI implements IComunicarMensajesService,IG
 
 	}
 
-	
+	public IComponentIdentifier[] ArrayListToArray(ArrayList<IComponentIdentifier> lista) {
+		IComponentIdentifier[] a = new IComponentIdentifier[lista.size()];
+		int i = 0;
+		for (IComponentIdentifier agent : lista) {
+			a[i] = agent;
+			i++;
+		}
+
+		return a;
+	}
 	
 
 

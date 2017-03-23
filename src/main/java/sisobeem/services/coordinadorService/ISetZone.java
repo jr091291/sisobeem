@@ -8,4 +8,6 @@ public interface ISetZone {
 
 	
 	public ArrayList<IComponentIdentifier> setZone(IComponentIdentifier zone);
+	
+	public void duracion(int dura);
 }

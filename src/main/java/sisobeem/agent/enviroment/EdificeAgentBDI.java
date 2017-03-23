@@ -21,6 +21,7 @@ import jadex.micro.annotation.RequiredServices;
 import sisobeem.artifacts.Coordenada;
 import sisobeem.artifacts.Ubicacion;
 import sisobeem.artifacts.print.pojo.EdificePojo;
+import sisobeem.artifacts.print.pojo.EmergencyPojo;
 import sisobeem.services.edificeServices.IEvacuarService;
 import sisobeem.services.edificeServices.IGetEstadisticasService;
 import sisobeem.services.edificeServices.IGetSalidasService;
@@ -605,6 +606,24 @@ public class EdificeAgentBDI extends EnviromentAgentBDI
 
 		});
 
+	}
+
+	@Override
+	public void setResguardo(IComponentIdentifier agent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setPersonaAyudada(IComponentIdentifier agent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setEstadisticasEmergencia(EmergencyPojo info) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

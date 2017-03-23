@@ -47,5 +47,12 @@ public interface ISetBeliefPersonService {
 	public void setToCoordinador(IComponentIdentifier coordinador);
 	
 	public void setRute(Coordenada [] rute);
+	
+	public void setPersonHelp(IComponentIdentifier[] agents);
+	
+	public void setDestiny(Coordenada c);
+	
+	public void curar();
+	
     
 }

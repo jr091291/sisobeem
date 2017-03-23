@@ -18,7 +18,7 @@ public interface IMapaService {
     */
    public boolean changePosition(Coordenada nueva, IComponentIdentifier cid, String tipo);
   
-   public boolean changePosition(Ubicacion nueva, IComponentIdentifier cid, String tipo);
+   //public boolean changePosition(Ubicacion nueva, IComponentIdentifier cid, String tipo);
    
    
    /**
@@ -33,5 +33,7 @@ public interface IMapaService {
     * @param agent
     * @param destino
     */
-   public Coordenada[] getRuta(IComponentIdentifier agent, Coordenada destino, double conocimientoDelaZona);
+   public Coordenada[] getRuta(IComponentIdentifier agent,Coordenada inicio, Coordenada destino, double conocimientoDelaZona);
+   
+   public Coordenada getTamañoMapa();
 }

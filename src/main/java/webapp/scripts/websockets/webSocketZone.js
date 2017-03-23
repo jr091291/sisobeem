@@ -4,6 +4,8 @@
 var BASE_URL = "ws://localhost:8080/sisobeem";
 var intervalSismo = null;
 
+var temblor = false;
+
 var socketZone = new WebSocket(BASE_URL + "/simulacion/jadex");
 var socketZone2 = new WebSocket(BASE_URL + "/simulacion/jadex2" );
 var socketZone3 = new WebSocket(BASE_URL + "/simulacion/jadex3" );
@@ -44,6 +46,26 @@ var socketZone37 = new WebSocket(BASE_URL + "/simulacion/jadex37" );
 var socketZone38 = new WebSocket(BASE_URL + "/simulacion/jadex38" );
 var socketZone39 = new WebSocket(BASE_URL + "/simulacion/jadex39" );
 var socketZone40 = new WebSocket(BASE_URL + "/simulacion/jadex40" );
+var socketZone41 = new WebSocket(BASE_URL + "/simulacion/jadex41" );
+var socketZone42 = new WebSocket(BASE_URL + "/simulacion/jadex42" );
+var socketZone43 = new WebSocket(BASE_URL + "/simulacion/jadex43" );
+var socketZone44 = new WebSocket(BASE_URL + "/simulacion/jadex44" );
+var socketZone45 = new WebSocket(BASE_URL + "/simulacion/jadex45" );
+var socketZone46 = new WebSocket(BASE_URL + "/simulacion/jadex46" );
+var socketZone47 = new WebSocket(BASE_URL + "/simulacion/jadex47" );
+var socketZone48 = new WebSocket(BASE_URL + "/simulacion/jadex48" );
+var socketZone49 = new WebSocket(BASE_URL + "/simulacion/jadex49" );
+var socketZone50 = new WebSocket(BASE_URL + "/simulacion/jadex50" );
+var socketZone51 = new WebSocket(BASE_URL + "/simulacion/jadex51" );
+var socketZone52 = new WebSocket(BASE_URL + "/simulacion/jadex52" );
+var socketZone53 = new WebSocket(BASE_URL + "/simulacion/jadex53" );
+var socketZone54 = new WebSocket(BASE_URL + "/simulacion/jadex54" );
+var socketZone55 = new WebSocket(BASE_URL + "/simulacion/jadex55" );
+var socketZone56 = new WebSocket(BASE_URL + "/simulacion/jadex56" );
+var socketZone57 = new WebSocket(BASE_URL + "/simulacion/jadex57" );
+var socketZone58 = new WebSocket(BASE_URL + "/simulacion/jadex58" );
+var socketZone59 = new WebSocket(BASE_URL + "/simulacion/jadex59" );
+var socketZone60 = new WebSocket(BASE_URL + "/simulacion/jadex60" );
 var socketZoneZONE = new WebSocket(BASE_URL + "/simulacion/jadexZONE");
 
 socketZone.onmessage = function(event) {
@@ -215,6 +237,106 @@ socketZone40.onmessage = function(event) {
 };
 
 
+socketZone41.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone42.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone43.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone44.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone45.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone46.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone47.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone48.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone49.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone50.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone51.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone52.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone53.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone54.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone55.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone56.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone57.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone58.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone59.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
+socketZone60.onmessage = function(event) {
+	factoryAction(JSON.parse(event.data));
+};
+
+
 
 
 function sendMensaje(mensaje) {
@@ -315,12 +437,19 @@ function factoryAction(data){
 		
 		if(!data.Tipo){
 			if(data.estado){
-				intervalSismo = setInterval(() => {
-					temblando();
-				}, 1000);;
+			   if(temblor==false){
+				   temblor= true;
+					intervalSismo = setInterval(() => {
+						temblando();
+					}, 1000);;
+			   }else{
+				   
+			   }
 			}
 			else{
+				
 				endTemblor();
+				
 			}
 		}
 		else{
@@ -350,6 +479,28 @@ function setMensage(data){
 		case "frustracion":
 			mensaje(data, "/sisobeem/img/simulacion/mensaje_frustacion.png");
 		break;
+		
+		/*
+		case "motivacion":
+			mensaje(data, "/sisobeem/img/simulacion/mensaje_motivacion.png");
+		break;
+		
+		case "calma":
+			mensaje(data, "/sisobeem/img/simulacion/mensaje_calma.png");
+		break;
+		
+		case "confianza":
+			mensaje(data, "/sisobeem/img/simulacion/mensaje_confianza.png");
+		break;
+		
+		case "resguardo":
+			mensaje(data, "/sisobeem/img/simulacion/mensaje_resguardo.png");
+		break;
+		
+		case "auxilios":
+			mensaje(data, "/sisobeem/img/simulacion/mensaje_auxilios.png");
+		break;
+		*/
 	}
 }
 

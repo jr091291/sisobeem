@@ -11,5 +11,7 @@ public interface IGetPersonHelpService {
 	 * @return
 	 */
 	public ArrayList<IComponentIdentifier> getPeopleHelp(IComponentIdentifier agent);
+	
+	
 
 }

@@ -373,38 +373,17 @@ function factoryAction(data){
 		break;
 	
 	case "estadistica":
-		data = data.data;
-		
-		switch (data.idAgent) {
-		
-		case "Zone":
-			estadisticasZone = data;
-			$("#btnEstaZona").removeAttr('disabled');
-			break;
-		
-		case "CoordinadorEmergenciaAgent" : 	
-			estadisticasCordinador[data.Tipo] = data;
-			$("#btnEstaEmergencia").removeAttr('disabled');
-			break;	
-		
-		default:
-			estadisticasEdificios[data.idAgent] = data;
-			$("#btnEstaEdificios").removeAttr('disabled');
-			try{
-				market = getMarketEdificio(data.idAgent);
-				if(market){
-					market.info = data;
-					
-					 market.addListener('click', function() {     
-						 setEstadisticaEdificio(market.info);
-						 $('#estaEdificioModal').modal();
-				     });
-				}
-			}
-			catch (e) {
-				console.log(e);
-			}
-			break;
+		estadistica(data);
+		break;
+	
+	case "FinalEstadistica":
+		if(data.data.fin){
+			generateData(function(){
+				$("#btnEstaZona").removeAttr('disabled');
+				$("#btnEstaEmergencia").removeAttr('disabled');
+				$("#btnEstaEdificios").removeAttr('disabled');
+			});
+			
 		}
 		break;
 	
@@ -434,6 +413,39 @@ function factoryAction(data){
 	
 	default:
 		console.log("Accion " + data.name + " Desconocido" );
+		break;
+	}
+}
+
+function estadistica(data){
+	data = data.data;
+	
+	switch (data.idAgent) {
+	
+	case "Zone":
+		estadisticasZone = data;
+		break;
+	
+	case "CoordinadorEmergenciaAgent" : 	
+		estadisticasCordinador[data.Tipo] = data;
+		break;	
+	
+	default:
+		estadisticasEdificios[data.idAgent] = data;
+		try{
+			market = getMarketEdificio(data.idAgent);
+			if(market){
+				market.info = data;
+				
+				 market.addListener('click', function() {     
+					 setEstadisticaEdificio(market.info);
+					 $('#estaEdificioModal').modal();
+			     });
+			}
+		}
+		catch (e) {
+			console.log(e);
+		}
 		break;
 	}
 }
@@ -509,18 +521,14 @@ function setEstadisticaEdificio(info) {
 	}
 }
 
-function generateData(tipo){
-	switch (tipo) {
-		case "zone":
-			setChatEstadistica("chartZone", 
-					["'Msg Calma", "Msg Confianza", "Msg Frustacion", "Msg Hostil", "Msg Motivación", "Msg Panico","Msg Primeros Auxilios","Msg Resguardo","Personas Atrapadas","Personas Muertas","Suicidios"],[ 
-						estadisticasZone.MsgCalma, estadisticasZone.MsgConfianza, estadisticasZone.MsgFrustacion, estadisticasZone.MsgHostilidad, estadisticasZone.MsgMotivacion, 
-						estadisticasZone.MsgPanico, estadisticasZone.MsgPrimerosAux, estadisticasZone.MsgResguardo,
-						estadisticasZone.PersonasAtrapadas, estadisticasZone.PersonasMuertas, estadisticasZone.Suicidios
-					],  estadisticasZone.idAgent);
-		break;
-		
-		case "edificios":
+function generateData(callback){
+	setChatEstadistica("chartZone", 
+			["'Msg Calma", "Msg Confianza", "Msg Frustacion", "Msg Hostil", "Msg Motivación", "Msg Panico","Msg Primeros Auxilios","Msg Resguardo","Personas Atrapadas","Personas Muertas","Suicidios"],[ 
+				estadisticasZone.MsgCalma, estadisticasZone.MsgConfianza, estadisticasZone.MsgFrustacion, estadisticasZone.MsgHostilidad, estadisticasZone.MsgMotivacion, 
+				estadisticasZone.MsgPanico, estadisticasZone.MsgPrimerosAux, estadisticasZone.MsgResguardo,
+				estadisticasZone.PersonasAtrapadas, estadisticasZone.PersonasMuertas, estadisticasZone.Suicidios
+			],  estadisticasZone.idAgent);
+	
 			var a,b,c,d,e,f,g, h, i, j, k;
 			
 			for(agent in estadisticasEdificios){
@@ -537,38 +545,37 @@ function generateData(tipo){
 				k += estadisticasEdificios[agent].Suicidios;
 			}
 			
-			setChatEstadistica("chartZone", 
+			setChatEstadistica("chartEdificios", 
 					["'Msg Calma", "Msg Confianza", "Msg Frustacion", "Msg Hostil", "Msg Motivación", "Msg Panico","Msg Primeros Auxilios","Msg Resguardo","Personas Atrapadas","Personas Muertas","Suicidios"],
 					[a, b, c, d, e, f, g, h, i, j, k ],
 					"Edifificios");
-		break;
+		
 
-		default:
-			data = estadisticasCordinador[tipo];
-			switch (tipo) {
-			case "seguridad":
-				setChatEstadistica("chartSeguridad", 
+			
+			setChatEstadistica("chartEdificios", 
+					["'Msg Calma", "Msg Confianza", "Msg Frustacion", "Msg Hostil", "Msg Motivación", "Msg Panico","Msg Primeros Auxilios","Msg Resguardo","Personas Atrapadas","Personas Muertas","Suicidios"],
+					[a, b, c, d, e, f, g, h, i, j, k ],
+					"Edifificios");
+			
+			data = estadisticasCordinador["seguridad"];
+			setChatEstadistica("chartSeguridad", 
 						["Pacientes", "Personas Atendidas", "Personas Ayudadas", "Puntos Cubiertos"],
 						[data.pacientes, data.personasAtendidas, data.personasAyudadas, data.puntosCubiertos],  data.idAgent
 						);
-			break;
 			
-			case "salud":
-				setChatEstadistica("chartSalud", 
+			data = estadisticasCordinador["salud"];
+			setChatEstadistica("chartSalud", 
 						["Pacientes", "Personas Atendidas", "Personas Ayudadas", "Puntos Cubiertos"],
 						[data.pacientes, data.personasAtendidas, data.personasAyudadas, data.puntosCubiertos],  data.idAgent
 						);
-			break;
 			
-			case "busqueda":
-				setChatEstadistica("chartRescate", 
+			data = estadisticasCordinador["busqueda"];
+			setChatEstadistica("chartRescate", 
 						["Pacientes", "Personas Atendidas", "Personas Ayudadas", "Puntos Cubiertos"],
 						[data.pacientes, data.personasAtendidas, data.personasAyudadas, data.puntosCubiertos], data.idAgent);
-			break;
-			}
-		break;
-	}
+			callback();
 }
+
 function setChatEstadistica(divId, labels, data, agent){
 	$("#"+divId + "Title").html("Agente: " + agent);
 	var ctx = document.getElementById(divId);
@@ -577,10 +584,10 @@ function setChatEstadistica(divId, labels, data, agent){
 	    data: {
 	        labels: labels,
 	        datasets: [{
-	            label: labels,
+	            label: "Acciones " + agent,
 	            data: data,
-	            backgroundColor: generateColors(labels.lenght),
-	            borderColor: generateColors(labels.lenght),
+	            backgroundColor: generateColors(labels.length),
+	            borderColor: generateColors(labels.length),
 	            borderWidth: 1
 	        }]
 	    },
@@ -599,7 +606,7 @@ function setChatEstadistica(divId, labels, data, agent){
 function generateColors(cantidad){
 	var a = [];
 	for (var int = 0; int < cantidad ; int++) {
-		a.push(getRandomColor);
+		a.push(getRandomColor());
 	}
 	return a;
 }

@@ -12,4 +12,5 @@ socketSimulacion.onmessage = function(event) {
 
 function sendConfig(config) {
     socketSimulacion.send(JSON.stringify(config));
+    $('#load')[0].style.display = "block";
 }

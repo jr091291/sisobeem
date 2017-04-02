@@ -3,8 +3,10 @@
  */
 var BASE_URL = "ws://localhost:8080/sisobeem";
 var intervalSismo = null;
-
 var temblor = false;
+var estadisticasEdificios = {};
+var estadisticasZone = {};
+var estadisticasCordinador = {};
 
 var socketZone = new WebSocket(BASE_URL + "/simulacion/jadex");
 var socketZone2 = new WebSocket(BASE_URL + "/simulacion/jadex2" );
@@ -358,65 +360,56 @@ socketZone.onclose = function(event){
 
 /*Factory  de acciones*/
 function factoryAction(data){
-	
+	 $('#load')[0].style.display = "none";
 	switch (data.name) {
+	
 	case "move":
 		var data = data.data;
 		move(data.idAgent, data.moveTo, map.getMap, "/sisobeem/img/simulacion/caminando.png","/sisobeem/img/simulacion/"+data.Tipo+".png");
 		break;
 		
 	case "punto":
-		var imagen = "";
-		data = data.data;
-		if(data.Tipo == "seguro"){
-			imagen = "/sisobeem/img/simulacion/seguro.png";
-		}
-		else{
-			imagen = "/sisobeem/img/simulacion/inseguro.png";
-		}
-		if(imagen){
-			var marketNew = new google.maps.Marker({
-		        position: data.posicion ,
-		        map: map.getMap,
-		        icon: imagen
-		    });
-			marketNew.setMap(map.getMap);
-		}
+		punto(data);
 		break;
 	
 	case "estadistica":
 		data = data.data;
-		if(data.idAgent =="Zone"){
-			
-		}
-		else{
+		
+		switch (data.idAgent) {
+		
+		case "Zone":
+			estadisticasZone = data;
+			$("#btnEstaZona").removeAttr('disabled');
+			break;
+		
+		case "CoordinadorEmergenciaAgent" : 	
+			estadisticasCordinador[data.Tipo] = data;
+			$("#btnEstaEmergencia").removeAttr('disabled');
+			break;	
+		
+		default:
+			estadisticasEdificios[data.idAgent] = data;
+			$("#btnEstaEdificios").removeAttr('disabled');
+			try{
+				market = getMarketEdificio(data.idAgent);
+				if(market){
+					market.info = data;
+					
+					 market.addListener('click', function() {     
+						 setEstadisticaEdificio(market.info);
+						 $('#estaEdificioModal').modal();
+				     });
+				}
+			}
+			catch (e) {
+				console.log(e);
+			}
+			break;
 		}
 		break;
 	
 	case "derrumbe":
-		var agent = data.data.idAgent;
-		var arrayAgent = agent.split("EdificeAgent");
-		var _market = null;
-		if(arrayAgent.length>0 && arrayAgent.length > 1 ){
-			if(arrayAgent[1]==""){
-				_market = marketList.get(arrayAgent[0]);
-			}
-			else{
-				_market = marketList.get(arrayAgent[1]);
-			} 
-		}
-		if(_market){
-			var icon = "/sisobeem/img/simulacion/edificio_derrumbado.png";
-			var icon2 ="/sisobeem/img/simulacion/edificio_averiado.png";
-			
-			if(_market.icon != icon && _market.icon != icon2){
-				changeIcon(_market,icon2, map.getMap);
-		
-				setTimeout(() => {
-					changeIcon(_market, icon , map.getMap);
-				}, 2000);
-			}
-		}
+		derrumbe(data);
 		break;
 		
 	case "muerto":
@@ -424,41 +417,281 @@ function factoryAction(data){
 		market.block = false;
 		changeIcon(market,"/sisobeem/img/simulacion/muerto.png", map.getMap());
 		break;	
-	
+		
 	case "route":
-		console.log("recibiendo mensaje de ruta");
 		var data = data.data;
 		var route = getRoute(data.agent, data.origen, data.destino, function(route){
 			sendMensaje(JSON.stringify(route));
 		});
 		
 	case "mensaje":
-		data = data.data;
-		
-		if(!data.Tipo){
-			if(data.estado){
-			   if(temblor==false){
-				   temblor= true;
-					intervalSismo = setInterval(() => {
-						temblando();
-					}, 1000);;
-			   }else{
-				   
-			   }
-			}
-			else{
-				
-				endTemblor();
-				
-			}
-		}
-		else{
-			setMensage(data);
-		}
+		mensage(data);
 		break;
+	
+	case "action":
+		setAction(data);
+		break;
+	
 	default:
 		console.log("Accion " + data.name + " Desconocido" );
 		break;
+	}
+}
+
+function setEstadisticaEdificio(info) {
+	if(info){
+		$("#modaltitle").html("Edificio " + info.idAgent);
+		
+		var table ="";
+		if(info.derrumbado){
+			table = "<h1 class=derrumbado> Edificio Colapsado</h1>";
+		}
+		else{
+			table = "<h4 class=enpie> Edificio En Pie</h4>";
+		}
+		
+		var table = table +
+		'<table style="width: 100%;" cellpadding="3">'+
+		'<tbody>'+
+			'<tr>'+
+				'<td>Msg Ayuda</td>' +
+				'<td>'+info.MsgAyuda+'</td>' +
+			'</tr>'+
+	
+			'<tr>'+
+				'<td>Msg Calma</td>' +
+				'<td>'+info.MsgDeCalma+'</td>' +
+			'</tr>'+
+			'<tr>'+
+				'<td>Msg Confianza</td>' +
+				'<td>'+info.MsgDeConfianza+'</td>' +
+			'</tr>'+
+			'<tr>'+
+				'<td>Msg Frustación</td>' +
+				'<td>'+info.MsgFrsutracion+'</td>' +
+			'</tr>'+
+			'<tr>'+
+				'<td>Msg Hostilidad</td>' +
+				'<td>'+info.MsgHostilidad+'</td>' +
+			'</tr>'+
+			'<tr>'+
+				'<td>Msg Motivación</td>' +
+				'<td>'+info.MsgMotivacion+'</td>' +
+			'</tr>'+
+			'<tr>'+
+				'<td>Msg Panico</td>' +
+				'<td>'+info.MsgPanico+'</td>' +
+			'</tr>'+
+			'<tr>'+
+				'<td>Msg Primeros Auxilios</td>' +
+				'<td>'+info.MsgPrimerosAux+'</td>' +
+			'</tr>'+
+			'<tr>'+
+				'<td>Msg Reguardo</td>' +
+				'<td>'+info.MsgResguardo+'</td>' +
+			'</tr>'+
+			'<tr>'+
+				'<td> Personas Atrapadas</td>' +
+				'<td>'+info.PersonasAtrapadas+'</td>' +
+			'</tr>'+
+			'<tr>'+
+				'<td>Personas Muertas</td>' +
+				'<td>'+info.PersonasMuertas+'</td>' +
+			'</tr>'+
+			'<tr>'+
+				'<td>Suicidios</td>' +
+				'<td>'+info.Suicidios+'</td>' +
+			'</tr>'+
+			'<tr>'+
+			'</tbody>'+
+		'</table>';
+		$('#bodyModalEstaEdi').html(table);
+	}
+}
+
+function generateData(tipo){
+	switch (tipo) {
+		case "zone":
+			setChatEstadistica("chartZone", 
+					["'Msg Calma", "Msg Confianza", "Msg Frustacion", "Msg Hostil", "Msg Motivación", "Msg Panico","Msg Primeros Auxilios","Msg Resguardo","Personas Atrapadas","Personas Muertas","Suicidios"],[ 
+						estadisticasZone.MsgCalma, estadisticasZone.MsgConfianza, estadisticasZone.MsgFrustacion, estadisticasZone.MsgHostilidad, estadisticasZone.MsgMotivacion, 
+						estadisticasZone.MsgPanico, estadisticasZone.MsgPrimerosAux, estadisticasZone.MsgResguardo,
+						estadisticasZone.PersonasAtrapadas, estadisticasZone.PersonasMuertas, estadisticasZone.Suicidios
+					],  estadisticasZone.idAgent);
+		break;
+		
+		case "edificios":
+			var a,b,c,d,e,f,g, h, i, j, k;
+			
+			for(agent in estadisticasEdificios){
+				a += estadisticasEdificios[agent].MsgCalma; 
+				b += estadisticasEdificios[agent].MsgConfianza;
+				c += estadisticasEdificios[agent].MsgFrustacion;
+				d += estadisticasEdificios[agent].MsgHostilidad;
+				e += estadisticasEdificios[agent].MsgMotivacion;
+				f += estadisticasEdificios[agent].MsgPanico; 
+				g += estadisticasEdificios[agent].MsgPrimerosAux;
+				h += estadisticasEdificios[agent].MsgResguardo;
+				i += estadisticasEdificios[agent].PersonasAtrapadas;
+				j += estadisticasEdificios[agent].PersonasMuertas;
+				k += estadisticasEdificios[agent].Suicidios;
+			}
+			
+			setChatEstadistica("chartZone", 
+					["'Msg Calma", "Msg Confianza", "Msg Frustacion", "Msg Hostil", "Msg Motivación", "Msg Panico","Msg Primeros Auxilios","Msg Resguardo","Personas Atrapadas","Personas Muertas","Suicidios"],
+					[a, b, c, d, e, f, g, h, i, j, k ],
+					"Edifificios");
+		break;
+
+		default:
+			data = estadisticasCordinador[tipo];
+			switch (tipo) {
+			case "seguridad":
+				setChatEstadistica("chartSeguridad", 
+						["Pacientes", "Personas Atendidas", "Personas Ayudadas", "Puntos Cubiertos"],
+						[data.pacientes, data.personasAtendidas, data.personasAyudadas, data.puntosCubiertos],  data.idAgent
+						);
+			break;
+			
+			case "salud":
+				setChatEstadistica("chartSalud", 
+						["Pacientes", "Personas Atendidas", "Personas Ayudadas", "Puntos Cubiertos"],
+						[data.pacientes, data.personasAtendidas, data.personasAyudadas, data.puntosCubiertos],  data.idAgent
+						);
+			break;
+			
+			case "busqueda":
+				setChatEstadistica("chartRescate", 
+						["Pacientes", "Personas Atendidas", "Personas Ayudadas", "Puntos Cubiertos"],
+						[data.pacientes, data.personasAtendidas, data.personasAyudadas, data.puntosCubiertos], data.idAgent);
+			break;
+			}
+		break;
+	}
+}
+function setChatEstadistica(divId, labels, data, agent){
+	$("#"+divId + "Title").html("Agente: " + agent);
+	var ctx = document.getElementById(divId);
+	var myChart = new Chart(ctx, {
+	    type: 'bar',
+	    data: {
+	        labels: labels,
+	        datasets: [{
+	            label: labels,
+	            data: data,
+	            backgroundColor: generateColors(labels.lenght),
+	            borderColor: generateColors(labels.lenght),
+	            borderWidth: 1
+	        }]
+	    },
+	    options: {
+	        scales: {
+	            yAxes: [{
+	                ticks: {
+	                    beginAtZero:true
+	                }
+	            }]
+	        }
+	    }
+	});
+}
+
+function generateColors(cantidad){
+	var a = [];
+	for (var int = 0; int < cantidad ; int++) {
+		a.push(getRandomColor);
+	}
+	return a;
+}
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+function mensage(data){
+	data = data.data;
+	
+	if(!data.Tipo){
+		if(data.estado){
+		   if(temblor==false){
+			   temblor= true;
+				intervalSismo = setInterval(() => {
+					temblando();
+				}, 1000);;
+		   }else{
+			   
+		   }
+		}
+		else{	
+			endTemblor();
+		}
+	}
+	else{
+		setMensage(data);
+	}
+}
+
+function punto(data){
+	var imagen = "";
+	data = data.data;
+	if(data.Tipo == "seguro"){
+		imagen = "/sisobeem/img/simulacion/seguro.png";
+	}
+	else{
+		imagen = "/sisobeem/img/simulacion/inseguro.png";
+	}
+	if(imagen){
+		var marketNew = new google.maps.Marker({
+	        position: data.posicion ,
+	        map: map.getMap,
+	        icon: imagen
+	    });
+		marketNew.setMap(map.getMap);
+	}
+};
+
+function getMarketEdificio(agent){
+	var arrayAgent = agent.split("EdificeAgent");
+	var _market = null;
+	if(arrayAgent.length>0 && arrayAgent.length > 1 ){
+		if(arrayAgent[1]==""){
+			_market = marketList.get(0);
+		}
+		else{
+			_market = marketList.get(arrayAgent[1]);
+		} 
+	}
+	return _market;
+}
+
+function derrumbe(data){
+	var agent = data.data.idAgent;
+	_market = getMarketEdificio(agent);
+	if(_market){
+		var icon = "/sisobeem/img/simulacion/edificio_derrumbado.png";
+		var icon2 ="/sisobeem/img/simulacion/edificio_averiado.png";
+		
+		if(_market.icon != icon && _market.icon != icon2){
+			changeIcon(_market,icon2, map.getMap);
+	
+			setTimeout(() => {
+				changeIcon(_market, icon , map.getMap);
+			}, 2000);
+		}
+	}
+};
+
+function setAction(data){
+	data = data.data;
+	switch (data.Tipo) {
+		case "ayuda":
+			mensaje(data, "/sisobeem/img/simulacion/"+data.Tipo+"_action.png");
+		break;	
 	}
 }
 
@@ -480,7 +713,6 @@ function setMensage(data){
 			mensaje(data, "/sisobeem/img/simulacion/mensaje_frustacion.png");
 		break;
 		
-		/*
 		case "motivacion":
 			mensaje(data, "/sisobeem/img/simulacion/mensaje_motivacion.png");
 		break;
@@ -500,7 +732,6 @@ function setMensage(data){
 		case "auxilios":
 			mensaje(data, "/sisobeem/img/simulacion/mensaje_auxilios.png");
 		break;
-		*/
 	}
 }
 
@@ -530,47 +761,6 @@ var Route = function Route(agent, origen,destino, coordenadas){
 	this.origen = origen;
 	this.destino = destino;
 	this.coordenadas = coordenadas;
-}
-var _marketInfoEsta = null;
-function infoEstadisticaEdificio(data){
-	var arrayAgent = data.idAgent.split("EdificeAgent");
-	var _marketInfoEsta = null;
-	if(arrayAgent.length>0 && arrayAgent.length > 1 ){
-		if(arrayAgent[1]==""){
-			_marketInfoEsta = marketList.get(arrayAgent[0]);
-		}
-		else{
-			_marketInfoEsta = marketList.get(arrayAgent[1]);
-		}
-		if(_marketInfoEsta){
-			var aux = "En Pie";
-			if(data.derrumbado){
-				aux = "Edificio Derrumbado";
-		    }
-			var infowindow = new google.maps.InfoWindow({
-			    content: '<div id="headWindowEdifice">'+ aux +'</div>'+
-			    '<div id="bodyWindowEdifice"> '+
-				'  <div><strong>Mensajes De Ayuda: </strong>' + data.MsgAyuda+'<div>'+
-				'  <div><strong>Mensajes De Ayuda: </strong>' + data.MsgDeCalma+'<div>'+
-				'  <div><strong>Mensajes De Ayuda: </strong>' +  data.MsgDeConfianza +'<div>'+
-				'  <div><strong>Mensajes De Ayuda: </strong>' +  data.MsgFrsutracion +'<div>'+
-				'  <div><strong>Mensajes De Ayuda: </strong>' + data.MsgHostilidad +'<div>'+
-				'  <div><strong>Mensajes De Ayuda: </strong>' + data.MsgMotivacion +'<div>'+
-				'  <div><strong>Mensajes De Ayuda: </strong>' + data.MsgPanico +'<div>'+
-				'  <div><strong>Mensajes De Ayuda: </strong>' + data.MsgPrimerosAux +'<div>'+
-				'  <div><strong>Mensajes De Ayuda: </strong>' + data.MsgResguardo +'<div>'+
-				'  <div><strong>Mensajes De Ayuda: </strong>' + data.PersonasAtrapadas +'<div>'+
-				'  <div><strong>Mensajes De Ayuda: </strong>' +  data.PersonasMuertas +'<div>'+
-				'  <div><strong>Mensajes De Ayuda: </strong>' +   data.Suicidios +'<div>'+
-				'</div>',
-			    maxWidth: 200
-			  });
-			
-			_marketInfoEsta.addListener('click', function() {
-			    infowindow.open(map.getMap, _marketInfoEsta);
-			  });
-		}
-	}
 }
 
 /* Funciones de acciones*/
@@ -632,6 +822,4 @@ function getRoute(agent, origen, destino, callback){
 		    }
 	});
 }
-
-
 

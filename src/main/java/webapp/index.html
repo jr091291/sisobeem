@@ -17,11 +17,104 @@
 
     <!--css-->
     <link href="stylesheet/styles.css" rel="stylesheet" type="text/css">
+
 </head>
 <body>
     <!-- modals-->
-
-    <!-- Modal cof simulacion-->
+	
+	<!-- modal estadisticas -->
+	<!-- Modal Estadisticas edificios -->
+	<div id="estaEdificiosModal" class="modal fade" role="dialog">
+	  <div class="modal-dialog">
+	
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 id=estaEdificiosModalTitle class="modal-title"></h4>
+	      </div>
+	      <div class="modal-body">
+	      	  <canvas id="chartEdificios" width="400" height="400"></canvas>
+	      </div>
+	    </div>
+	
+	  </div>
+	</div>
+	
+	<!-- Modal Estadisticas edificios -->
+	<div id="estaZoneModal" class="modal fade" role="dialog">
+	  <div class="modal-dialog">
+	
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 id=estaZoneModalTitle class="modal-title"></h4>
+	      </div>
+	      <div class="modal-body">
+	      	  <canvas id="chartZone" width="400" height="400"></canvas>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	<!-- Modal Estadisticas edificios -->
+	<div id="estaAteEmerModal" class="modal fade" role="dialog">
+	  <div class="modal-dialog">
+	
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 id=modaltitle class="modal-title"></h4>
+	      </div>
+	      <div class="modal-body">	      	  
+			 <div class="container">
+			  <ul class="nav nav-pills">
+			    <li class="active"><a data-toggle="pill" href="#salud">Organismos De Salud</a></li>
+			    <li><a data-toggle="pill" href="#seguridad">Organismos De Seguridad</a></li>
+			    <li><a data-toggle="pill" href="#rescate">Organismos De Rescate</a></li>
+			  </ul>
+			  
+			  <div class="tab-content">
+			    <div id="salud" class="tab-pane fade in active">
+			    	 <h3>Acciones Organismos de Salud y Apoyo Psicologico</h3>
+			    	 <canvas id="chartSalud" width="400" height="400"></canvas> 
+			    </div>
+			    <div id="seguridad" class="tab-pane fade">
+			    	 <h3>Acciones Organismos de Seguridad</h3>
+			    	 <canvas id="chartSeguridad" width="400" height="400"></canvas>
+			    </div>
+			    <div id="rescate" class="tab-pane fade">
+			    	 <h3>Acciones Organismos de Busqueda y Rescate</h3>
+			    	 <canvas id="chartRescate" width="400" height="400"></canvas>
+			    </div>
+			  </div>
+			</div>	
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	
+	<!-- Modal Estadisticas edificio -->
+	<div id="estaEdificioModal" class="modal fade" role="dialog">
+	  <div class="modal-dialog">
+	
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 id=modaltitle class="modal-title"></h4>
+	      </div>
+	      <div id="bodyModalEstaEdi" class="modal-body">	       
+	      </div>
+	    </div>
+	
+	  </div>
+	</div>
+		
+	<!-- Modal cof simulacion-->
     <div id="modalConfSimulacion" class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -140,7 +233,7 @@
                                value="1"
                                istype = "int"
                                placeholder="Cant. personas"
-                               min="1" step="1" value="1" required
+                               min="1" step="1" max="100" value="1" required
                                data-parsley-trigger="focusout"
                                data-progression
                                data-helper="Indica Cantidad de personas en el ambiente (Calles)"/>
@@ -232,7 +325,7 @@
                                value="50"
                                required
                                istype = "int"
-                               data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"
+                               data-slider-min="0" max="15" data-slider-max="100" data-slider-step="1" data-slider-value="0"
                                data-progression
                                data-helper="Indica el promedio de eficiencia en la atención de la emergencia en el tiempo de la simulación,
                                                Ejemplo : 100% -> la simulación termino y lo se atendió la emergencia."/>
@@ -248,7 +341,7 @@
                                name="personalBusquedaRescate"
                                istype = "int"
                                placeholder="Cant. Bomberos/defensa civil"
-                               min="0"  step="1" required
+                               min="0" max="15" step="1" required
                                data-parsley-trigger="focusout"
                                data-progression
                                data-helper="Indica numero de personal encargado de la búsqueda y rescate de personas"/>
@@ -263,7 +356,7 @@
                                istype = "int"
                                placeholder="Cant. pramedicos"
                                data-parsley-trigger="focusout"
-                               min="0"  step="1" required
+                               min="0" max="15" step="1" required
                                data-progression
                                data-helper="Indica numero de personal encargado de la atención y apoyo psicológico a las personas"/>
                     </div>
@@ -277,7 +370,7 @@
                                istype = "int"
                                placeholder="Cant. Policias"
                                data-parsley-trigger="focusout"
-                               min="0" step="1" required
+                               min="0" max="15" step="1" required
                                data-progression
                                data-helper="Indica numero de personal encargado de la seguridad de la zona"/>
                     </div>
@@ -324,7 +417,7 @@
                                name="personas"
                                istype = "int"
                                placeholder="Cant. personas en el edificio"
-                               min="1"  step="1" required
+                               min="1" max="30" step="1" required
                                value="1"
                                data-parsley-trigger="focusout"
                                data-progression
@@ -340,7 +433,7 @@
                                value="1"
                                istype = "int"
                                placeholder="Cant. personas en el edificio"
-                               min="1"  step="1" required
+                               min="1" max="13" step="1" required
                                data-parsley-trigger="focusout"
                                data-progression
                                data-helper="Indica la cantidad de pisos del edificio"/>
@@ -355,7 +448,7 @@
                                istype = "int"
                                placeholder="Cant. salidas del edificio"
                                value="0"
-                               min="0"  step="1" required
+                               min="0" max="10" step="1" required
                                data-parsley-trigger="focusout"
                                data-progression
                                data-helper="Indica numero de salidas adicionales disponibles para evacuar el edificio"/>
@@ -410,6 +503,34 @@
         </ul>
     </div>
 
+	  <!-- Menu estadisticas Simulacion -->
+    <div class="estadisticas">
+        <ul>
+            <li data-step="9" data-intro="8. Visualise estadisticas De la Zona.">
+                <div class="btn-group">
+                	<button id="btnEstaZona" disabled class="btn glyphicon glyphicon-tree-conifer"  aria-hidden="true"
+                        data-toggle="tooltip" data-placement="top" title="Estadisticas Zona"
+                        onclick="showModalConfig('estaZoneModal')"></button>
+                </div>        
+            </li>
+            <li data-step="10" data-intro="9. Visualise estadisticas En Los Edificios.">
+                <div class="btn-group">
+                	<button id="btnEstaEdificios" disabled class="btn glyphicon glyphicon-tower"    aria-hidden="true"
+                         data-toggle="tooltip" data-placement="top" title="Estadisticas Edificios"
+                         onclick="showModalConfig('estaEdificiosModal')"    ></button>
+                </div>        
+            </li>
+            <li data-step="11" data-intro="10. Visualise estadisticas De Los Organismos De Control Y Emergencias.">
+                <div class="btn-group">
+                	<button id="btnEstaEmergencia" disabled class="btn glyphicon glyphicon-bullhorn"  aria-hidden="true"
+                         data-toggle="tooltip" data-placement="top" title="Estadisticas Atencion Emergencia"
+          				 onclick="showModalConfig('estaAteEmerModal')"></button>
+                </div>        
+            </li>
+        </ul>
+    </div>
+	
+
     <!-- NavBar-->
     <nav class="navbar  navbar-inverse">
         <div class="container-fluid">
@@ -445,11 +566,16 @@
     </nav>
 
     <!-- Contenido pagina-->
+   <div class="progress" id="load" style="display: none">
+		  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+		    <span class="sr-only">Loading</span>
+		  </div>
+   </div>
+  
     <section class="row">
         <div id="map" class="col-lg-12"></div>
-        <div class="col-lg-4"></div>
     </section>
-
+  
     <!-- footer-->
     <div class="footer">
         © 2016 SISOBEEM v. 0.1
@@ -457,6 +583,7 @@
 
     <!-- libraries-->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAHzcs6XjIu_ILOGwMErPDLQ2BeLlwg5UU&language=es&region=CO&libraries=places"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js" type="text/javascript"></script>
     <script src="libs/js/jquery-3.1.0.min.js"></script>
     <script src="libs/js/bootstrap.min.js"></script>
     <script src="libs/js/bootstrap-slider.min.js"></script>

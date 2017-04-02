@@ -2,9 +2,6 @@
 * estilos generales
 */
 
-#map {
-  -vendor-animation-iteration-count: infinite;
-}
 
 *{
     margin: 0;
@@ -44,18 +41,29 @@
     top: 41%;
 }
 
-.social ul{
+.estadisticas{
+    position: fixed;
+    z-index: 1;
+    right: 0;
+    top: 41%;
+}
+
+.social ul, .estadisticas ul{
     list-style: none;
     margin-bottom: 0;
 }
 
-.social ul li button{
+.social ul li button,.estadisticas ul li button{
     display: inline-block !important;
     padding: 10px 15px !important;
     color: white !important;
     text-decoration: none;
     cursor: pointer;
     border-radius: 0px 4px 4px 0px;
+}
+
+.estadisticas ul li button{
+    border-radius: 4px 0px 0px 4px;
 }
 
 .social ul li button:hover{
@@ -66,15 +74,23 @@
     transition: all 500ms ease;
 }
 
-.social ul li .glyphicon-scale{
+.estadisticas ul li button:hover{
+	height: 80px;
+	background-color: black !important;
+    -moz-transition: all 500ms ease;
+    -webkit-transition: all 500ms ease;
+    transition: all 500ms ease;
+}
+
+.social ul li .glyphicon-scale, .glyphicon-bullhorn{
     background: #ffa200 !important;;
 }
 
-.social ul li .glyphicon-heart-empty{
+.social ul li .glyphicon-heart-empty, .glyphicon-tower{
     background: #ff4172 !important;;
 }
 
-.social ul li .glyphicon-user {
+.social ul li .glyphicon-user, .glyphicon-tree-conifer {
     background: #2bc8ae !important;;
 }
 
@@ -119,3 +135,44 @@
 .parsley-errors-list{
     color: red;
 }
+
+/*Estilos tabla*/
+.derrumbado{
+    background-color: rgba(227, 10, 10, 0.08);
+    padding: 10px 60px;
+    border: solid #d42525 1px;
+    border-radius: 5px;
+    color: #cc1717;
+    text-align: center;
+}
+
+.enpie{
+    background-color: rgba(10, 120, 227, 0.1);
+    padding: 10px 60px;
+    border: solid #179fcc;
+    border-radius: 5px;
+    color: #179fcc;
+    text-align: center;
+}
+table {
+    border-collapse: collapse;
+    border: solid 1px gray;
+    width: 100%;
+}
+
+th, td {
+    text-align: left;
+    border: solid 1px black;
+    padding: 8px;
+}
+
+tr:hover {
+	background-color: #ccc;
+}
+
+tr:nth-child(even){background-color: #f2f2f2}
+
+.progress {
+    height: 5px;
+    margin-bottom: 0px;
+    border-radius: 0px;

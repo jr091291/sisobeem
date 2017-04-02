@@ -13,8 +13,8 @@ map = new Map(google, "map", {
     disableDefaultUI: true,
     clickableIcons: false,
     disableDoubleClickZoom: true,
-    draggable: false,
-    scrollwheel: false
+    draggable: true,
+    scrollwheel: true
 });
 
 /*

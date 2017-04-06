@@ -452,11 +452,9 @@ function estadistica(data){
 
 function setEstadisticaEdificio(info) {
 	if(info){
-		$("#modaltitle").html("Edificio " + info.idAgent);
-		
-		var table ="";
+		var table ="<h1> "+info.idAgent;
 		if(info.derrumbado){
-			table = "<h1 class=derrumbado> Edificio Colapsado</h1>";
+			table = "<h4 class=derrumbado> Edificio Colapsado</h4>";
 		}
 		else{
 			table = "<h4 class=enpie> Edificio En Pie</h4>";
@@ -524,7 +522,7 @@ function setEstadisticaEdificio(info) {
 function generateData(callback){
 	setChatEstadistica("chartZone", 
 			["'Msg Calma", "Msg Confianza", "Msg Frustacion", "Msg Hostil", "Msg Motivación", "Msg Panico","Msg Primeros Auxilios","Msg Resguardo","Personas Atrapadas","Personas Muertas","Suicidios"],[ 
-				estadisticasZone.MsgCalma, estadisticasZone.MsgConfianza, estadisticasZone.MsgFrustacion, estadisticasZone.MsgHostilidad, estadisticasZone.MsgMotivacion, 
+				estadisticasZone.MsgDeCalma, estadisticasZone.MsgDeConfianza, estadisticasZone.MsgFrsutracion, estadisticasZone.MsgHostilidad, estadisticasZone.MsgMotivacion, 
 				estadisticasZone.MsgPanico, estadisticasZone.MsgPrimerosAux, estadisticasZone.MsgResguardo,
 				estadisticasZone.PersonasAtrapadas, estadisticasZone.PersonasMuertas, estadisticasZone.Suicidios
 			],  estadisticasZone.idAgent);
@@ -532,9 +530,9 @@ function generateData(callback){
 			var a,b,c,d,e,f,g, h, i, j, k;
 			
 			for(agent in estadisticasEdificios){
-				a += estadisticasEdificios[agent].MsgCalma; 
-				b += estadisticasEdificios[agent].MsgConfianza;
-				c += estadisticasEdificios[agent].MsgFrustacion;
+				a += estadisticasEdificios[agent].MsgDeCalma; 
+				b += estadisticasEdificios[agent].MsgDeConfianza;
+				c += estadisticasEdificios[agent].MsgFrsutracion;
 				d += estadisticasEdificios[agent].MsgHostilidad;
 				e += estadisticasEdificios[agent].MsgMotivacion;
 				f += estadisticasEdificios[agent].MsgPanico; 
@@ -550,12 +548,6 @@ function generateData(callback){
 					[a, b, c, d, e, f, g, h, i, j, k ],
 					"Edifificios");
 		
-
-			
-			setChatEstadistica("chartEdificios", 
-					["'Msg Calma", "Msg Confianza", "Msg Frustacion", "Msg Hostil", "Msg Motivación", "Msg Panico","Msg Primeros Auxilios","Msg Resguardo","Personas Atrapadas","Personas Muertas","Suicidios"],
-					[a, b, c, d, e, f, g, h, i, j, k ],
-					"Edifificios");
 			
 			data = estadisticasCordinador["seguridad"];
 			setChatEstadistica("chartSeguridad", 

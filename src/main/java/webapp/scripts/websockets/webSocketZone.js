@@ -385,6 +385,20 @@ function factoryAction(data){
 					$("#btnEstaZona").removeAttr('disabled');
 					$("#btnEstaEmergencia").removeAttr('disabled');
 					$("#btnEstaEdificios").removeAttr('disabled');
+					
+					var ctx = document.getElementById("chartSeguridad").getContext("2d");
+					ctx.canvas.width = 1000;
+					ctx.canvas.height = 450;
+					
+					var ctx = document.getElementById("chartSalud").getContext("2d");
+					ctx.canvas.width = 1000;
+					ctx.canvas.height = 500;
+					
+					var ctx = document.getElementById("chartRescate").getContext("2d");
+					ctx.canvas.width = 1000;
+					ctx.canvas.height = 500;
+					
+					
 				});
 				
 			}
@@ -532,7 +546,7 @@ function generateData(callback){
 				estadisticasZone.PersonasAtrapadas, estadisticasZone.PersonasMuertas, estadisticasZone.Suicidios
 			],  estadisticasZone.idAgent);
 	
-			var a,b,c,d,e,f,g, h, i, j, k;
+			var a =0,b=0,c=0,d=0,e=0,f=0,g=0, h=0, i=0, j=0, k=0;
 			
 			for(agent in estadisticasEdificios){
 				a += estadisticasEdificios[agent].MsgDeCalma; 

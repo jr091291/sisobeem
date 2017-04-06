@@ -8,6 +8,8 @@ var estadisticasEdificios = {};
 var estadisticasZone = {};
 var estadisticasCordinador = {};
 
+var FinEstadistica = false;
+
 var socketZone = new WebSocket(BASE_URL + "/simulacion/jadex");
 var socketZone2 = new WebSocket(BASE_URL + "/simulacion/jadex2" );
 var socketZone3 = new WebSocket(BASE_URL + "/simulacion/jadex3" );
@@ -377,14 +379,17 @@ function factoryAction(data){
 		break;
 	
 	case "FinalEstadistica":
-		if(data.data.fin){
-			generateData(function(){
-				$("#btnEstaZona").removeAttr('disabled');
-				$("#btnEstaEmergencia").removeAttr('disabled');
-				$("#btnEstaEdificios").removeAttr('disabled');
-			});
-			
-		}
+	    if(FinEstadistica == false){
+	    	if(data.data.fin){
+				generateData(function(){
+					$("#btnEstaZona").removeAttr('disabled');
+					$("#btnEstaEmergencia").removeAttr('disabled');
+					$("#btnEstaEdificios").removeAttr('disabled');
+				});
+				
+			}
+	    	FinEstadistica=true;
+	    }
 		break;
 	
 	case "derrumbe":

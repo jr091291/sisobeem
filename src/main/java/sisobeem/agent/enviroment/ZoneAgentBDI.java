@@ -44,6 +44,7 @@ import sisobeem.artifacts.Mensajero;
 import sisobeem.artifacts.Ubicacion;
 import sisobeem.artifacts.print.EdificeAction;
 import sisobeem.artifacts.print.EmergencyAction;
+import sisobeem.artifacts.print.FinEstadisticaAction;
 import sisobeem.artifacts.print.MoveAction;
 import sisobeem.artifacts.print.PersonAction;
 import sisobeem.artifacts.print.PuntoAction;
@@ -51,6 +52,7 @@ import sisobeem.artifacts.print.RouteAction;
 import sisobeem.artifacts.print.SismoAction;
 import sisobeem.artifacts.print.pojo.EdificePojo;
 import sisobeem.artifacts.print.pojo.EmergencyPojo;
+import sisobeem.artifacts.print.pojo.FinEstadisticaPojo;
 import sisobeem.artifacts.print.pojo.MovePojo;
 import sisobeem.artifacts.print.pojo.PersonPojo;
 import sisobeem.artifacts.print.pojo.PuntoPojo;
@@ -266,6 +268,7 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 	@AgentBody
 	public void body() {
+		//System.out.println("ENVIANDO FINAL DE ESTADISTICAS");
 
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(4000).get();
 		contextSendMsg = true;
@@ -285,6 +288,17 @@ public class ZoneAgentBDI extends EnviromentAgentBDI implements IMapaService, IS
 
 		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(this.simulacionConfig.getDuracion()*1000).get();
 		getEstadisticas();
+		
+		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10000).get();
+		
+		if (contador > 19) {
+			contador = 0;
+		}
+
+		System.out.println("ENVIANDO FINAL DE ESTADISTICAS");
+		FinEstadisticaAction info = new FinEstadisticaAction("FinalEstadistica", new FinEstadisticaPojo());
+		bandejaMsg.put("Zone" + contador, info.toJson());
+		contador++;
 
 	}
 

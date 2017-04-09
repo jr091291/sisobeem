@@ -458,7 +458,7 @@
 
                     <button id="addEdificiobtn" type="button" class="btn btn-success"
                         onclick="addEdificio()" disabled>Agregar Edificio</button>
-
+					
                     <button id="confAgentsEdibtn" type="button" class="btn btn-primary"
                         onclick="endConfig()" disabled>Terminar</button>
                 </div>
@@ -538,20 +538,31 @@
                     <img alt="Brand" src="img/logo.svg" alt="SISOOBEM LOGO" style="height: 213%; margin-top: -11px;">
                 </a>
             </div>
-
+            
+            
             <div class="navbar-form navbar-right" role="search">
                 <div class="form-group">
+                <select id="confPred" class="form-control" style="width: 200px !important" 
+                  data-step="12" data-intro="12. Configuraciones Predeterminadas." onchange="changeConfig('confPred')"
+                         >
+                         <option value="">Seleccione Una Opción</option>
+				  	</select>
+			
                     <input id="searchPlace" type="text" class="form-control" placeholder="Buscar Lugar"
                            data-step="2"
                            data-intro="1. Seleccione el lugar de la emergencia."
                     >
+                   
                     <span class="glyphicon glyphicon-search" aria-hidden="true" style="color: #aebdb4; margin: 0px 10px 0px -24px;"></span>
+                   
                     <div class="btn-group">
                    		<button id="runBtn" class="btn btn-warning " disabled
                             data-step="7" data-intro="5. Ejecute la simulacion."
                             data-toggle="tooltip" data-placement="bottom" title="Ejecutar simulación"
                             >Run</button>
                     </div>
+                    
+                    
                     <span id="asistenteVirtual" class="glyphicon glyphicon-off" aria-hidden="true"
                           data-step="8" data-intro="En cualquier momento usted podrá activar y desactivar el asistente virtual
                           para futuros ingresos desde este navegador"

@@ -4,6 +4,8 @@
 /*
  * Configuramos plugin jquery con animate.css
  **/
+
+
 $.fn.extend({
     animateCss: function (animationName) {
         var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
@@ -18,9 +20,19 @@ $.fn.extend({
 * */
 $(function () {
     $('[data-toggle="tooltip"]').tooltip()
+    loadConfig("confPred");
 });
 
-
+function loadConfig(selectIdDiv){
+	var conf = localStorage.sisobeemConfiguration;
+	if(conf){
+		conf= JSON.parse(conf);
+	}
+	
+	for(name in conf ){
+	      $("#"+selectIdDiv).append($("<option></option>").val(name).html(name));
+	}
+}
 /*
 * ajusta el alto del mapa
 * */
@@ -137,6 +149,7 @@ $("#formConfigEdi").parsley().on("field:validated", function(e) {
         $('#addEdificiobtn').removeAttr('disabled');
         $('#confAgentsEdibtn').removeAttr('disabled');
         $('#btnAddEdificio').removeAttr('disabled');
+        
     }
     else {
         $('#addEdificiobtn').attr('disabled', true);
@@ -228,7 +241,7 @@ $(document).ready(function(){
 
 	/*MANEJADORES DE EVENTOS*/
 	document.getElementById("runBtn").onclick = function (){
-		sendConfig(getConfiguration());
+		sendConfig(configuration);s
 		$('#runBtn').attr('disabled', true);
 	}
 	

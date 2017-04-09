@@ -3,6 +3,7 @@
 **/
 var marketList = new MarketList();
 var edificiosList = new EdificiosList();
+var configuration = {};
 
 /*
  * Inicializamos el mapa
@@ -85,7 +86,11 @@ function printEdificio(latLng, mapa){
         edificiosList.next();
     }
     else{
-        alert("edificios configurados, ya puede ejecutar la simulacion");
+    	configuration = getConfiguration();
+        if(confirm("¿Desea Guardar Esta Configuración?")){
+        	saveConfiguration();
+        };
+        
         $("#runBtn").removeAttr('disabled');
     }
 }

@@ -12,13 +12,14 @@ var Simulacion  = function(lugar ,momento, duracion, intencidad, duracionSismo) 
     this.duracionSismo = duracionSismo;
 };
 
-var Edificio = function(id, personas, ubicacion, resistencia, pisos, salidas){
+var Edificio = function(id, personas, ubicacion, resistencia, pisos, salidas, ubicacion){
     this.id;
     this.personas =  personas;
     this.ubicacion = ubicacion;
     this.resistencia = resistencia;
     this.pisos = pisos;
     this.salidas = salidas;
+    this.ubicacion = ubicacion;
 };
 
 var Persona = function(transeuntes , internos, edad , conocimiento, salud, liderazgo){
@@ -190,4 +191,74 @@ function getConfiguration(){
     per._set(getData(q2).name);
     eme._set(getData(q3).name);
     return [sim,edificios,per,eme];
+}
+
+function changeConfig(div){
+	
+	var e = $("#"+div)[0];
+	var name = e[e.selectedIndex].value;
+	var conf = JSON.parse(localStorage.sisobeemConfiguration);
+		conf = conf[name];
+	configuration = conf;
+	
+    map.getMap.fitBounds(conf[0].lugar);
+	$("#lugarTerremoto").val(conf[0].lugar);
+	$("#momentoTerremoto").val(conf[0].momento);
+	$("#duracionSimulacion").val(conf[0].duracion);
+	$("#intensidad").val(conf[0].intencidad);
+	$("#duracionTerremoto").val(conf[0].duracionSismo);
+	
+	var edificios = conf[1];
+	marketList.reset();
+	
+	for(i in edificios){
+		var e = edificios[i]; 
+		 var image = getImagen(e.pisos);
+	        latLng = e.ubicacion;
+	        var marker = new google.maps.Marker({
+	            position: latLng ,
+	            map: map.getMap,
+	            icon: image
+	        });
+	        marketList.add(e.id, marker);
+	}
+	
+	var p = conf[2];
+	
+	$("#numeroPersonas").val(p.transeuntes);
+	$("#porcConoZona").val(p.conocimiento);
+	$("#porcSalud").val(p.salud);
+	$("#porcAdultos").val(p.edad);
+	$("#porcLider").val( p.liderazgo);
+	
+	var e = conf[3];
+	
+	$("#porcAtenEmer").val(e.tiempoRespuesta);
+	$("#cantidadAisSeg").val(e.PersonalSeguridad);
+	$("#cantidadSaludBas").val(e.personalSalud);
+	$("#cantidadBusResc").val(e.personalBusquedaRescate);
+	
+	 $('#btnConfSimulacion').removeAttr('disabled');
+	 $('#btnConAgentsEmer').removeAttr('disabled');
+     $('#btnConAgents').removeAttr('disabled');
+     $("#runBtn").removeAttr('disabled');
+}
+
+
+
+function saveConfiguration(){
+	var x = localStorage.sisobeemConfiguration;
+	if(!x){
+		x = {};
+	}
+	
+	var name = prompt("Por Favor Ingrese Un Nombre De Configuración");
+	if(x[name]){
+		if(!confirm("Esta Confuguración ya fue registrada, Desea Sobrescribirla ?", name)){
+			return;
+		}
+	}
+	x[name] =  getConfiguration();
+	localStorage.setItem("sisobeemConfiguration", JSON.stringify(x));
+	alert("Configuracion Disponible Para Proximas Simulaciones En Este Navegador." );
 }

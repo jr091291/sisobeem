@@ -2,6 +2,9 @@
  * Created by Ricardo on 31/08/2016.
  */
 var BASE_URL = "ws://localhost:8080/sisobeem";
+
+var AgentsMarkets = {};
+
 var intervalSismo = null;
 var temblor = false;
 var estadisticasEdificios = {};
@@ -71,6 +74,13 @@ var socketZone58 = new WebSocket(BASE_URL + "/simulacion/jadex58" );
 var socketZone59 = new WebSocket(BASE_URL + "/simulacion/jadex59" );
 var socketZone60 = new WebSocket(BASE_URL + "/simulacion/jadex60" );
 var socketZoneZONE = new WebSocket(BASE_URL + "/simulacion/jadexZONE");
+
+var Route = function Route(agent, origen,destino, coordenadas){
+	this.agent = agent;
+	this.origen = origen;
+	this.destino = destino;
+	this.coordenadas = coordenadas;
+}
 
 socketZone.onmessage = function(event) {
 	factoryAction(JSON.parse(event.data));
@@ -770,15 +780,6 @@ function mensaje(data, icono){
 			changeIcon(market, icon, map.getMap);
 		}, 2000);
 	}
-}
-
-var AgentsMarkets = {};
-
-var Route = function Route(agent, origen,destino, coordenadas){
-	this.agent = agent;
-	this.origen = origen;
-	this.destino = destino;
-	this.coordenadas = coordenadas;
 }
 
 /* Funciones de acciones*/
